@@ -14,6 +14,20 @@
     "https://*.hubspot.com/*",
     "https://*.hubspot.com/*"
   ],
+  "page_action": {
+    "default_icon": {
+      "16": "icons/rc16.png",
+      "32": "icons/rc32.png",
+      "48": "icons/rc48.png",
+      "128": "icons/rc128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/rc16.png",
+    "32": "icons/rc32.png",
+    "48": "icons/rc48.png",
+    "128": "icons/rc128.png"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -30,7 +44,6 @@
     ],
     "persistent": true
   },
-  "browser_action": {},
   "content_security_policy": "script-src 'self' https://apps.ringcentral.com/integration/ringcentral-embeddable/0.1.0/index.html; object-src 'self'",
   "manifest_version": 2
 }
