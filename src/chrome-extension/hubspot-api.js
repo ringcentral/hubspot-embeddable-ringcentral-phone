@@ -3,7 +3,7 @@
  */
 
 import {HSConfig} from './custom-app-config'
-import {createElementFromHTML} from './helpers'
+import {createElementFromHTML, findParentBySel} from './helpers'
 import fetch, {jsonHeader} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
@@ -60,6 +60,57 @@ function buildPhone(contact) {
       }
     ]
     : []
+}
+
+/**
+ * search contacts by number match
+ * @param {array} contacts
+ * @param {string} keyword
+ */
+function findMatchContacts(contacts, numbers) {
+  let res = contacts.filter(contact => {
+    let {
+      phoneNumbers
+    } = contact
+    return _.find(phoneNumbers, n => {
+      return numbers.includes(n.phoneNumber)
+    })
+  })
+  return res.reduce((prev, it) => {
+    let phone = _.find(it.phoneNumbers, n => {
+      return numbers.includes(n.phoneNumber)
+    })
+    let num = phone.phoneNumber
+    if (!prev[num]) {
+      prev[num] = []
+    }
+    let res = {
+      entityType: it.type,
+      name: it.name,
+      phoneNumbers: it.phoneNumbers
+    }
+    prev[num].push(res)
+    return prev
+  }, {})
+}
+
+
+/**
+ * search contacts by keyword
+ * @param {array} contacts
+ * @param {string} keyword
+ */
+function searchContacts(contacts, keyword) {
+  return contacts.filter(contact => {
+    let {
+      name,
+      phoneNumbers
+    } = contact
+    return name.includes(keyword) ||
+      _.find(phoneNumbers, n => {
+        return n.phoneNumber.includes(keyword)
+      })
+  })
 }
 
 /**
@@ -129,7 +180,7 @@ async function getContacts() {
       ...res.contacts
     ]
   }
-  return contacts
+  return formatContacts(contacts)
 }
 
 function getRefreshToken() {
@@ -237,7 +288,7 @@ function showAuthBtn() {
 function handleAuthClick(e) {
   let {target} = e
   let {classList}= target
-  if (classList.contains('rc-auth-btn')) {
+  if (findParentBySel(target, '.rc-auth-btn')) {
     doAuth()
   } else if (classList.contains('rc-dismiss-auth')) {
     hideAuthBtn()
@@ -294,6 +345,8 @@ function renderAuthPanel() {
  */
 async function handleRCEvents(e) {
   let {data} = e
+  console.log('data')
+  console.log(data)
   if (!data) {
     return
   }
@@ -328,7 +381,6 @@ async function handleRCEvents(e) {
   }
   else if (path === '/contacts') {
     let contacts = await getContacts()
-    contacts = formatContacts(contacts)
     rc.postMessage({
       type: 'rc-post-message-response',
       responseId: data.requestId,
@@ -339,32 +391,28 @@ async function handleRCEvents(e) {
     }, '*')
   }
   else if (path === '/contacts/search') {
-    rc.postMessage({
-      type: 'rc-post-message-response',
-      responseId: data.requestId,
-      response: {
-        data: []
-      }
-    }, '*')
-  }
-  else if (path === '/contacts/match') {
-    const matchedContacts = {
-      '+12165325078': [
-        {
-          entityType: serviceName,
-          name: 'TestService 1',
-          phoneNumbers: [{
-            phoneNumber: '+12165325078',
-            phoneType: 'directPhone'
-          }]
-        }
-      ]
+    let contacts = await getContacts()
+    let keyword = _.get(data, 'body.searchString')
+    if (keyword) {
+      contacts = searchContacts(contacts, keyword)
     }
     rc.postMessage({
       type: 'rc-post-message-response',
       responseId: data.requestId,
       response: {
-        data: matchedContacts
+        data: contacts
+      }
+    }, '*')
+  }
+  else if (path === '/contacts/match') {
+    let contacts = await getContacts()
+    let phoneNumbers = _.get(data, 'body.phoneNumbers') || []
+    let res = findMatchContacts(contacts, phoneNumbers)
+    rc.postMessage({
+      type: 'rc-post-message-response',
+      responseId: data.requestId,
+      response: {
+        data: res
       }
     }, '*')
   }
