@@ -1,0 +1,77 @@
+@require '../css/box'
+
+.rc-auth-btn
+.call-with-ringccentral-btn
+  display inline-block
+  vertical-align middle
+  font-size .75rem
+  line-height .75rem
+  padding .5625rem 1rem
+  color #333
+  border-radius .1875rem
+  cursor pointer
+  border 1px solid #aaa
+  background #fff
+.rc-tooltip
+  position absolute
+  left 0
+  top 0
+  display none
+  z-index 100
+  .call-with-ringccentral-btn
+    position relative
+    &:before
+      content ''
+      position absolute
+      bottom -10px
+      left 10px
+      border-width 10px 10px 0
+      border-style solid
+      border-color #aaa transparent
+      display block
+      width 0
+    &:after
+      content ''
+      position absolute
+      bottom -9px
+      left 11px
+      border-width 9px 9px 0
+      border-style solid
+      border-color #fff transparent
+      display block
+      width 0
+
+.animate
+  transition all 0.5s
+
+.rc-auth-wrap
+.rc-auth-button-wrap
+  width 500px
+  padding 10px
+  overflow hidden
+  position fixed
+  z-index 100000
+  left 0
+  top calc(50% - 80px)
+  background #fff
+  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+.rc-dismiss-auth
+  cursor pointer
+  font-size 16px
+  color #777
+  &:hover
+    color #08c
+
+.rc-auth-frame
+.rc-auth-wrap
+  width 500px
+  height 500px
+
+.rc-auth-wrap
+  top 60px
+  z-index 100000
+  padding 0
+
+.rc-hide-to-side
+  width 0
+  padding 0

@@ -1,0 +1,32 @@
+{
+  "presets": [
+    "react",
+    ["env", {
+      "targets": {
+        "chrome": 58,
+        "node": "current"
+      }
+    }]
+  ],
+  "plugins": [
+    "transform-class-properties",
+    "transform-object-rest-spread",
+    "transform-decorators-legacy",
+    "lodash",
+    "syntax-dynamic-import",
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": true
+      }
+    ],
+    [
+      "transform-runtime",
+      {
+        "polyfill": false,
+        "regenerator": false
+      }
+    ]
+  ]
+}

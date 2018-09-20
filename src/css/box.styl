@@ -1,0 +1,149 @@
+$prefix = 'rc-'
+for $i, $index in 5 16 32
+  
+  //padding
+  .{$prefix}pd{$index+1}
+    padding ($i)px
+    
+  .{$prefix}pd{$index+1}x
+    padding-left ($i)px
+    padding-right ($i)px
+
+  .{$prefix}pd{$index+1}l
+    padding-left ($i)px
+  
+  .{$prefix}pd{$index+1}r
+    padding-right ($i)px
+    
+  .{$prefix}pd{$index+1}y
+    padding-top ($i)px
+    padding-bottom ($i)px
+
+  .{$prefix}pd{$index+1}t
+    padding-top ($i)px
+  
+  .{$prefix}pd{$index+1}b
+    padding-bottom ($i)px
+
+  //margin
+  .{$prefix}mg{$index+1}
+    margin ($i)px
+    
+  .{$prefix}mg{$index+1}x
+    margin-left ($i)px
+    margin-right ($i)px
+
+  .{$prefix}mg{$index+1}l
+    margin-left ($i)px
+  
+  .{$prefix}mg{$index+1}r
+    margin-right ($i)px
+    
+  .{$prefix}mg{$index+1}y
+    margin-top ($i)px
+    margin-bottom ($i)px
+
+  .{$prefix}mg{$index+1}t
+    margin-top ($i)px
+  
+  .{$prefix}mg{$index+1}b
+    margin-bottom ($i)px
+
+.{$prefix}mg-auto
+  margin-left auto
+  margin-right auto
+.{$prefix}mg0
+  margin 0
+.{$prefix}pd0
+  padding 0
+  
+.{$prefix}block
+  display block
+
+.{$prefix}inline
+  display inline-block
+
+.{$prefix}iblock
+  display inline-block
+  vertical-align middle
+
+.{$prefix}ibblock
+  display inline-block
+  vertical-align baseline
+  
+.{$prefix}itblock
+  display inline-block
+  vertical-align top
+
+.{$prefix}border
+  border 1px solid #e4e4e4
+
+.{$prefix}borderl
+  border-left 1px solid #e4e4e4
+
+.{$prefix}borderr
+  border-right 1px solid #e4e4e4
+
+.{$prefix}borderb
+  border-bottom 1px solid #e4e4e4
+  &.{$prefix}dashed
+    border-bottom 1px dashed #e4e4e4
+
+.{$prefix}bordert
+  border-top 1px solid #e4e4e4
+
+.{$prefix}borderr
+  border-right 1px solid #e4e4e4
+
+.{$prefix}borderl
+  border-left 1px solid #e4e4e4
+
+.{$prefix}border-dashed
+  border-style dashed
+.{$prefix}border-dotted
+  border-style dotted
+
+.{$prefix}hide,
+.{$prefix}hide1, 
+.{$prefix}hide2
+  display none
+
+.{$prefix}hidden
+  visibility hidden
+
+.{$prefix}fleft
+  float left
+
+.{$prefix}fright
+  float right
+
+.{$prefix}fcenter
+  float center
+
+.{$prefix}fix:before,
+.{$prefix}fix:after
+  content " "
+  display table
+
+.{$prefix}fix
+  &:after
+    clear both
+    
+.{$prefix}overhide
+  overflow hidden
+
+.{$prefix}overscroll
+  overflow scroll
+
+.{$prefix}overscroll-y
+  overflow-y scroll
+
+.{$prefix}relative
+  position relative
+.{$prefix}absolute
+  position absolute
+.{$prefix}pointer
+  cursor pointer
+
+.{$prefix}spin-90
+  transform rotate(90deg)

@@ -1,0 +1,37 @@
+# Logs
+*.log
+.DS_Store
+*.rdb
+
+# config etc
+.idea/
+/temp/
+.vscode/
+/dist/content.js*
+package-lock.json
+/config.js
+
+*.pid
+*.seed
+*.gz
+.project
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# node-waf configuration
+.lock-wscript
+
+# Dependency directory
+/node_modules/
+
+npm-debug.log*
+
+/logs/
+/pids/
+
+docs/esdoc
+yarn.lock
