@@ -20,6 +20,9 @@ let refreshToken
 let accessToken
 let rcLogined = false
 let tokenHandler
+let cache = {}
+let cacheKey = 'contacts'
+const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
 const authUrl = `${appServerHS}/oauth/authorize?` +
@@ -167,6 +170,12 @@ async function getContacts() {
     showAuthBtn()
     return []
   }
+  let now = + new Date()
+  let cacheLastTime = _.get(cache, `${cacheKey}.time`)
+  if (cacheLastTime && now - cacheLastTime < cacheTime) {
+    console.log('return cache')
+    return cache[cacheKey].value
+  }
   let contacts = []
   let res = await getContact()
   contacts = [
@@ -180,7 +189,12 @@ async function getContacts() {
       ...res.contacts
     ]
   }
-  return formatContacts(contacts)
+  let final = formatContacts(contacts)
+  cache[cacheKey] = {
+    time: + new Date(),
+    value: final
+  }
+  return final
 }
 
 function getRefreshToken() {
