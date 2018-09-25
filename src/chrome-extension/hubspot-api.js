@@ -4,15 +4,16 @@
 
 import {formatNumber} from 'libphonenumber-js'
 import {HSConfig} from './custom-app-config'
+import * as ls from './ls'
 import {
   createElementFromHTML,
   findParentBySel,
   callWithRingCentral
 } from './helpers'
-import fetch, {jsonHeader} from '../common/fetch'
+import fetch, {jsonHeader, handleErr} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
-
+window.localStorage.setItem('sfd', 'sdfsdf')
 let {
   appKeyHS,
   appSecretHS,
@@ -21,8 +22,17 @@ let {
   appRedirectHS
 } = HSConfig
 
-let refreshToken
-let accessToken
+let lsKeys = {
+  accessTokenLSKey: 'third-party-access-token',
+  refreshTokenLSKey: 'third-party-refresh-token',
+  expireTimeLSKey: 'third-party-expire-time'
+}
+let local = {
+  refreshToken: null,
+  accessToken: null,
+  expireTime: null
+}
+
 let rcLogined = false
 let tokenHandler
 let cache = {}
@@ -37,14 +47,27 @@ const authUrl = `${appServerHS}/oauth/authorize?` +
 const blankUrl = 'about:blank'
 const serviceName = 'HubSpot'
 
+async function updateToken(newToken, type = 'accessToken') {
+  if (!newToken){
+    await ls.remove(_.values(lsKeys))
+  } else if (_.isString(newToken)) {
+    local[type] = newToken
+    let key = lsKeys[`${type}LSKey`]
+    await ls.set(key, newToken)
+  } else {
+    Object.assign(local, newToken)
+    await ls.set(newToken)
+  }
+}
+
 function formatPhone(phone) {
   return formatNumber(phone, phoneFormat)
 }
 
 function hideContactInfoPanel() {
-  document
+  let dom = document
     .querySelector('.rc-contact-panel')
-    .classList.add('rc-hide-contact-panel')
+  dom && dom.classList.add('rc-hide-contact-panel')
 }
 
 /**
@@ -187,17 +210,24 @@ function buildPhone(contact) {
  * @param {string} keyword
  */
 function findMatchContacts(contacts, numbers) {
-  let formatedNumbers = numbers.map(n => {
-    return formatPhone(n)
+  let {formatedNumbers, formatNumbersMap} = numbers.reduce((prev, n) => {
+    let nn = formatPhone(n)
+    prev.formatedNumbers.push(nn)
+    prev.formatNumbersMap[nn] = n
+    return prev
+  }, {
+    formatedNumbers: [],
+    formatNumbersMap: {}
   })
   let res = contacts.filter(contact => {
     let {
       phoneNumbers
     } = contact
     return _.find(phoneNumbers, n => {
-      return formatedNumbers.includes(
-        formatPhone(n.phoneNumber)
-      )
+      return formatedNumbers
+        .includes(
+          formatPhone(n.phoneNumber)
+        )
     })
   })
   return res.reduce((prev, it) => {
@@ -207,15 +237,19 @@ function findMatchContacts(contacts, numbers) {
       )
     })
     let num = phone.phoneNumber
-    if (!prev[num]) {
-      prev[num] = []
+    let key = formatNumbersMap[
+      formatPhone(num)
+    ]
+    console.log(key, 'key')
+    if (!prev[key]) {
+      prev[key] = []
     }
     let res = {
       entityType: it.type,
       name: it.name,
       phoneNumbers: it.phoneNumbers
     }
-    prev[num].push(res)
+    prev[key].push(res)
     return prev
   }, {})
 }
@@ -265,10 +299,23 @@ async function getContact(
   let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname`
   let res = await fetch.get(url, {
     headers: {
-      Authorization: `Bearer ${accessToken}`,
+      Authorization: `Bearer ${local.accessToken}`,
       ...jsonHeader
+    },
+    handleErr: (res) => {
+      let {status} = res
+      if (status === 401) {
+        return {
+          error: 'unauthed'
+        }
+      } else if (status > 304) {
+        handleErr(res)
+      }
     }
   })
+  if (res && res.error === 'unauthed') {
+    await updateToken(null)
+  }
   if (res && res.contacts) {
     return res
   } else {
@@ -289,7 +336,7 @@ async function getContacts() {
   if (!rcLogined) {
     return []
   }
-  if (!accessToken) {
+  if (!local.accessToken) {
     showAuthBtn()
     return []
   }
@@ -322,7 +369,7 @@ async function getContacts() {
 
 function getRefreshToken() {
   getAuthToken({
-    refresh_token: refreshToken
+    refresh_token: local.refreshToken
   })
 }
 
@@ -374,8 +421,12 @@ async function getAuthToken({
     console.log('get token failed')
     console.log(res)
   } else {
-    accessToken = res.access_token
-    refreshToken = res.refresh_token
+    let expireTime = res.expires_in * .8 + (+new Date)
+    await updateToken({
+      [lsKeys.accessTokenLSKey]: res.access_token,
+      [lsKeys.refreshTokenLSKey]: res.refresh_token,
+      [lsKeys.expireTimeLSKey]: expireTime
+    })
     notifyRCAuthed()
     tokenHandler = setTimeout(
       getRefreshToken,
@@ -384,14 +435,14 @@ async function getAuthToken({
   }
 }
 
-function unAuth() {
-  accessToken = null
+async function unAuth() {
+  await updateToken(null)
   clearTimeout(tokenHandler)
   notifyRCAuthed(false)
 }
 
 function doAuth() {
-  if (accessToken) {
+  if (local.accessToken) {
     return
   }
   hideAuthBtn()
@@ -496,7 +547,7 @@ async function handleRCEvents(e) {
   if (
     type === 'rc-route-changed-notify' &&
     path === '/contacts' &&
-    !accessToken
+    !local.accessToken
   ) {
     showAuthBtn()
   } else if (
@@ -513,7 +564,7 @@ async function handleRCEvents(e) {
   let rc = document.querySelector('#rc-widget-adapter-frame').contentWindow
 
   if (data.path === '/authorize') {
-    if (accessToken) {
+    if (local.accessToken) {
       unAuth()
     } else {
       doAuth()
@@ -568,15 +619,31 @@ async function handleRCEvents(e) {
  * init auth event, dom render etc
  */
 let authEventInited = false
-export function initHubSpotAPI() {
+export async function initHubSpotAPI() {
   if (authEventInited) {
     return
   }
   authEventInited = true
+  //hanlde contacts events
+  window.addEventListener('message', handleRCEvents)
+  let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
+  let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
+  let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
+  if (expireTime && expireTime < (+new Date())) {
+    local = {
+      refreshToken,
+      accessToken
+    }
+  }
 
   //get the html ready
   renderAuthPanel()
   renderAuthButton()
+
+  if (local.refreshToken) {
+    notifyRCAuthed()
+    getRefreshToken()
+  }
 
   //wait for auth token
   window.addEventListener('message', function (e) {
@@ -610,10 +677,6 @@ export function initHubSpotAPI() {
         authorized: false
       }
     }, '*')
-
-  //hanlde contacts events
-  window.addEventListener('message', handleRCEvents)
-
 
 }
 

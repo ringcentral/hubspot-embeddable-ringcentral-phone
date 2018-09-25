@@ -13,7 +13,7 @@ function parseResponse(response) {
   return isJsonResult ? response.json() : response.text()
 }
 
-async function handleErr(res) {
+export async function handleErr(res) {
   console.log(res)
   let text = _.isFunction(res.text)
     ? await res.text()
