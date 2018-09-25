@@ -19,27 +19,7 @@ chrome.pageAction.onClicked.addListener(function (tab) {
   }
 })
 
-// chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-//   let {
-//     method,
-//     key,
-//     value
-//   } = request
-//   if (method === 'getLocalStorage') {
-//     sendResponse({
-//       value: localStorage.getItem(key),
-//       key
-//     })
-//   } else if (method === 'setLocalStorage') {
-//     localStorage.setItem(key, value)
-//     sendResponse({})
-//   } else if (method === 'removeLocalStorage') {
-//     localStorage.removeItem(key)
-//     sendResponse({})
-//   } else {
-//     sendResponse({})
-//   }
-// })
+
 
 chrome.windows.onRemoved.addListener(function (id) {
   if (newWindow && newWindow.id === id) {

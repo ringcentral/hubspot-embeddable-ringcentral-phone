@@ -96,15 +96,15 @@ function getRCTooltip(phoneNumber) {
  * build tooltip postition style from event
  * @param {*} e
  */
-function buildStyle(e) {
-  let {clientX, clientY} = e
+function buildStyle(e, dom) {
+  let {clientX} = e
+  let {
+    top
+  } = dom.getBoundingClientRect()
   if (clientX > window.innerWidth - 120) {
     clientX = window.innerWidth - 120
   }
-  if (clientY > window.innerHeight - 34) {
-    clientX = window.innerHeight - 34
-  }
-  return `left:${clientX + 3}px;top:${clientY - 34}px;display:block;`
+  return `left:${clientX + 3}px;top:${top - 34}px;display:block;`
 }
 
 /**
@@ -133,7 +133,7 @@ const handleAddRCBtn = (e) => {
   currentRow = dom
   let {tooltip, isShowing} = getRCTooltip(text)
   if (!isShowing) {
-    tooltip.setAttribute('style', buildStyle(e))
+    tooltip.setAttribute('style', buildStyle(e, dom))
   }
 }
 

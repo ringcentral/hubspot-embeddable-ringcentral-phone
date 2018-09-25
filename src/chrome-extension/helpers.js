@@ -1,10 +1,10 @@
 import {parseNumber} from 'libphonenumber-js'
 import _ from 'lodash'
 
-export function checkPhoneNumber(phone) {
+export function checkPhoneNumber(phone, country = 'US') {
   return !_.isEqual(
     {},
-    parseNumber(phone)
+    parseNumber(phone, country)
   )
 }
 
