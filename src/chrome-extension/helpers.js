@@ -1,6 +1,11 @@
-//from https://github.com/tejasmanohar/is-phone-number/blob/master/index.js
+import {parseNumber} from 'libphonenumber-js'
+import _ from 'lodash'
+
 export function checkPhoneNumber(phone) {
-  return /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]\d{4}$/.test(phone)
+  return !_.isEqual(
+    {},
+    parseNumber(phone)
+  )
 }
 
 export function isCallTab(href) {

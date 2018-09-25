@@ -2,8 +2,13 @@
  * hubspot api related
  */
 
+import {formatNumber} from 'libphonenumber-js'
 import {HSConfig} from './custom-app-config'
-import {createElementFromHTML, findParentBySel} from './helpers'
+import {
+  createElementFromHTML,
+  findParentBySel,
+  callWithRingCentral
+} from './helpers'
 import fetch, {jsonHeader} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
@@ -22,6 +27,7 @@ let rcLogined = false
 let tokenHandler
 let cache = {}
 let cacheKey = 'contacts'
+const phoneFormat = 'National'
 const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
@@ -30,6 +36,116 @@ const authUrl = `${appServerHS}/oauth/authorize?` +
 `&redirect_uri=${appRedirectHSCoded}&scope=contacts`
 const blankUrl = 'about:blank'
 const serviceName = 'HubSpot'
+
+function formatPhone(phone) {
+  return formatNumber(phone, phoneFormat)
+}
+
+function hideContactInfoPanel() {
+  document
+    .querySelector('.rc-contact-panel')
+    .classList.add('rc-hide-contact-panel')
+}
+
+/**
+ * click contact info panel event handler
+ * @param {Event} e
+ */
+function onClickContactPanel (e) {
+  let {target} = e
+  let {classList} = target
+  if (classList.contains('rc-close-contact')) {
+    document
+      .querySelector('.rc-contact-panel')
+      .classList.add('rc-hide-contact-panel')
+  } else if (
+    classList.contains('rc-phone-span')
+  ) {
+    callWithRingCentral(
+      (target.textContent || '').trim()
+    )
+  }
+}
+
+/**
+ * show caller/callee info
+ * @param {Object} call
+ */
+async function showContactInfoPanel(call) {
+  if (call.telephonyStatus === 'NoCall') {
+    return
+  }
+  let isInbound = call.direction === 'Inbound'
+  let phone = isInbound
+    ? _.get(
+      call,
+      'from.phoneNumber'
+    )
+    : _.get(call, 'to.phoneNumber')
+  if (!phone) {
+    return
+  }
+  phone = formatPhone(phone)
+  let contacts = await getContacts()
+  let contact = _.find(contacts, c => {
+    return _.find(c.phoneNumbers, p => {
+      return formatPhone(p.phoneNumber) === phone
+    })
+  })
+  if (!contact) {
+    return
+  }
+  let title = isInbound
+    ? 'Inbound call from:'
+    : 'Calling contact:'
+  let {
+    name,
+    phoneNumbers
+  } = contact
+  let phoneNumbersText = phoneNumbers.map(
+    p => {
+      return `
+        <span class="rc-phone-span">
+          ${p.phoneNumber}
+        </span>
+      `
+    }
+  )
+    .join(', ')
+  let elem = createElementFromHTML(
+    `<div class="rc-contact-panel animate rc-hide-contact-panel">
+      <div class="rc-pd2">
+        <div class="rc-contact-header rc-pd1y">
+          <span title="close" class="rc-close-contact">
+          &times
+          </span>
+        </div>
+        <h2>${title}</h2>
+        <div class="rc-contact-body">
+          <div class="rc-item-label">
+            name:
+          </div>
+          <div class="rc-item-value">
+            ${name}
+          </div>
+          <div class="rc-item-label">
+          phone:
+        </div>
+        <div class="rc-item-value">
+          ${phoneNumbersText}
+        </div>
+      </div>
+    </div>
+    `
+  )
+  elem.onclick = onClickContactPanel
+  let old = document
+    .querySelector('.rc-contact-panel')
+  old && old.remove()
+
+  document.body.appendChild(elem)
+  elem.classList.remove('rc-hide-contact-panel')
+}
 
 /**
  * build name from contact info
@@ -71,17 +187,24 @@ function buildPhone(contact) {
  * @param {string} keyword
  */
 function findMatchContacts(contacts, numbers) {
+  let formatedNumbers = numbers.map(n => {
+    return formatPhone(n)
+  })
   let res = contacts.filter(contact => {
     let {
       phoneNumbers
     } = contact
     return _.find(phoneNumbers, n => {
-      return numbers.includes(n.phoneNumber)
+      return formatedNumbers.includes(
+        formatPhone(n.phoneNumber)
+      )
     })
   })
   return res.reduce((prev, it) => {
     let phone = _.find(it.phoneNumbers, n => {
-      return numbers.includes(n.phoneNumber)
+      return formatedNumbers.includes(
+        formatPhone(n.phoneNumber)
+      )
     })
     let num = phone.phoneNumber
     if (!prev[num]) {
@@ -359,12 +482,13 @@ function renderAuthPanel() {
  */
 async function handleRCEvents(e) {
   let {data} = e
-  console.log('data')
-  console.log(data)
+  console.log('======data======')
+  console.log(data, data.type, data.path)
+  console.log('======data======')
   if (!data) {
     return
   }
-  let {type, loggedIn, path} = data
+  let {type, loggedIn, path, call} = data
   if (type ===  'rc-login-status-notify') {
     console.log('rc logined', loggedIn)
     rcLogined = loggedIn
@@ -375,6 +499,13 @@ async function handleRCEvents(e) {
     !accessToken
   ) {
     showAuthBtn()
+  } else if (
+    type === 'rc-active-call-notify' ||
+    type === 'rc-call-start-notify'
+  ) {
+    showContactInfoPanel(call)
+  } else if ('rc-call-end-notify' === type) {
+    hideContactInfoPanel()
   }
   if (type !== 'rc-post-message-request') {
     return
@@ -422,6 +553,7 @@ async function handleRCEvents(e) {
     let contacts = await getContacts()
     let phoneNumbers = _.get(data, 'body.phoneNumbers') || []
     let res = findMatchContacts(contacts, phoneNumbers)
+    console.log('matches', res)
     rc.postMessage({
       type: 'rc-post-message-response',
       responseId: data.requestId,

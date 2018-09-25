@@ -82,5 +82,43 @@ body .Adapter_root.Adapter_right
   left 0
 
 .rc-hide-to-side
-  width 0
+  left -500px
   padding 0
+
+.rc-contact-panel
+  position fixed
+  width 300px
+  left 0
+  top 0
+  bottom 0
+  overflow-y scroll
+  background #fff
+  padding-top 50px
+  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+
+.rc-hide-contact-panel
+  left -300px
+
+.rc-contact-header
+  text-align right
+
+.rc-close-contact
+  font-size 20px
+  color #333
+  cursor pointer
+  &:hover
+    color #08c
+
+.rc-item-value
+.rc-item-label
+  padding 5px 0
+
+.rc-item-value
+  font-weight bold
+.rc-phone-span
+  display block
+  padding 5px
+  color #08c
+  cursor pointer
+  &:hover
+    color #333
