@@ -55,6 +55,7 @@ const serviceName = 'HubSpot'
 async function updateToken(newToken, type = 'accessToken') {
   if (!newToken){
     await ls.remove(_.values(lsKeys))
+    local = {}
   } else if (_.isString(newToken)) {
     local[type] = newToken
     let key = lsKeys[`${type}LSKey`]

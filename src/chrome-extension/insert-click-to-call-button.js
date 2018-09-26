@@ -84,6 +84,9 @@ class insertHandler {
 
   addCallWithRingCentralButton = (phoneNumber) => {
     let {elem, insertMethod} = this.getParentDom()
+    if (!elem) {
+      return
+    }
     let callByRingCentralBtn = createElementFromHTML(createCallBtnHtml(RCBTNCLS2))
 
     callByRingCentralBtn.onclick = () => {
