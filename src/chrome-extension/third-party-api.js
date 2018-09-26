@@ -257,7 +257,8 @@ function findMatchContacts(contacts, numbers) {
       prev[key] = []
     }
     let res = {
-      entityType: it.type,
+      id: it.id, // id to identify third party contact
+      type: serviceName, // need to same as service name
       name: it.name,
       phoneNumbers: it.phoneNumbers
     }
