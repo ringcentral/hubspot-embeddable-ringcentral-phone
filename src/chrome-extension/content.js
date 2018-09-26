@@ -1,7 +1,17 @@
 
 
-import main from './main'
-import appConfigQuery from './custom-app-config'
+import main from './init'
+import {ringCentralConfigs} from './app-config'
+
+let {
+  appKey,
+  appServer
+} = ringCentralConfigs
+
+let appConfigQuery = ''
+if (appKey || appServer) {
+  appConfigQuery = `?appKey=${appKey}&appServer=${encodeURIComponent(appServer)}`
+}
 
 /* eslint-disable-next-line */
 ;(function() {

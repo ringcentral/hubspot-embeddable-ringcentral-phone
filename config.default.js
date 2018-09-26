@@ -1,16 +1,31 @@
 const os = require('os')
 const extend = require('recursive-assign')
 let config = {
+
+  //dev related
   devCPUCount: os.cpus().length,
   devPort: 8020,
-  appKey: '',
-  appServer: '',
+
+  //build options
   minimize: false,
-  appKeyHS: '06b1ce1e-7059-4114-a517-4c8b3218c029',
-  appSecretHS: 'a7e6a9b6-0791-4d0d-a01c-fe66677b2f32',
-  appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
-  appServerHS: 'https://app.hubspot.com',
-  apiServerHS: 'https://api.hubspot.com'
+
+  //congfigs to build app
+
+  //ringcentral config
+  ringCentralConfigs: {
+    appKey: '',
+    appServer: ''
+  },
+
+  //for third party related
+  thirdPartyConfigs: {
+    appKeyHS: '06b1ce1e-7059-4114-a517-4c8b3218c029',
+    appSecretHS: 'a7e6a9b6-0791-4d0d-a01c-fe66677b2f32',
+    appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
+    appServerHS: 'https://app.hubspot.com',
+    apiServerHS: 'https://api.hubspot.com'
+  }
+
 }
 
 try {

@@ -1,9 +1,13 @@
 /**
- * hubspot api related
+ * third party api
+ * you can do something like:
+ * 1. sync thirdparty contacts to ringcentral contact list
+ * 2. when calling or call inbound, show caller/callee info panel
+ * 3. sync call log to third party system
  */
 
 import {formatNumber} from 'libphonenumber-js'
-import {HSConfig} from './custom-app-config'
+import {thirdPartyConfigs} from './app-config'
 import * as ls from './ls'
 import {
   createElementFromHTML,
@@ -13,14 +17,14 @@ import {
 import fetch, {jsonHeader, handleErr} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
-window.localStorage.setItem('sfd', 'sdfsdf')
+chrome.storage.local.clear()
 let {
   appKeyHS,
   appSecretHS,
   appServerHS,
   apiServerHS,
   appRedirectHS
-} = HSConfig
+} = thirdPartyConfigs
 
 let lsKeys = {
   accessTokenLSKey: 'third-party-access-token',
@@ -33,6 +37,7 @@ let local = {
   expireTime: null
 }
 
+let authEventInited = false
 let rcLogined = false
 let tokenHandler
 let cache = {}
@@ -56,7 +61,12 @@ async function updateToken(newToken, type = 'accessToken') {
     await ls.set(key, newToken)
   } else {
     Object.assign(local, newToken)
-    await ls.set(newToken)
+    let ext = Object.keys(newToken)
+      .reduce((prev, key) => {
+        prev[lsKeys[`${key}LSKey`]] = newToken[key]
+        return prev
+      }, {})
+    await ls.set(ext)
   }
 }
 
@@ -423,9 +433,9 @@ async function getAuthToken({
   } else {
     let expireTime = res.expires_in * .8 + (+new Date)
     await updateToken({
-      [lsKeys.accessTokenLSKey]: res.access_token,
-      [lsKeys.refreshTokenLSKey]: res.refresh_token,
-      [lsKeys.expireTimeLSKey]: expireTime
+      accessToken: res.access_token,
+      refreshToken: res.refresh_token,
+      expireTime: expireTime
     })
     notifyRCAuthed()
     tokenHandler = setTimeout(
@@ -615,11 +625,7 @@ async function handleRCEvents(e) {
   }
 }
 
-/**
- * init auth event, dom render etc
- */
-let authEventInited = false
-export async function initHubSpotAPI() {
+export default async function initThirdPartyApi () {
   if (authEventInited) {
     return
   }
@@ -677,6 +683,4 @@ export async function initHubSpotAPI() {
         authorized: false
       }
     }, '*')
-
 }
-

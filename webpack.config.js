@@ -7,7 +7,6 @@ const HappyPack = require('happypack')
 const happyThreadPool = packThreadCount === 0 ? null : HappyPack.ThreadPool({ size: packThreadCount })
 const path = require('path')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
-const {resolve} = require('path')
 const express = require('express')
 
 const happyConf = {
@@ -109,13 +108,8 @@ var config = {
     }),
     new ExtraneousFileCleanupPlugin(opts),
     new webpack.DefinePlugin({
-      'process.env.appKey': JSON.stringify(sysConfigDefault.appKey),
-      'process.env.appServer': JSON.stringify(sysConfigDefault.appServer),
-      'process.env.appKeyHS': JSON.stringify(sysConfigDefault.appKeyHS),
-      'process.env.appServerHS': JSON.stringify(sysConfigDefault.appServerHS),
-      'process.env.apiServerHS': JSON.stringify(sysConfigDefault.apiServerHS),
-      'process.env.appRedirectHS': JSON.stringify(sysConfigDefault.appRedirectHS),
-      'process.env.appSecretHS': JSON.stringify(sysConfigDefault.appSecretHS)
+      'process.env.ringCentralConfigs': JSON.stringify(sysConfigDefault.ringCentralConfigs),
+      'process.env.thirdPartyConfigs': JSON.stringify(sysConfigDefault.thirdPartyConfigs)
     })
   ],
   devServer: {

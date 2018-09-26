@@ -1,38 +1,16 @@
 import {parseNumber} from 'libphonenumber-js'
 import _ from 'lodash'
+import RCLOGOSVG from './rc-logo'
+
+export const RCBTNCLS = 'call-with-ringccentral-btn'
+export const RCBTNCLS2 = 'call-with-rc-btn'
+export const RCTOOLTIPCLS = 'rc-tooltip'
 
 export function checkPhoneNumber(phone, country = 'US') {
   return !_.isEqual(
     {},
     parseNumber(phone, country)
   )
-}
-
-export function isCallTab(href) {
-  return href.includes('?interaction=call')
-}
-
-export function isContactsListTab(href) {
-  return href.includes('contacts/list/view/all/')
-}
-
-/**
- * check contact has phone number or not
- * if has, return the number, or return false
- * @return {mixed}
- */
-export function contactHasPhoneNumber() {
-  let phoneWrap = document.querySelector('[data-profile-property=\'phone\']')
-  if (!phoneWrap) {
-    return false
-  }
-  let phoneInput = phoneWrap.querySelector('input')
-  if (!phoneInput) {
-    return false
-  }
-  let {value} = phoneInput
-  let isNumber = checkPhoneNumber(value)
-  return isNumber ? value : false
 }
 
 export function createElementFromHTML(htmlString) {
@@ -71,7 +49,7 @@ setInterval(() => {
   })
 }, 1000)
 
-export function registerOnPathChange(checker, callback) {
+export function dirtyLoop(checker, callback) {
   events.push({
     checker, callback
   })
@@ -107,3 +85,10 @@ export function findParentBySel(node, sel) {
   }
   return res
 }
+
+export const createCallBtnHtml = (cls = '') => `
+<span class="${RCBTNCLS} rc-mg1r ${cls}">
+  <span class="rc-iblock rc-mg1r">Call with</span>
+  <img src="${RCLOGOSVG}" class="rc-iblock" />
+</span>
+`
