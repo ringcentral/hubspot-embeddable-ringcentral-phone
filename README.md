@@ -26,7 +26,8 @@ cd hubspot-embeddable-ringcentral-phone
 npm i
 cp config.sample.js config.js
 # edit config.js, fill the required thirdPartyConfigs.clientIDHS and thirdPartyConfigs.clientSecretHS
-# you can get the ID/Secret from https://app.hubspot.com/developer, register and create an app
+# you can get the ID/Secret from https://app.hubspot.com/developer, register and create an app,
+# make sure you have Scopes: Basic OAuth functionality, and Read from and write to my: Contacts checked.
 
 # then run it
 npm start
@@ -40,7 +41,8 @@ npm start
 
 ## Build with custom RingCentral clientID/appServer
 
-Edit `config.js`, fill your RingCentral app's clientID and appServer, get it from https://developer.ringcentral.com/
+- Create an app from https://developer.ringcentral.com/, make sure you choose a browser based app, and set all permissions, and add `https://ringcentral.github.io/ringcentral-embeddable/redirect.html` to your redirect URI list,Edit `config.js`,
+- Fill your RingCentral app's clientID and appServer in `config.js`
 ```js
 
   ringCentralConfigs: {
