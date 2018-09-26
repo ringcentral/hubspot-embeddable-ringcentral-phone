@@ -76,6 +76,7 @@ function formatPhone(phone) {
 }
 
 function hideContactInfoPanel() {
+  console.log('hide')
   let dom = document
     .querySelector('.rc-contact-panel')
   dom && dom.classList.add('rc-hide-contact-panel')
@@ -107,8 +108,9 @@ function onClickContactPanel (e) {
  */
 async function showContactInfoPanel(call) {
   if (call.telephonyStatus === 'NoCall') {
-    return
+    return hideContactInfoPanel()
   }
+  console.log('show')
   let isInbound = call.direction === 'Inbound'
   let phone = isInbound
     ? _.get(
