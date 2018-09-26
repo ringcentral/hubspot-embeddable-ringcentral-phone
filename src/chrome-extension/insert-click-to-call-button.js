@@ -25,9 +25,6 @@ class insertHandler {
   }
 
   getParentDom = () => {
-    if (this.parentDom) {
-      return this.parentDom
-    }
     let {
       parentsToInsertButton
     } = this.config
@@ -45,9 +42,6 @@ class insertHandler {
         console.log(e)
       }
     }
-    if (res.elem) {
-      this.parentDom = res
-    }
     return res
   }
 
@@ -56,7 +50,7 @@ class insertHandler {
     if (!parent) {
       return false
     }
-    return parent.querySelector('.' + RCBTNCLS2)
+    return !!parent.querySelector('.' + RCBTNCLS2)
   }
 
   //in contact call tab try add call with ringcentral button

@@ -14,7 +14,7 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
 
 ## Features
 - Click to call button
-- Popup when call inbound
+- Popup caller/callee info panel when call inbound
 - build with custom app config
 
 ## Build and Use
@@ -24,11 +24,13 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
 git clone https://github.com/zxdong262/hubspot-embeddable-ringcentral-phone.git
 cd hubspot-embeddable-ringcentral-phone
 npm i
+cp config.sample.js config.js
+# edit config.js, fill the required thirdPartyConfigs.clientIDHS and thirdPartyConfigs.clientSecretHS
+# you can get the ID/Secret from https://app.hubspot.com/developer, register and create an app
 
-# build content.js first, with webpack
-# edit src/*.js, webpack will auto-rebuild
+# then run it
 npm start
-
+# edit src/*.js, webpack will auto-rebuild
 ```
 
 2. Go to Chrome extensions page.
@@ -36,38 +38,18 @@ npm start
 4. Load `hubspot-embeddable-ringcentral-phone/dist` as unpacked package.
 5. Go to `https://app.hubspot.com` to check
 
-## Build with custom appKey/appServer etc
-```bash
-cp config.sample.js config.js
-```
+## Build with custom RingCentral clientID/appServer
 
-Then edit config.js
+Edit `config.js`, fill your RingCentral app's clientID and appServer, get it from https://developer.ringcentral.com/
 ```js
-  // hubspot app client ID,
-  // get it from your hubspot app, https://app.hubspot.com/developer
-  // appKeyHS: ,
 
-  // hubspot app client Secret,
-  // appSecretHS: ,
+  ringCentralConfigs: {
+    // your ringCentral app's Client ID
+    clientID: 'your-clientID',
 
-  // hubspot app auth server
-  // appServerHS: ,
-
-  // hubspot app api server
-  // apiServerHS: ,
-
-  // hubspot app redirect uri
-  // appRedirectHS: ,
-
-  // your ringcentral app's Client ID
-  // get them from https://developer.ringcentral.com
-  // appKey: ,
-
-  // your ringcentral app's Auth Server URL
-  // appServer:
-
-  // minimize content.js
-  // minimize: false
+    // your ringCentral app's Auth Server URL
+    appServer: 'your ringCentral app Auth Server URL'
+  },
 ```
 
 ## License

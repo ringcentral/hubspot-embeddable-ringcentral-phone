@@ -24,7 +24,7 @@ module.exports = {
 
   ringCentralConfigs: {
     // your ringCentral app's Client ID
-    appKey: 'qypCMRJuSOOivhrrGVeCrw',
+    clientID: 'qypCMRJuSOOivhrrGVeCrw',
 
     // your ringCentral app's Auth Server URL
     appServer: 'https://platform.devtest.ringcentral.com'
@@ -32,25 +32,23 @@ module.exports = {
 
 
   //// for third party related
-  /*
   thirdPartyConfigs: {
-    // hubspot app client ID,
+    // hubspot app client ID, required
     // get it from your hubspot app, https://app.hubspot.com/developer
-    // appKeyHS: ,
+    clientIDHS: ,
 
     // hubspot app client Secret,
-    // appSecretHS: ,
+    clientSecretHS: ,
 
-    // hubspot app auth server
-    // appServerHS: ,
+    // hubspot app auth server, not required
+    // appServerHS: 'https://app.hubspot.com',
 
-    // hubspot app api server
-    // apiServerHS: ,
+    // hubspot app api server, not required
+    // apiServerHS: 'https://app.hubspot.com',
 
-    // hubspot app redirect uri
-    // appRedirectHS: ,
+    // hubspot app redirect uri, not required
+    // appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
   },
-  */
 
   //// content modification for click to call feature
   /*
@@ -85,7 +83,7 @@ module.exports = {
   ]
   */
 
- appKey: 'n2Hbs3xyRW6PlCgAJ5tV5A',
+ clientID: 'n2Hbs3xyRW6PlCgAJ5tV5A',
  appServer: '	https://platform.devtest.ringcentral.com',
 
 }

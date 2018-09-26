@@ -19,8 +19,8 @@ import _ from 'lodash'
 import logo from './rc-logo'
 
 let {
-  appKeyHS,
-  appSecretHS,
+  clientIDHS,
+  clientSecretHS,
   appServerHS,
   apiServerHS,
   appRedirectHS
@@ -47,7 +47,7 @@ const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
 const authUrl = `${appServerHS}/oauth/authorize?` +
-`client_id=${appKeyHS}` +
+`client_id=${clientIDHS}` +
 `&redirect_uri=${appRedirectHSCoded}&scope=contacts`
 const blankUrl = 'about:blank'
 const serviceName = 'HubSpot'
@@ -195,7 +195,7 @@ function buildName(contact) {
   ) || 'noname'
   let lastname = _.get(
     contact,
-    'properties.firstname.value'
+    'properties.lastname.value'
   ) || 'noname'
   return firstname + ' ' + lastname
 }
@@ -405,8 +405,8 @@ async function getAuthToken({
       ? 'grant_type=authorization_code'
       : 'grant_type=refresh_token'
   ) +
-  `&client_id=${appKeyHS}&` +
-  `client_secret=${appSecretHS}&` +
+  `&client_id=${clientIDHS}&` +
+  `client_secret=${clientSecretHS}&` +
   `redirect_uri=${appRedirectHSCoded}&` +
     (
       code

@@ -4,13 +4,13 @@ import main from './init'
 import {ringCentralConfigs} from './app-config'
 
 let {
-  appKey,
+  clientID,
   appServer
 } = ringCentralConfigs
 
 let appConfigQuery = ''
-if (appKey || appServer) {
-  appConfigQuery = `?appKey=${appKey}&appServer=${encodeURIComponent(appServer)}`
+if (clientID || appServer) {
+  appConfigQuery = `?clientID=${clientID}&appServer=${encodeURIComponent(appServer)}`
 }
 
 /* eslint-disable-next-line */

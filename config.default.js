@@ -13,14 +13,14 @@ let config = {
 
   //ringcentral config
   ringCentralConfigs: {
-    appKey: '',
+    clientID: '',
     appServer: ''
   },
 
   //for third party related
   thirdPartyConfigs: {
-    appKeyHS: '06b1ce1e-7059-4114-a517-4c8b3218c029',
-    appSecretHS: 'a7e6a9b6-0791-4d0d-a01c-fe66677b2f32',
+    clientIDHS: '',
+    clientSecretHS: '',
     appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
     appServerHS: 'https://app.hubspot.com',
     apiServerHS: 'https://api.hubspot.com'
