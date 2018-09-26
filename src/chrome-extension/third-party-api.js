@@ -17,7 +17,7 @@ import {
 import fetch, {jsonHeader, handleErr} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
-chrome.storage.local.clear()
+
 let {
   appKeyHS,
   appSecretHS,
@@ -250,7 +250,6 @@ function findMatchContacts(contacts, numbers) {
     let key = formatNumbersMap[
       formatPhone(num)
     ]
-    console.log(key, 'key')
     if (!prev[key]) {
       prev[key] = []
     }
@@ -543,9 +542,9 @@ function renderAuthPanel() {
  */
 async function handleRCEvents(e) {
   let {data} = e
-  console.log('======data======')
-  console.log(data, data.type, data.path)
-  console.log('======data======')
+  // console.log('======data======')
+  // console.log(data, data.type, data.path)
+  // console.log('======data======')
   if (!data) {
     return
   }
@@ -614,7 +613,6 @@ async function handleRCEvents(e) {
     let contacts = await getContacts()
     let phoneNumbers = _.get(data, 'body.phoneNumbers') || []
     let res = findMatchContacts(contacts, phoneNumbers)
-    console.log('matches', res)
     rc.postMessage({
       type: 'rc-post-message-response',
       responseId: data.requestId,

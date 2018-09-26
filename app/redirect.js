@@ -108,7 +108,6 @@ function parseQuery(queryString) {
 
 
 function init() {
-  console.log(location.search);
   let q = parseQuery(location.search);
   let {
     code,
