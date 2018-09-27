@@ -54,6 +54,9 @@ npm start
   },
 ```
 
+## Cli tool
+You can use [ringcentral-embeddable-extension-factory](https://github.com/zxdong262/ringcentral-embeddable-extension-factory) to create similar extensions.
+
 ## License
 MIT
 
