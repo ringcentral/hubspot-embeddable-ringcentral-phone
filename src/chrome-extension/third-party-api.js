@@ -54,8 +54,12 @@ const serviceName = 'HubSpot'
 
 async function updateToken(newToken, type = 'accessToken') {
   if (!newToken){
-    await ls.remove(_.values(lsKeys))
-    local = {}
+    await ls.clear()
+    local = {
+      refreshToken: null,
+      accessToken: null,
+      expireTime: null
+    }
   } else if (_.isString(newToken)) {
     local[type] = newToken
     let key = lsKeys[`${type}LSKey`]
@@ -642,7 +646,7 @@ export default async function initThirdPartyApi () {
   let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
   let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
   let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
-  if (expireTime && expireTime < (+new Date())) {
+  if (expireTime && expireTime > (+new Date())) {
     local = {
       refreshToken,
       accessToken,

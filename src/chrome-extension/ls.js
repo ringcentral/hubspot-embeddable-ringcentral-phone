@@ -44,3 +44,11 @@ export const remove = (key) => {
     )
   })
 }
+
+export const clear = () => {
+  return new Promise((resolve) => {
+    chrome.storage.local.clear(
+      resolve
+    )
+  })
+}
