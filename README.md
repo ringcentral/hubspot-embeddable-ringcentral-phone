@@ -41,7 +41,7 @@ npm start
 
 ## Build with custom RingCentral clientID/appServer
 
-- Create an app from https://developer.ringcentral.com/, make sure you choose a browser based app, and set all permissions, and add `https://ringcentral.github.io/ringcentral-embeddable/redirect.html` to your redirect URI list,Edit `config.js`,
+- Create an app from https://developer.ringcentral.com/, make sure you choose a browser based app, and set all permissions, and add `https://ringcentral.github.io/ringcentral-embeddable/redirect.html` to your redirect URI list, Edit `config.js`,
 - Fill your RingCentral app's clientID and appServer in `config.js`
 ```js
 

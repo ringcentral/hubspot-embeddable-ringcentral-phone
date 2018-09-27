@@ -76,7 +76,7 @@ function formatPhone(phone) {
 }
 
 function hideContactInfoPanel() {
-  console.log('hide')
+  //console.log('hide')
   let dom = document
     .querySelector('.rc-contact-panel')
   dom && dom.classList.add('rc-hide-contact-panel')
@@ -107,10 +107,15 @@ function onClickContactPanel (e) {
  * @param {Object} call
  */
 async function showContactInfoPanel(call) {
+  if (
+    !call.telephonyStatus ||
+    call.telephonyStatus === 'CallConnected'
+  ) {
+    return
+  }
   if (call.telephonyStatus === 'NoCall') {
     return hideContactInfoPanel()
   }
-  console.log('show')
   let isInbound = call.direction === 'Inbound'
   let phone = isInbound
     ? _.get(
@@ -640,7 +645,8 @@ export default async function initThirdPartyApi () {
   if (expireTime && expireTime < (+new Date())) {
     local = {
       refreshToken,
-      accessToken
+      accessToken,
+      expireTime
     }
   }
 
