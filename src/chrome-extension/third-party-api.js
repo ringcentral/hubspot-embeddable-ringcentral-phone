@@ -43,6 +43,7 @@ let tokenHandler
 let cache = {}
 let cacheKey = 'contacts'
 const phoneFormat = 'National'
+let oldRcFrameStyle = ''
 const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
@@ -79,8 +80,40 @@ function formatPhone(phone) {
   return formatNumber(phone, phoneFormat)
 }
 
+function canShowNativeContact(contact) {
+  let {id} = contact
+  if (
+    !location.href.includes('/contacts/list/view/all/')
+  ) {
+    return
+  }
+  return document.querySelector(
+    `table.table a[href*="${id}"]`
+  )
+}
+
+function showNativeContact(contact, contactTrLinkElem) {
+  let previewBtn = findParentBySel(contactTrLinkElem, 'td.name-cell')
+    .querySelector('[data-selenium-test="object-preview-button"]')
+  if (previewBtn) {
+    previewBtn.click()
+    let rc = document.querySelector('#rc-widget')
+    oldRcFrameStyle = rc.getAttribute('style')
+    rc.setAttribute('style', '    transform: translate( -442px, -15px)!important;')
+  }
+}
+
 function hideContactInfoPanel() {
-  //console.log('hide')
+  let nativeInfoPanel = document.querySelector('.private-layer .private-panel--right')
+  if (nativeInfoPanel) {
+    let closeBtn = document.querySelector(
+      '[data-selenium-test="base-side-panel-close"]'
+    )
+    closeBtn && closeBtn.click()
+    document.querySelector('#rc-widget')
+      .setAttribute('style', oldRcFrameStyle)
+    return
+  }
   let dom = document
     .querySelector('.rc-contact-panel')
   dom && dom.classList.add('rc-hide-contact-panel')
@@ -139,6 +172,10 @@ async function showContactInfoPanel(call) {
   })
   if (!contact) {
     return
+  }
+  let contactTrLinkElem = canShowNativeContact(contact)
+  if (contactTrLinkElem) {
+    return showNativeContact(contact, contactTrLinkElem)
   }
   let title = isInbound
     ? 'Inbound call from:'
@@ -643,6 +680,11 @@ export default async function initThirdPartyApi () {
   authEventInited = true
 
   //register service to rc-widgets
+
+  let rcFrame = document.querySelector('#rc-widget-adapter-frame')
+  if (!rcFrame || !rcFrame.contentWindow) {
+    return
+  }
   rcFrame
     .contentWindow.postMessage({
       type: 'rc-adapter-register-third-party-service',
@@ -691,10 +733,5 @@ export default async function initThirdPartyApi () {
       hideAuthBtn()
     }
   })
-
-  let rcFrame = document.querySelector('#rc-widget-adapter-frame')
-  if (!rcFrame || !rcFrame.contentWindow) {
-    return
-  }
 
 }
