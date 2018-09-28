@@ -515,7 +515,7 @@ function renderAuthButton() {
           <span class="rc-iblock">access HubSpot data</span>
         </span>
         <div class="rc-auth-desc rc-pd1t">
-          After auth, you can access hubspot contacts from RingCentral phone's contacts list.
+          After auth, you can access hubspot contacts from RingCentral phone's contacts list. You can revoke the auth from RingCentral phone's setting.
         </div>
         <div class="rc-pd1t">
           <span class="rc-dismiss-auth" title="dismiss">&times;</span>
@@ -641,6 +641,23 @@ export default async function initThirdPartyApi () {
     return
   }
   authEventInited = true
+
+  //register service to rc-widgets
+  rcFrame
+    .contentWindow.postMessage({
+      type: 'rc-adapter-register-third-party-service',
+      service: {
+        name: serviceName,
+        contactsPath: '/contacts',
+        contactSearchPath: '/contacts/search',
+        contactMatchPath: '/contacts/match',
+        authorizationPath: '/authorize',
+        authorizedTitle: 'Unauthorize',
+        unauthorizedTitle: 'Authorize',
+        authorized: false
+      }
+    }, '*')
+
   //hanlde contacts events
   window.addEventListener('message', handleRCEvents)
   let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
@@ -680,19 +697,4 @@ export default async function initThirdPartyApi () {
     return
   }
 
-  //register service to rc-widgets
-  rcFrame
-    .contentWindow.postMessage({
-      type: 'rc-adapter-register-third-party-service',
-      service: {
-        name: serviceName,
-        contactsPath: '/contacts',
-        contactSearchPath: '/contacts/search',
-        contactMatchPath: '/contacts/match',
-        authorizationPath: '/authorize',
-        authorizedTitle: 'Unauthorize',
-        unauthorizedTitle: 'Authorize',
-        authorized: false
-      }
-    }, '*')
 }
