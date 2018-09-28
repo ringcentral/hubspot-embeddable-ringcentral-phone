@@ -39,7 +39,7 @@ class insertHandler {
         res.insertMethod = pc.insertMethod
         break
       } catch (e) {
-        console.log(e)
+        //console.log(e)
       }
     }
     return res
