@@ -247,6 +247,21 @@ function buildName(contact) {
 }
 
 /**
+ * build email
+ * @param {Object} contact
+ */
+function buildEmail(contact) {
+  for (let f of contact['identity-profiles']) {
+    for (let g of f.identities) {
+      if (g.type === 'EMAIL') {
+        return [g.value]
+      }
+    }
+  }
+  return []
+}
+
+/**
  * build phone numbers from contact info
  * @param {object} contact
  * @return {array}
@@ -343,6 +358,7 @@ function formatContacts(contacts) {
       id: contact.vid,
       name: buildName(contact),
       type: 'HubSpot',
+      emails: buildEmail(contact),
       phoneNumbers: buildPhone(contact)
     }
   })
