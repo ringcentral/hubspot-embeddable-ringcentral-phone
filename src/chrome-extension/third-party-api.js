@@ -8,6 +8,7 @@
 
 import {formatNumber} from 'libphonenumber-js'
 import {thirdPartyConfigs} from './app-config'
+import {createContactInfoUIHtml} from './contact-info-panel'
 import * as ls from './ls'
 import {
   createElementFromHTML,
@@ -92,26 +93,34 @@ function canShowNativeContact(contact) {
   )
 }
 
+function moveWidgets() {
+  let rc = document.querySelector('#rc-widget')
+  oldRcFrameStyle = rc.getAttribute('style')
+  rc.setAttribute('style', 'transform: translate( -442px, -15px)!important;')
+}
+
+function restoreWidgets() {
+  document.querySelector('#rc-widget')
+    .setAttribute('style', oldRcFrameStyle)
+}
+
 function showNativeContact(contact, contactTrLinkElem) {
   let previewBtn = findParentBySel(contactTrLinkElem, 'td.name-cell')
     .querySelector('[data-selenium-test="object-preview-button"]')
   if (previewBtn) {
     previewBtn.click()
-    let rc = document.querySelector('#rc-widget')
-    oldRcFrameStyle = rc.getAttribute('style')
-    rc.setAttribute('style', '    transform: translate( -442px, -15px)!important;')
+    moveWidgets()
   }
 }
 
 function hideContactInfoPanel() {
   let nativeInfoPanel = document.querySelector('.private-layer .private-panel--right')
+  restoreWidgets()
   if (nativeInfoPanel) {
     let closeBtn = document.querySelector(
       '[data-selenium-test="base-side-panel-close"]'
     )
     closeBtn && closeBtn.click()
-    document.querySelector('#rc-widget')
-      .setAttribute('style', oldRcFrameStyle)
     return
   }
   let dom = document
@@ -177,49 +186,7 @@ async function showContactInfoPanel(call) {
   if (contactTrLinkElem) {
     return showNativeContact(contact, contactTrLinkElem)
   }
-  let title = isInbound
-    ? 'Inbound call from:'
-    : 'Calling contact:'
-  let {
-    name,
-    phoneNumbers
-  } = contact
-  let phoneNumbersText = phoneNumbers.map(
-    p => {
-      return `
-        <span class="rc-phone-span">
-          ${p.phoneNumber}
-        </span>
-      `
-    }
-  )
-    .join(', ')
-  let elem = createElementFromHTML(
-    `<div class="rc-contact-panel animate rc-hide-contact-panel">
-      <div class="rc-pd2">
-        <div class="rc-contact-header rc-pd1y">
-          <span title="close" class="rc-close-contact">
-          &times
-          </span>
-        </div>
-        <h2>${title}</h2>
-        <div class="rc-contact-body">
-          <div class="rc-item-label">
-            name:
-          </div>
-          <div class="rc-item-value">
-            ${name}
-          </div>
-          <div class="rc-item-label">
-          phone:
-        </div>
-        <div class="rc-item-value">
-          ${phoneNumbersText}
-        </div>
-      </div>
-    </div>
-    `
-  )
+  let elem = createElementFromHTML(createContactInfoUIHtml(contact))
   elem.onclick = onClickContactPanel
   let old = document
     .querySelector('.rc-contact-panel')
@@ -227,6 +194,7 @@ async function showContactInfoPanel(call) {
 
   document.body.appendChild(elem)
   elem.classList.remove('rc-hide-contact-panel')
+  moveWidgets()
 }
 
 /**
@@ -238,12 +206,17 @@ function buildName(contact) {
   let firstname = _.get(
     contact,
     'properties.firstname.value'
-  ) || 'noname'
+  ) || ''
   let lastname = _.get(
     contact,
     'properties.lastname.value'
-  ) || 'noname'
-  return firstname + ' ' + lastname
+  ) || ''
+  let name = firstname || lastname ? firstname + ' ' + lastname : 'noname'
+  return {
+    name,
+    firstname,
+    lastname
+  }
 }
 
 /**
@@ -356,10 +329,11 @@ function formatContacts(contacts) {
   return contacts.map(contact => {
     return {
       id: contact.vid,
-      name: buildName(contact),
-      type: 'HubSpot',
+      ...buildName(contact),
+      type: serviceName,
       emails: buildEmail(contact),
-      phoneNumbers: buildPhone(contact)
+      phoneNumbers: buildPhone(contact),
+      portalId: contact['portal-id']
     }
   })
 }
@@ -439,6 +413,7 @@ async function getContacts() {
     time: + new Date(),
     value: final
   }
+  showContactInfoPanel(final[0])
   return final
 }
 

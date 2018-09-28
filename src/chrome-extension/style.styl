@@ -87,28 +87,37 @@ body .Adapter_root.Adapter_right
 
 .rc-contact-panel
   position fixed
-  width 300px
-  left 0
+  width 500px
+  right 0
   top 0
   bottom 0
   z-index 10000
-  overflow-y scroll
-  background #fff
-  padding-top 50px
   box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
 
 .rc-hide-contact-panel
   left -300px
+.rc-contact-panel.rc-hide-contact-panel
+  left auto
+  right -500px
 
 .rc-contact-header
   text-align right
 
 .rc-close-contact
-  font-size 20px
-  color #333
+  font-size 30px
+  color #fff
   cursor pointer
+  position absolute
+  right 20px
+  top 14px
+  display block
+  width 40px
+  line-height 40px
+  height 40px
+  border-radius 40px
+  text-align center
   &:hover
-    color #08c
+    background rgba(255,255,255,.2)
 
 .rc-item-value
 .rc-item-label
