@@ -81,48 +81,48 @@ function formatPhone(phone) {
   return formatNumber(phone, phoneFormat)
 }
 
-function canShowNativeContact(contact) {
-  let {id} = contact
-  if (
-    !location.href.includes('/contacts/list/view/all/')
-  ) {
-    return
-  }
-  return document.querySelector(
-    `table.table a[href*="${id}"]`
-  )
-}
+// function canShowNativeContact(contact) {
+//   let {id} = contact
+//   if (
+//     !location.href.includes('/contacts/list/view/all/')
+//   ) {
+//     return
+//   }
+//   return document.querySelector(
+//     `table.table a[href*="${id}"]`
+//   )
+// }
 
-function moveWidgets() {
-  let rc = document.querySelector('#rc-widget')
-  oldRcFrameStyle = rc.getAttribute('style')
-  rc.setAttribute('style', 'transform: translate( -442px, -15px)!important;')
-}
+// function moveWidgets() {
+//   let rc = document.querySelector('#rc-widget')
+//   oldRcFrameStyle = rc.getAttribute('style')
+//   rc.setAttribute('style', 'transform: translate( -442px, -15px)!important;')
+// }
 
-function restoreWidgets() {
-  document.querySelector('#rc-widget')
-    .setAttribute('style', oldRcFrameStyle)
-}
+// function restoreWidgets() {
+//   document.querySelector('#rc-widget')
+//     .setAttribute('style', oldRcFrameStyle)
+// }
 
-function showNativeContact(contact, contactTrLinkElem) {
-  let previewBtn = findParentBySel(contactTrLinkElem, 'td.name-cell')
-    .querySelector('[data-selenium-test="object-preview-button"]')
-  if (previewBtn) {
-    previewBtn.click()
-    moveWidgets()
-  }
-}
+// function showNativeContact(contact, contactTrLinkElem) {
+//   let previewBtn = findParentBySel(contactTrLinkElem, 'td.name-cell')
+//     .querySelector('[data-selenium-test="object-preview-button"]')
+//   if (previewBtn) {
+//     previewBtn.click()
+//     moveWidgets()
+//   }
+// }
 
 function hideContactInfoPanel() {
-  let nativeInfoPanel = document.querySelector('.private-layer .private-panel--right')
-  restoreWidgets()
-  if (nativeInfoPanel) {
-    let closeBtn = document.querySelector(
-      '[data-selenium-test="base-side-panel-close"]'
-    )
-    closeBtn && closeBtn.click()
-    return
-  }
+  // let nativeInfoPanel = document.querySelector('.private-layer .private-panel--right')
+  // restoreWidgets()
+  // if (nativeInfoPanel) {
+  //   let closeBtn = document.querySelector(
+  //     '[data-selenium-test="base-side-panel-close"]'
+  //   )
+  //   closeBtn && closeBtn.click()
+  //   return
+  // }
   let dom = document
     .querySelector('.rc-contact-panel')
   dom && dom.classList.add('rc-hide-contact-panel')
@@ -182,19 +182,37 @@ async function showContactInfoPanel(call) {
   if (!contact) {
     return
   }
-  let contactTrLinkElem = canShowNativeContact(contact)
-  if (contactTrLinkElem) {
-    return showNativeContact(contact, contactTrLinkElem)
-  }
-  let elem = createElementFromHTML(createContactInfoUIHtml(contact))
+  // let contactTrLinkElem = canShowNativeContact(contact)
+  // if (contactTrLinkElem) {
+  //   return showNativeContact(contact, contactTrLinkElem)
+  // }
+  let {host, protocol} = location
+  let url = `${protocol}//${host}/contacts/${contact.portalId}/contact/${contact.id}/?interaction=note`
+  let elem = createElementFromHTML(
+    `
+    <div class="animate rc-contact-panel" draggable="false">
+      <div class="rc-close-box">
+        <div class="rc-fix rc-pd2x">
+          <span class="rc-fleft">Contact</span>
+          <span class="rc-fright">
+            <span class="rc-close-contact">&times;</span>
+          </span>
+        </div>
+      </div>
+      <div class="rc-contact-frame-box">
+        <iframe scrolling="no" class="rc-contact-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" allow="microphone" src="${url}" id="rc-contact-frame">
+        </iframe>
+      </div>
+    </div>
+    `
+  )
   elem.onclick = onClickContactPanel
   let old = document
     .querySelector('.rc-contact-panel')
   old && old.remove()
 
   document.body.appendChild(elem)
-  elem.classList.remove('rc-hide-contact-panel')
-  moveWidgets()
+  //moveWidgets()
 }
 
 /**
