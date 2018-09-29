@@ -1,7 +1,7 @@
 {
   "name": "RingCentral Embeddable Voice for HubSpot",
   "description": "RingCentral Embeddable Voice for HubSpot",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "permissions": [
     "http://*/",
     "https://*/",
@@ -15,6 +15,7 @@
     "https://*.hubspot.com/*"
   ],
   "page_action": {
+    "default_title": "RingCentral Embeddable Voice for HubSpot",
     "default_icon": {
       "16": "icons/rc16.png",
       "32": "icons/rc32.png",
