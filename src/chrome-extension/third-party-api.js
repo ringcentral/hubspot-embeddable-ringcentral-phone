@@ -8,11 +8,11 @@
 
 import {formatNumber} from 'libphonenumber-js'
 import {thirdPartyConfigs} from './app-config'
-import {createContactInfoUIHtml} from './contact-info-panel'
 import * as ls from './ls'
 import {
   createElementFromHTML,
   findParentBySel,
+  popup,
   callWithRingCentral
 } from './helpers'
 import fetch, {jsonHeader, handleErr} from '../common/fetch'
@@ -44,7 +44,7 @@ let tokenHandler
 let cache = {}
 let cacheKey = 'contacts'
 const phoneFormat = 'National'
-let oldRcFrameStyle = ''
+//let oldRcFrameStyle = ''
 const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
@@ -113,6 +113,12 @@ function formatPhone(phone) {
 //   }
 // }
 
+function onloadIframe () {
+  let dom = document
+    .querySelector('.rc-contact-panel')
+  dom && dom.classList.add('rc-contact-panel-loaded')
+}
+
 function hideContactInfoPanel() {
   // let nativeInfoPanel = document.querySelector('.private-layer .private-panel--right')
   // restoreWidgets()
@@ -162,6 +168,7 @@ async function showContactInfoPanel(call) {
   if (call.telephonyStatus === 'NoCall') {
     return hideContactInfoPanel()
   }
+  popup()
   let isInbound = call.direction === 'Inbound'
   let phone = isInbound
     ? _.get(
@@ -203,10 +210,12 @@ async function showContactInfoPanel(call) {
         <iframe scrolling="no" class="rc-contact-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" allow="microphone" src="${url}" id="rc-contact-frame">
         </iframe>
       </div>
+      <div class="rc-loading">loading...</div>
     </div>
     `
   )
   elem.onclick = onClickContactPanel
+  elem.querySelector('iframe').onload = onloadIframe
   let old = document
     .querySelector('.rc-contact-panel')
   old && old.remove()
