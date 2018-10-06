@@ -4,7 +4,11 @@ Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringce
 Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
  [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
 
-| preview            |  preview |
+## Youtube video
+https://youtu.be/tRjG4aOquv8
+
+## Screenshots
+| screenshots            |  screenshots |
 :-------------------------:|:-------------------------:
 ![hubspot-btn2](screenshots/hubspot-btn2.png) | ![hubspot-btn2](screenshots/hubspot1.png)
 ![hubspot-list2](screenshots/hubspot-list2.png) | ![hubspot-list2](screenshots/hs1.png)
