@@ -8,9 +8,11 @@ function checkTab(tab) {
 }
 
 async function cb(tabId) {
-  let tab = await new Promise((resolve) => {
-    chrome.tabs.get(tabId, resolve)
-  })
+  let tab = tabId.id
+    ? tabId
+    : await new Promise((resolve) => {
+      chrome.tabs.get(tabId, resolve)
+    })
   if (
     checkTab(tab)
   ) {
