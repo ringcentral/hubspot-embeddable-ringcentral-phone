@@ -21,7 +21,12 @@ https://youtu.be/tRjG4aOquv8
 - Popup caller/callee info panel when call inbound
 - build with custom app config
 
-## Build and Use
+## try it with private crx package
+- Download the private crx from release page: https://github.com/zxdong262/hubspot-embeddable-ringcentral-phone/releases
+- Open your chrome extension page(chrome://extensions/), drag the crx file to the extension page to install.
+- Go to `https://app.hubspot.com` to check
+
+## Custombuild and use
 
 1. build `content.js`
 ```bash
