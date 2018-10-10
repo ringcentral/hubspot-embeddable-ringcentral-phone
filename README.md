@@ -5,7 +5,7 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
  [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
 
 ## Youtube video
-https://youtu.be/tRjG4aOquv8
+https://youtu.be/zxHnCCR3Po4
 
 ## Screenshots
 | screenshots            |  screenshots |
@@ -19,7 +19,9 @@ https://youtu.be/tRjG4aOquv8
 ## Features
 - Click to call button
 - Popup caller/callee info panel when call inbound
-- build with custom app config
+- Build with custom app config
+- Auto/manually sync call log to hubspot
+- Check hubspot activities from ringcentral contact panel
 
 ## try it with private crx package
 - Download the private crx from release page: https://github.com/zxdong262/hubspot-embeddable-ringcentral-phone/releases
