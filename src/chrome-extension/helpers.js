@@ -6,6 +6,31 @@ export const RCBTNCLS = 'call-with-ringccentral-btn'
 export const RCBTNCLS2 = 'call-with-rc-btn'
 export const RCTOOLTIPCLS = 'rc-tooltip'
 
+let msgHandler1
+let msgHandler2
+export function notify(msg, type = 'info', timer = 5000) {
+  clearTimeout(msgHandler1)
+  clearTimeout(msgHandler2)
+  let wrap = document.getElementById('rc-msg-wrap')
+  if (wrap) {
+    wrap.remove()
+  }
+  wrap = createElementFromHTML(
+    `
+      <div class="rc-msg-wrap animate rc-msg-type-${type}" id="rc-msg-wrap">
+        ${msg}
+      </div>
+    `
+  )
+  document.body.appendChild(wrap)
+  msgHandler1 = setTimeout(() => {
+    wrap.classList.add('rc-msg-enter')
+  }, 200)
+  msgHandler2 = setTimeout(() => {
+    wrap.classList.remove('rc-msg-enter')
+  }, timer)
+}
+
 export function checkPhoneNumber(phone, country = 'US') {
   return !_.isEqual(
     {},

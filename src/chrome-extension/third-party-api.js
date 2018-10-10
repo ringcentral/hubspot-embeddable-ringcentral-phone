@@ -8,11 +8,13 @@
 
 import {formatNumber} from 'libphonenumber-js'
 import {thirdPartyConfigs} from './app-config'
+import getPhoneStatus from './phone-result-map'
 import * as ls from './ls'
 import {
   createElementFromHTML,
   findParentBySel,
   popup,
+  notify,
   callWithRingCentral
 } from './helpers'
 import fetch, {jsonHeader, handleErr} from '../common/fetch'
@@ -53,6 +55,236 @@ const authUrl = `${appServerHS}/oauth/authorize?` +
 `&redirect_uri=${appRedirectHSCoded}&scope=contacts`
 const blankUrl = 'about:blank'
 const serviceName = 'HubSpot'
+const commonFetchOptions = () => ({
+  headers: {
+    Authorization: `Bearer ${local.accessToken}`,
+    ...jsonHeader
+  },
+  handleErr: (res) => {
+    let {status} = res
+    if (status === 401) {
+      updateToken(null)
+    }
+    if (status > 304) {
+      handleErr(res)
+    }
+  }
+})
+
+async function getOwnerId() {
+  let emailDom = document.querySelector('.user-info-email')
+  if (!emailDom) {
+    return
+  }
+  let email = emailDom.textContent.trim()
+  let url = `${apiServerHS}/owners/v2/owners/?email=${email}`
+  let res = await fetch.get(url, commonFetchOptions())
+  let ownerId = ''
+  if (res && res.length) {
+    ownerId = _.get(res, '[0].ownerId')
+  } else {
+    console.log('fetch ownerId error')
+    console.log(res)
+  }
+  return ownerId
+    ? parseInt(ownerId, 10)
+    : ''
+}
+
+async function getContactId(body) {
+  if (body.call) {
+    let obj = _.find(
+      [
+        ...body.call.toMatches,
+        ...body.call.fromMatches
+      ],
+      m => m.type === serviceName
+    )
+    return obj ? obj.id : null
+  }
+  else {
+    /*
+action: "VoIP Call"
+direction: "Outbound"
+from: {phoneNumber: "+12054097374"}
+fromName: "Xudong ZHAO"
+id: "AaIxv8ru3s1CzUA"
+offset: 0
+onBehalfOf: ""
+partyId: "cs169612398538812766-1"
+sessionId: "19748669004"
+startTime: 1539140476053
+telephonySessionId: "Y3MxNjk2MTIzOTg1Mzg4MTI3NjZAMTAuMjguMjAuMTEw"
+telephonyStatus: "CallConnected"
+to: {phoneNumber: "+16504377931"}
+    */
+    let n = body.direction === 'Outbound'
+      ? body.to.phoneNumber
+      : body.from.phoneNumber
+    let fn = formatPhone(n)
+    let contacts = await getContacts()
+    let res = _.find(
+      contacts,
+      contact => {
+        let {
+          phoneNumbers
+        } = contact
+        return _.find(phoneNumbers, nx => {
+          return fn === formatPhone(nx.phoneNumber)
+        })
+      }
+    )
+
+    return _.get(res, 'id')
+  }
+}
+
+async function syncCallLogToHubspot(body) {
+  if (!local.accessToken) {
+    return body.call ? showAuthBtn() : null
+  }
+  if (
+    !body.call && (
+      body.telephonyStatus !== 'NoCall' ||
+      body.terminationType !== 'final'
+    )
+  ) {
+    return
+  }
+  let contactId = await getContactId(body)
+  if (!contactId) {
+    return notify('no related contact', 'warn')
+  }
+  let ownerId = await getOwnerId()
+  if (!ownerId) {
+    return
+  }
+  let now = + new Date()
+  let contactIds = [contactId]
+  let toNumber = body.call
+    ? _.get(body, 'call.to.phoneNumber')
+    : _.get(body, 'to.phoneNumber')
+  let fromNumber = body.call
+    ? _.get(body, 'call.from.phoneNumber')
+    : _.get(body, 'from.phoneNumber')
+  let status = body.call
+    ? getPhoneStatus(
+      _.get(body, 'call.result') || 'COMPLETED'
+    )
+    : 'COMPLETED'
+  let durationMilliseconds = body.call
+    ? body.call.duration * 1000
+    : body.endTime - body.startTime
+  let externalId = body.id || body.call.sessionId
+  let data = {
+    engagement: {
+      active: true,
+      ownerId,
+      type: 'CALL',
+      timestamp: now
+    },
+    associations: {
+      contactIds,
+      companyIds: [],
+      dealIds: [],
+      ownerIds: []
+    },
+    attachments: [],
+    metadata: {
+      externalId,
+      body: '',
+      toNumber,
+      fromNumber,
+      status,
+      durationMilliseconds
+    }
+  }
+  let url = `${apiServerHS}/engagements/v1/engagements`
+  let res = await fetch.post(url, data, commonFetchOptions())
+  if (res && res.engagement) {
+    notify('call log synced to hubspot!', 'success')
+  } else {
+    notify('call log sync to hubspot failed', 'warn')
+    console.log('engagements/v1/engagements error')
+    console.log(res)
+  }
+
+}
+
+function showActivityDetail(body) {
+  let {activity = {}} = body
+  let {
+    subject,
+    body: notes
+  } = activity
+  let msg = `
+    <div>
+      <div class="rc-pd1b">
+        <b>subject: ${subject}</b>
+      </div>
+      <div class="rc-pd1b">
+        ${notes || 'no notes'}
+      </div>
+    </div>
+  `
+  notify(msg, 'info', 8000)
+}
+
+function formatEngagements(arr, contact) {
+  return arr.map(item => {
+    return {
+      id: item.engagement.id,
+      subject: item.engagement.type,
+      time: item.engagement.createdAt,
+      body: item.metadata.body,
+      contact
+    }
+  })
+    .sort((a, b) => {
+      return b.time - a.time
+    })
+  /*
+    [
+      {
+        id: '123',
+        subject: 'Title',
+        time: 1528854702472
+      }
+    ]
+  */
+}
+
+async function getActivities(body) {
+  ///engagements/v1/engagements/associated/:objectType/:objectId/paged
+  let id = _.get(body, 'contact.id')
+  if (!id) {
+    return []
+  }
+  let url = `${apiServerHS}/engagements/v1/engagements/associated/contact/${id}/paged`
+  let res = await fetch.get(url, commonFetchOptions())
+  if (res && res.results) {
+    return formatEngagements(res.results, body.contact)
+  } else {
+    console.log('fetch engagements error')
+    console.log(res)
+  }
+  /*
+body:
+  contact:
+    emails: ["drake.zhao@ringcentral.com"]
+    firstname: "Drake"
+    id: 101
+    lastname: "Zhao"
+    name: "Drake Zhao"
+    phoneNumbers: Array(1)
+    0: {phoneNumber: "(650) 437-7931", phoneType: "directPhone"}
+    length: 1
+    __proto__: Array(0)
+    portalId: 4920570
+    type: "HubSpot"
+  */
+  return []
+}
 
 async function updateToken(newToken, type = 'accessToken') {
   if (!newToken){
@@ -160,6 +392,7 @@ function onClickContactPanel (e) {
  */
 async function showContactInfoPanel(call) {
   if (
+    !call ||
     !call.telephonyStatus ||
     call.telephonyStatus === 'CallConnected'
   ) {
@@ -283,7 +516,7 @@ function buildPhone(contact) {
  * @param {array} contacts
  * @param {string} keyword
  */
-function findMatchContacts(contacts, numbers) {
+function findMatchContacts(contacts, numbers, common = false) {
   let {formatedNumbers, formatNumbersMap} = numbers.reduce((prev, n) => {
     let nn = formatPhone(n)
     prev.formatedNumbers.push(nn)
@@ -304,6 +537,9 @@ function findMatchContacts(contacts, numbers) {
         )
     })
   })
+  if (common) {
+    return res
+  }
   return res.reduce((prev, it) => {
     let phone = _.find(it.phoneNumbers, n => {
       return formatedNumbers.includes(
@@ -372,26 +608,8 @@ async function getContact(
   count = 100
 ) {
   //https://api.hubapi.com/contacts/v1/lists/all/contacts/all
-  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname`
-  let res = await fetch.get(url, {
-    headers: {
-      Authorization: `Bearer ${local.accessToken}`,
-      ...jsonHeader
-    },
-    handleErr: (res) => {
-      let {status} = res
-      if (status === 401) {
-        return {
-          error: 'unauthed'
-        }
-      } else if (status > 304) {
-        handleErr(res)
-      }
-    }
-  })
-  if (res && res.error === 'unauthed') {
-    await updateToken(null)
-  }
+  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone`
+  let res = await fetch.get(url, commonFetchOptions())
   if (res && res.contacts) {
     return res
   } else {
@@ -440,7 +658,6 @@ async function getContacts() {
     time: + new Date(),
     value: final
   }
-  showContactInfoPanel(final[0])
   return final
 }
 
@@ -610,9 +827,6 @@ function renderAuthPanel() {
  */
 async function handleRCEvents(e) {
   let {data} = e
-  // console.log('======data======')
-  // console.log(data, data.type, data.path)
-  // console.log('======data======')
   if (!data) {
     return
   }
@@ -632,6 +846,7 @@ async function handleRCEvents(e) {
     type === 'rc-call-start-notify'
   ) {
     showContactInfoPanel(call)
+    syncCallLogToHubspot(call)
   } else if ('rc-call-end-notify' === type) {
     hideContactInfoPanel()
   }
@@ -689,6 +904,44 @@ async function handleRCEvents(e) {
       }
     }, '*')
   }
+  else if (path === '/callLogger') {
+    // add your codes here to log call to your service
+    console.log(data, 'call log data')
+    syncCallLogToHubspot(data.body)
+    // response to widget
+    rc.postMessage({
+      type: 'rc-post-message-response',
+      responseId: data.requestId,
+      response: { data: 'ok' }
+    }, '*')
+  }
+  else if (path === '/activities') {
+    const activities = await getActivities(data.body)
+    /*
+    [
+      {
+        id: '123',
+        subject: 'Title',
+        time: 1528854702472
+      }
+    ]
+    */
+    // response to widget
+    rc.postMessage({
+      type: 'rc-post-message-response',
+      responseId: data.requestId,
+      response: { data: activities }
+    }, '*')
+  }
+  else if (path === '/activity') {
+    // response to widget
+    showActivityDetail(data.body)
+    rc.postMessage({
+      type: 'rc-post-message-response',
+      responseId: data.requestId,
+      response: { data: 'ok' }
+    }, '*')
+  }
 }
 
 export default async function initThirdPartyApi () {
@@ -714,6 +967,10 @@ export default async function initThirdPartyApi () {
         authorizationPath: '/authorize',
         authorizedTitle: 'Unauthorize',
         unauthorizedTitle: 'Authorize',
+        callLoggerPath: '/callLogger',
+        callLoggerTitle: `Log to ${serviceName}`,
+        activitiesPath: '/activities',
+        activityPath: '/activity',
         authorized: false
       }
     }, '*')

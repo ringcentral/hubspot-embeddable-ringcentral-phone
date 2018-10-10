@@ -57,6 +57,7 @@ body .Adapter_root.Adapter_right
   left 0
   top calc(50% - 80px)
   background #fff
+  border-right 3px solid #ff7a59
   box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
 .rc-dismiss-auth
   cursor pointer
@@ -73,9 +74,27 @@ body .Adapter_root.Adapter_right
   top 0
   bottom 0
 
+.rc-msg-wrap
+  position fixed
+  left -200px
+  top 50%
+  width 200px
+  padding 10px
+  background #fff
+  border-right 3px solid #ff7a59
+  z-index 10000
+  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+.rc-msg-enter
+  left 0
+.rc-msg-type-success
+  color #28a745
+.rc-msg-type-warn
+  color #ffc107
+
 .rc-auth-wrap
   z-index 100000
   padding 0
+  border-right 3px solid #ff7a59
 
 .rc-auth-frame
   position absolute
@@ -94,6 +113,7 @@ body .Adapter_root.Adapter_right
   z-index 10000
   overflow hidden
   box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  border-right 3px solid #ff7a59
 
 .rc-contact-panel.rc-hide-contact-panel
   left -400px
