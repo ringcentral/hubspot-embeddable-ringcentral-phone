@@ -629,7 +629,7 @@ async function getContact(
   count = 100
 ) {
   //https://api.hubapi.com/contacts/v1/lists/all/contacts/all
-  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone`
+  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
   let res = await fetch.get(url, commonFetchOptions())
   if (res && res.contacts) {
     return res

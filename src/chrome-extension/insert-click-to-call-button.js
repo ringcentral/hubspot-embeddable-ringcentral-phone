@@ -8,6 +8,7 @@ import {
   dirtyLoop,
   createCallBtnHtml,
   createElementFromHTML,
+  findParentBySel,
   callWithRingCentral,
   RCBTNCLS2
 } from './helpers'
@@ -54,11 +55,11 @@ class insertHandler {
   }
 
   //in contact call tab try add call with ringcentral button
-  tryAddCallBtn = () => {
+  tryAddCallBtn = async () => {
     let {href} = location
     let {
       urlCheck,
-      getContactPhoneNumber
+      getContactPhoneNumbers
     } = this.config
     if (!urlCheck(href)) {
       return
@@ -70,22 +71,33 @@ class insertHandler {
     if (callWithRingCentralBtn) {
       return
     }
-    let phoneNumber = getContactPhoneNumber()
-    if (phoneNumber) {
-      this.addCallWithRingCentralButton(phoneNumber)
+    let phoneNumbers = await getContactPhoneNumbers()
+    if (phoneNumbers.length) {
+      this.addCallWithRingCentralButton(phoneNumbers)
     }
   }
 
-  addCallWithRingCentralButton = (phoneNumber) => {
+  addCallWithRingCentralButton = (phoneNumbers) => {
     let {elem, insertMethod} = this.getParentDom()
     if (!elem) {
       return
     }
-    let callByRingCentralBtn = createElementFromHTML(createCallBtnHtml(RCBTNCLS2))
+    let callByRingCentralBtn = createElementFromHTML(
+      createCallBtnHtml(RCBTNCLS2, phoneNumbers)
+    )
+    callByRingCentralBtn.addEventListener('click', (e) => {
+      if (phoneNumbers.length === 1) {
+        return callWithRingCentral(phoneNumbers[0].number)
+      }
+      let {target} = e
+      let p = findParentBySel(target, '.rc-call-dd')
+      if (!p) {
+        return
+      }
+      let n = p.querySelector('b').textContent.trim()
+      callWithRingCentral(n)
+    })
 
-    callByRingCentralBtn.onclick = () => {
-      callWithRingCentral(phoneNumber)
-    }
     elem[insertMethod](
       callByRingCentralBtn,
       elem.childNodes[0]

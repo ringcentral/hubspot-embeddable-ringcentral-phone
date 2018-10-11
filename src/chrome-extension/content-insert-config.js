@@ -1,25 +1,61 @@
 /**
  * config content insert related feature
  */
-import {RCBTNCLS2, checkPhoneNumber} from './helpers'
+import {
+  RCBTNCLS2,
+  checkPhoneNumber,
+  getCSRFToken
+} from './helpers'
+import {thirdPartyConfigs} from './app-config'
+import fetch, {jsonHeader} from '../common/fetch'
+
+let {
+  apiServerHS
+} = thirdPartyConfigs
+
+let phoneTypeDict = {
+  phone: 'phone number',
+  company: 'company phone number',
+  mobilephone: 'mobile phone number'
+}
+
+function formatNumbers(res) {
+  return Object.keys(res).map(k => {
+    return {
+      id: k,
+      title: phoneTypeDict[k],
+      number: res[k].formattedNumber
+    }
+  })
+    .filter(o => checkPhoneNumber(o.number))
+}
+
+async function getNumbers() {
+  let {href} = location
+  let reg = /contacts\/(\d+)\/contact\/(\d+)/
+  let arr = href.match(reg) || []
+  let portalId = arr[1]
+  let vid = arr[2]
+  if (!portalId || !vid) {
+    return []
+  }
+  let url = `${apiServerHS}/twilio/v1/phonenumberinfo/contactPhoneNumbersByProperty?portalId=${portalId}&clienttimeout=14000&contactVid=${vid}`
+  let csrf = getCSRFToken()
+  let res = await fetch.get(url, {
+    headers: {
+      ...jsonHeader,
+      'x-hubspot-csrf-hubspotapi': csrf
+    }
+  })
+  return res ? formatNumbers(res) : []
+}
+
 export const insertClickToCallButton = [
   {
     urlCheck: href => {
       return href.includes('?interaction=call')
     },
-    getContactPhoneNumber: () => {
-      let phoneWrap = document.querySelector('[data-profile-property=\'phone\']')
-      if (!phoneWrap) {
-        return false
-      }
-      let phoneInput = phoneWrap.querySelector('input')
-      if (!phoneInput) {
-        return false
-      }
-      let {value} = phoneInput
-      let isNumber = checkPhoneNumber(value)
-      return isNumber ? value : false
-    },
+    getContactPhoneNumbers: getNumbers,
     parentsToInsertButton: [
       {
         getElem: () => {

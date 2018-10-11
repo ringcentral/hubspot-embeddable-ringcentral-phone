@@ -230,3 +230,35 @@ body .Adapter_root.Adapter_right
 .rc-btn-submit
   background #08c
   color #fff
+
+.rc-call-dds
+  display none
+  left -20px
+  top 100%
+  width 300px
+  background #fff
+  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+
+.rc-call-dd
+  padding 8px 10px
+  cursor pointer
+  border-bottom 1px solid #eee
+  &:last-child
+    border none
+  &:hover
+    background #08c
+    color #fff
+
+
+.rc-has-dd
+  position relative
+  height 33px
+  width 163px
+  z-index 888
+  &:hover
+    .rc-call-dds
+      display block
+      z-index 8888
+
+
+

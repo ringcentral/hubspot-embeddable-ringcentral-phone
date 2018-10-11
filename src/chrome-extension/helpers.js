@@ -12,6 +12,13 @@ export function getHost() {
   return `${protocol}//${host}`
 }
 
+export function getCSRFToken() {
+  return _.get(
+    document.cookie.match(/hubspotapi-csrf=([^=;]+);/),
+    '[1]'
+  )
+}
+
 let msgHandler1
 let msgHandler2
 export function notify(msg, type = 'info', timer = 5000) {
@@ -117,9 +124,40 @@ export function findParentBySel(node, sel) {
   return res
 }
 
-export const createCallBtnHtml = (cls = '') => `
-<span class="${RCBTNCLS} rc-mg1r ${cls}">
-  <span class="rc-iblock rc-mg1r">Call with</span>
-  <img src="${RCLOGOSVG}" class="rc-iblock" />
-</span>
-`
+function createDropdown(phoneNumbers) {
+  if (!phoneNumbers || phoneNumbers.length < 2) {
+    return ''
+  }
+  let dds = phoneNumbers.reduce((prev, obj) => {
+    let {
+      number,
+      title
+    } = obj
+    return prev +
+    `
+    <div class="rc-call-dd">
+      <span>${title}:</span>
+      <b>${number}</b>
+    </div>
+    `
+  }, '')
+  return `
+  <div class="rc-call-dds">
+    ${dds}
+  </div>
+  `
+}
+
+export const createCallBtnHtml = (cls = '', phoneNumbers) => {
+  let cls2 = phoneNumbers && phoneNumbers.length > 1
+    ? 'rc-has-dd'
+    : ''
+  return `
+    <span class="${RCBTNCLS} rc-mg1r ${cls} ${cls2}">
+      <span class="rc-iblock rc-mg1r">Call with</span>
+      <img src="${RCLOGOSVG}" class="rc-iblock" />
+      ${createDropdown(phoneNumbers)}
+    </span>
+  `
+}
+
