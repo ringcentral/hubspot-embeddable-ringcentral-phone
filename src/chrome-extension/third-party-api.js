@@ -8,7 +8,7 @@
 
 import {formatNumber} from 'libphonenumber-js'
 import {thirdPartyConfigs} from './app-config'
-import getPhoneStatus from './phone-result-map'
+import {createForm} from './call-log-sync-form'
 import * as ls from './ls'
 import {
   createElementFromHTML,
@@ -28,7 +28,9 @@ let {
   clientSecretHS,
   appServerHS,
   apiServerHS,
-  appRedirectHS
+  appRedirectHS,
+  showCallLogSyncForm,
+  autoSyncCallLogAfterCallEnd
 } = thirdPartyConfigs
 
 let lsKeys = {
@@ -158,17 +160,32 @@ async function getContactId(body) {
 }
 
 async function syncCallLogToHubspot(body) {
+  let isManuallySync = !!body.call
   if (!local.accessToken) {
-    return body.call ? showAuthBtn() : null
+    return isManuallySync ? showAuthBtn() : null
   }
   if (
-    !body.call && (
+    !isManuallySync && (
       body.telephonyStatus !== 'NoCall' ||
       body.terminationType !== 'final'
     )
   ) {
     return
   }
+  if (showCallLogSyncForm && isManuallySync) {
+    return createForm(
+      body.call,
+      serviceName,
+      (formData) => doSync(body, formData)
+    )
+  } else {
+    doSync(body, {})
+  }
+
+}
+
+async function doSync(body, formData) {
+  let isManuallySync = !!body.call
   let contactId = await getContactId(body)
   if (!contactId) {
     return notify('no related contact', 'warn')
@@ -179,18 +196,14 @@ async function syncCallLogToHubspot(body) {
   }
   let now = + new Date()
   let contactIds = [contactId]
-  let toNumber = body.call
+  let toNumber = isManuallySync
     ? _.get(body, 'call.to.phoneNumber')
     : _.get(body, 'to.phoneNumber')
-  let fromNumber = body.call
+  let fromNumber = isManuallySync
     ? _.get(body, 'call.from.phoneNumber')
     : _.get(body, 'from.phoneNumber')
-  let status = body.call
-    ? getPhoneStatus(
-      _.get(body, 'call.result') || 'COMPLETED'
-    )
-    : 'COMPLETED'
-  let durationMilliseconds = body.call
+  let status = 'COMPLETED'
+  let durationMilliseconds = isManuallySync
     ? body.call.duration * 1000
     : body.endTime - body.startTime
   let externalId = body.id || body.call.sessionId
@@ -210,7 +223,7 @@ async function syncCallLogToHubspot(body) {
     attachments: [],
     metadata: {
       externalId,
-      body: '',
+      body: formData.description,
       toNumber,
       fromNumber,
       status,
@@ -226,7 +239,6 @@ async function syncCallLogToHubspot(body) {
     console.log('post engagements/v1/engagements error')
     console.log(res)
   }
-
 }
 
 function showActivityDetail(body) {
@@ -286,21 +298,6 @@ async function getActivities(body) {
     console.log('fetch engagements error')
     console.log(res)
   }
-  /*
-body:
-  contact:
-    emails: ["drake.zhao@ringcentral.com"]
-    firstname: "Drake"
-    id: 101
-    lastname: "Zhao"
-    name: "Drake Zhao"
-    phoneNumbers: Array(1)
-    0: {phoneNumber: "(650) 437-7931", phoneType: "directPhone"}
-    length: 1
-    __proto__: Array(0)
-    portalId: 4920570
-    type: "HubSpot"
-  */
   return []
 }
 
@@ -863,7 +860,9 @@ async function handleRCEvents(e) {
     type === 'rc-call-start-notify'
   ) {
     showContactInfoPanel(call)
-    syncCallLogToHubspot(call)
+    if (autoSyncCallLogAfterCallEnd) {
+      syncCallLogToHubspot(call)
+    }
   } else if ('rc-call-end-notify' === type) {
     hideContactInfoPanel()
   }
@@ -923,7 +922,6 @@ async function handleRCEvents(e) {
   }
   else if (path === '/callLogger') {
     // add your codes here to log call to your service
-    console.log(data, 'call log data')
     syncCallLogToHubspot(data.body)
     // response to widget
     rc.postMessage({

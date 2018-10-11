@@ -48,6 +48,12 @@ module.exports = {
 
     // hubspot app redirect uri, not required
     // appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
+
+    // show call log sync desc form or not
+    // showCallLogSyncForm: true
+
+    // control if auto sync call log to hubspot when call end
+    // autoSyncCallLogAfterCallEnd: true
   },
 
   //// content modification for click to call feature
