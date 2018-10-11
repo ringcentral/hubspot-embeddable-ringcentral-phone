@@ -6,6 +6,12 @@ export const RCBTNCLS = 'call-with-ringccentral-btn'
 export const RCBTNCLS2 = 'call-with-rc-btn'
 export const RCTOOLTIPCLS = 'rc-tooltip'
 
+
+export function getHost() {
+  let {host, protocol} = location
+  return `${protocol}//${host}`
+}
+
 let msgHandler1
 let msgHandler2
 export function notify(msg, type = 'info', timer = 5000) {

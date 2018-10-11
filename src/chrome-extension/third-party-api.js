@@ -15,11 +15,13 @@ import {
   findParentBySel,
   popup,
   notify,
+  getHost,
   callWithRingCentral
 } from './helpers'
 import fetch, {jsonHeader, handleErr} from '../common/fetch'
 import _ from 'lodash'
 import logo from './rc-logo'
+import extLinkSvg from './link-external.svg'
 
 let {
   clientIDHS,
@@ -71,6 +73,37 @@ const commonFetchOptions = () => ({
   }
 })
 
+function getPortalId() {
+  let dom = document.querySelector('.navAccount-portalId')
+  return dom
+    ? dom.textContent.trim()
+    : ''
+}
+
+function notifySyncSuccess({
+  contactId
+}) {
+  let type = 'success'
+  let portalId = getPortalId()
+  let url = `${getHost()}/contacts/${portalId}/contact/${contactId}/?interaction=call`
+  let msg = `
+    <div>
+      <div class="rc-pd1b">
+        Call log synced to hubspot!
+      </div>
+      <div class="rc-pd1b">
+        <a href="${url}" target="_blank">
+          <img src="${extLinkSvg}" width=16 height=16 class="rc-iblock rc-mg1r" />
+          <span class="rc-iblock">
+            Check contact activities
+          </span>
+        </a>
+      </div>
+    </div>
+  `
+  notify(msg, type, 9000)
+}
+
 async function getOwnerId() {
   let emailDom = document.querySelector('.user-info-email')
   if (!emailDom) {
@@ -103,21 +136,6 @@ async function getContactId(body) {
     return obj ? obj.id : null
   }
   else {
-    /*
-action: "VoIP Call"
-direction: "Outbound"
-from: {phoneNumber: "+12054097374"}
-fromName: "Xudong ZHAO"
-id: "AaIxv8ru3s1CzUA"
-offset: 0
-onBehalfOf: ""
-partyId: "cs169612398538812766-1"
-sessionId: "19748669004"
-startTime: 1539140476053
-telephonySessionId: "Y3MxNjk2MTIzOTg1Mzg4MTI3NjZAMTAuMjguMjAuMTEw"
-telephonyStatus: "CallConnected"
-to: {phoneNumber: "+16504377931"}
-    */
     let n = body.direction === 'Outbound'
       ? body.to.phoneNumber
       : body.from.phoneNumber
@@ -202,10 +220,10 @@ async function syncCallLogToHubspot(body) {
   let url = `${apiServerHS}/engagements/v1/engagements`
   let res = await fetch.post(url, data, commonFetchOptions())
   if (res && res.engagement) {
-    notify('call log synced to hubspot!', 'success')
+    notifySyncSuccess({contactId})
   } else {
     notify('call log sync to hubspot failed', 'warn')
-    console.log('engagements/v1/engagements error')
+    console.log('post engagements/v1/engagements error')
     console.log(res)
   }
 
@@ -426,8 +444,7 @@ async function showContactInfoPanel(call) {
   // if (contactTrLinkElem) {
   //   return showNativeContact(contact, contactTrLinkElem)
   // }
-  let {host, protocol} = location
-  let url = `${protocol}//${host}/contacts/${contact.portalId}/contact/${contact.id}/?interaction=note`
+  let url = `${getHost()}/contacts/${contact.portalId}/contact/${contact.id}/?interaction=note`
   let elem = createElementFromHTML(
     `
     <div class="animate rc-contact-panel" draggable="false">

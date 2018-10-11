@@ -81,18 +81,18 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 117);
+/******/ 	return __webpack_require__(__webpack_require__.s = 118);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 117:
+/***/ 118:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-__webpack_require__(118);
+__webpack_require__(119);
 
 function parseQuery(queryString) {
   let query = {};
@@ -127,11 +127,11 @@ window.addEventListener('load', init);
 
 /***/ }),
 
-/***/ 118:
+/***/ 119:
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(119);
+var content = __webpack_require__(120);
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -153,7 +153,7 @@ if(false) {}
 
 /***/ }),
 
-/***/ 119:
+/***/ 120:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(13)(false);
