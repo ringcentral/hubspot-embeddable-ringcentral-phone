@@ -515,14 +515,21 @@ function buildEmail(contact) {
  */
 function buildPhone(contact) {
   let phoneNumber = _.get(contact, 'properties.phone.value')
-  return phoneNumber
-    ? [
-      {
-        phoneNumber,
-        phoneType: 'directPhone'
-      }
-    ]
-    : []
+  let mobile = _.get(contact, 'properties.mobilephone.value')
+  let res = []
+  if (phoneNumber) {
+    res.push({
+      phoneNumber,
+      phoneType: 'directPhone'
+    })
+  }
+  if (mobile) {
+    res.push({
+      phoneNumber: mobile,
+      phoneType: 'directPhone'
+    })
+  }
+  return res
 }
 
 /**

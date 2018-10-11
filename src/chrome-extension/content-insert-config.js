@@ -49,7 +49,7 @@ export const insertClickToCallButton = [
 export const hoverShowClickToCallButton = [
   {
     urlCheck: href => {
-      return href.includes('contacts/list/view/all/')
+      return href.includes('contacts/list/') || href.includes('contacts/view/all/')
     },
     selector: 'table.table tbody tr',
     getPhoneElemFromElem: elem => {
