@@ -51,9 +51,6 @@ module.exports = {
 
     // show call log sync desc form or not
     // showCallLogSyncForm: true
-
-    // control if auto sync call log to hubspot when call end
-    // autoSyncCallLogAfterCallEnd: true
   },
 
   //// content modification for click to call feature

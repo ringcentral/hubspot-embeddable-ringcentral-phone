@@ -24,8 +24,7 @@ let config = {
     appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
     appServerHS: 'https://app.hubspot.com',
     apiServerHS: 'https://api.hubspot.com',
-    showCallLogSyncForm: true,
-    autoSyncCallLogAfterCallEnd: true
+    showCallLogSyncForm: true
   }
 
 }

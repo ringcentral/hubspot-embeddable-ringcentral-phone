@@ -30,8 +30,7 @@ let {
   appServerHS,
   apiServerHS,
   appRedirectHS,
-  showCallLogSyncForm,
-  autoSyncCallLogAfterCallEnd
+  showCallLogSyncForm
 } = thirdPartyConfigs
 
 let lsKeys = {
@@ -158,17 +157,14 @@ async function getContactId(body) {
 }
 
 async function syncCallLogToHubspot(body) {
-  let isManuallySync = body.call && !body.call.sipData && body.triggerType !== 'callLogSync'
+  console.log(body, 'body')
+  let isManuallySync = !body.triggerType
+  let isAutoSync = body.triggerType === 'callLogSync'
+  if (!isAutoSync && !isManuallySync) {
+    return
+  }
   if (!local.accessToken) {
     return isManuallySync ? showAuthBtn() : null
-  }
-  if (
-    !isManuallySync && (
-      body.telephonyStatus !== 'NoCall' ||
-      body.terminationType !== 'final'
-    )
-  ) {
-    return
   }
   if (showCallLogSyncForm && isManuallySync) {
     return createForm(
@@ -183,7 +179,6 @@ async function syncCallLogToHubspot(body) {
 }
 
 async function doSync(body, formData) {
-  let isManuallySync = !!body.call
   let contactId = await getContactId(body)
   if (!contactId) {
     return notify('no related contact', 'warn')
@@ -194,16 +189,10 @@ async function doSync(body, formData) {
   }
   let now = + new Date()
   let contactIds = [contactId]
-  let toNumber = isManuallySync
-    ? _.get(body, 'call.to.phoneNumber')
-    : _.get(body, 'to.phoneNumber')
-  let fromNumber = isManuallySync
-    ? _.get(body, 'call.from.phoneNumber')
-    : _.get(body, 'from.phoneNumber')
+  let toNumber = _.get(body, 'call.to.phoneNumber')
+  let fromNumber = _.get(body, 'call.from.phoneNumber')
   let status = 'COMPLETED'
-  let durationMilliseconds = isManuallySync
-    ? body.call.duration * 1000
-    : body.endTime - body.startTime
+  let durationMilliseconds = body.call.duration * 1000
   let externalId = body.id || body.call.sessionId
   let data = {
     engagement: {
@@ -861,9 +850,6 @@ async function handleRCEvents(e) {
     type === 'rc-call-start-notify'
   ) {
     showContactInfoPanel(call)
-    if (autoSyncCallLogAfterCallEnd) {
-      syncCallLogToHubspot(call)
-    }
   } else if ('rc-call-end-notify' === type) {
     hideContactInfoPanel()
   }
