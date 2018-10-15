@@ -158,7 +158,7 @@ async function getContactId(body) {
 }
 
 async function syncCallLogToHubspot(body) {
-  let isManuallySync = body.call && !body.call.sipData
+  let isManuallySync = body.call && !body.call.sipData && body.triggerType !== 'callLogSync'
   if (!local.accessToken) {
     return isManuallySync ? showAuthBtn() : null
   }
