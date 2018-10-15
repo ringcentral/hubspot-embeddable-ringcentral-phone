@@ -1,4 +1,14 @@
 @require '../css/box'
+box-shadow()
+  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+@keyframes spin
+    from
+      transform rotate(0deg)
+    to
+      transform rotate(360deg)
+.rc-spinning
+  animation spin 4s infinite linear
+
 body .Adapter_root.Adapter_right
   right 60px
 .rc-auth-btn
@@ -58,7 +68,7 @@ body .Adapter_root.Adapter_right
   top calc(50% - 80px)
   background #fff
   border-right 3px solid #ff7a59
-  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  box-shadow()
 .rc-dismiss-auth
   cursor pointer
   font-size 16px
@@ -83,7 +93,7 @@ body .Adapter_root.Adapter_right
   background #fff
   border-right 3px solid #ff7a59
   z-index 10000
-  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  box-shadow()
 .rc-msg-enter
   left 0
 .rc-msg-type-success
@@ -112,7 +122,7 @@ body .Adapter_root.Adapter_right
   bottom 0
   z-index 10000
   overflow hidden
-  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  box-shadow()
   border-right 3px solid #ff7a59
 
 .rc-contact-panel.rc-hide-contact-panel
@@ -190,7 +200,7 @@ body .Adapter_root.Adapter_right
   width 300px
   bottom 40px
   height 460px
-  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  box-shadow()
   border-right 3px solid #ff7a59
 .rc-sync-show
   left 0
@@ -237,7 +247,7 @@ body .Adapter_root.Adapter_right
   top 100%
   width 300px
   background #fff
-  box-shadow 0px 0px 5px 1px rgba(0, 0, 0, 0.18)
+  box-shadow()
 
 .rc-call-dd
   padding 8px 10px
@@ -260,5 +270,7 @@ body .Adapter_root.Adapter_right
       display block
       z-index 8888
 
-
-
+.rc-phone-list
+  background #fff
+  padding 10px
+  box-shadow()

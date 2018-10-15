@@ -5,7 +5,7 @@ import RCLOGOSVG from './rc-logo'
 export const RCBTNCLS = 'call-with-ringccentral-btn'
 export const RCBTNCLS2 = 'call-with-rc-btn'
 export const RCTOOLTIPCLS = 'rc-tooltip'
-
+export const RCLOADINGCLS = 'rc-loading-wrap'
 
 export function getHost() {
   let {host, protocol} = location
@@ -124,7 +124,7 @@ export function findParentBySel(node, sel) {
   return res
 }
 
-function createDropdown(phoneNumbers) {
+export function createPhoneList(phoneNumbers, cls = 'rc-call-dds') {
   if (!phoneNumbers || phoneNumbers.length < 2) {
     return ''
   }
@@ -142,7 +142,7 @@ function createDropdown(phoneNumbers) {
     `
   }, '')
   return `
-  <div class="rc-call-dds">
+  <div class="${cls}">
     ${dds}
   </div>
   `
@@ -156,8 +156,17 @@ export const createCallBtnHtml = (cls = '', phoneNumbers) => {
     <span class="${RCBTNCLS} rc-mg1r ${cls} ${cls2}">
       <span class="rc-iblock rc-mg1r">Call with</span>
       <img src="${RCLOGOSVG}" class="rc-iblock" />
-      ${createDropdown(phoneNumbers)}
+      ${createPhoneList(phoneNumbers)}
     </span>
   `
 }
 
+export function onClickPhoneNumber(e) {
+  let {target} = e
+  let p = findParentBySel(target, '.rc-call-dd')
+  if (!p) {
+    return
+  }
+  let n = p.querySelector('b').textContent.trim()
+  callWithRingCentral(n)
+}

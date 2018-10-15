@@ -10,6 +10,7 @@ import {formatNumber} from 'libphonenumber-js'
 import {thirdPartyConfigs} from './app-config'
 import {createForm} from './call-log-sync-form'
 import * as ls from './ls'
+import {setCache, getCache} from './cache'
 import {
   createElementFromHTML,
   findParentBySel,
@@ -44,14 +45,11 @@ let local = {
   expireTime: null
 }
 
+let cacheKey = 'contacts'
 let authEventInited = false
 let rcLogined = false
 let tokenHandler
-let cache = {}
-let cacheKey = 'contacts'
 const phoneFormat = 'National'
-//let oldRcFrameStyle = ''
-const cacheTime = 10 * 1000 //10 seconds cache
 
 const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
 const authUrl = `${appServerHS}/oauth/authorize?` +
@@ -655,11 +653,10 @@ async function getContacts() {
     showAuthBtn()
     return []
   }
-  let now = + new Date()
-  let cacheLastTime = _.get(cache, `${cacheKey}.time`)
-  if (cacheLastTime && now - cacheLastTime < cacheTime) {
-    console.log('return cache')
-    return cache[cacheKey].value
+  let cached = getCache(cacheKey)
+  if (cached) {
+    console.log('use cache')
+    return cached
   }
   let contacts = []
   let res = await getContact()
@@ -675,10 +672,7 @@ async function getContacts() {
     ]
   }
   let final = formatContacts(contacts)
-  cache[cacheKey] = {
-    time: + new Date(),
-    value: final
-  }
+  setCache(cacheKey, final)
   return final
 }
 

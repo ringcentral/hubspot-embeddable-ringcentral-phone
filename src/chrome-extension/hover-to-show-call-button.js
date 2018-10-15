@@ -12,10 +12,15 @@ import {
   findParentBySel,
   createCallBtnHtml,
   createElementFromHTML,
-  checkPhoneNumber,
+  createPhoneList,
+  onClickPhoneNumber,
+  notify,
+  RCBTNCLS,
+  RCLOADINGCLS,
   callWithRingCentral,
   RCTOOLTIPCLS
 } from './helpers'
+import createLoading from './loading'
 
 class HoverHandler {
   constructor(config) {
@@ -43,8 +48,7 @@ class HoverHandler {
   handleAddRCBtn = (e) => {
     let {target} = e
     let {
-      selector,
-      getPhoneElemFromElem
+      selector
     } = this.config
     let dom = findParentBySel(target, selector)
     let isToolTip = findParentBySel(target, '.' + RCTOOLTIPCLS)
@@ -54,18 +58,9 @@ class HoverHandler {
     if (!dom || this.currentRow === dom) {
       return
     }
-    let phoneNumberNode = getPhoneElemFromElem(dom)
-    let text = phoneNumberNode
-      ? (phoneNumberNode.textContent || '').trim()
-      : ''
-    if (!checkPhoneNumber(text)) {
-      return
-    }
     this.currentRow = dom
-    let {tooltip, isShowing} = this.getRCTooltip(text)
-    if (!isShowing) {
-      tooltip.setAttribute('style', this.buildStyle(e, dom))
-    }
+    let {tooltip} = this.getRCTooltip()
+    tooltip.setAttribute('style', this.buildStyle(e, dom))
   }
 
   /**
@@ -80,14 +75,14 @@ class HoverHandler {
     if (clientX > window.innerWidth - 120) {
       clientX = window.innerWidth - 120
     }
-    return `left:${clientX + 3}px;top:${top - 34}px;display:block;`
+    return `left:${clientX + 3}px;top:${top - 5}px;display:block;`
   }
 
   /**
    * get ringcentral contact button wrap dom
    * if not created, just create and append to body
    */
-  getRCTooltip = (phoneNumber) => {
+  getRCTooltip = () => {
     let tooltip = document.querySelector('.' + RCTOOLTIPCLS)
     let isShowing = tooltip
       ? tooltip.style.display === 'block'
@@ -98,12 +93,60 @@ class HoverHandler {
           ${createCallBtnHtml()}
         </div>
       `)
+    } else {
+      tooltip.innerHTML = createCallBtnHtml()
     }
-    tooltip.onclick = () => {
-      callWithRingCentral(phoneNumber)
-    }
+    tooltip.onclick = this.onClick
     document.body.appendChild(tooltip)
     return {tooltip, isShowing}
+  }
+
+  onClick = async () => {
+    let {currentRow} = this
+    let {getContactPhoneNumbers} = this.config
+    this.loading(true)
+    let numbers = await getContactPhoneNumbers(currentRow)
+    this.loading(false)
+    if (!numbers.length) {
+      notify('No phone number for this contact', 'warn')
+      return this.hideRCBtn()
+    }
+    else if (numbers.length === 1) {
+      this.hideRCBtn()
+      callWithRingCentral(numbers[0].number)
+    }
+    else {
+      this.showNumbers(numbers)
+    }
+  }
+
+  showNumbers = numbers => {
+    let phonesHtml = createPhoneList(numbers, 'rc-phone-list')
+    let dom = createElementFromHTML(phonesHtml)
+    let tooltip = document.querySelector(
+      `.${RCTOOLTIPCLS}`
+    )
+    if (tooltip) {
+      tooltip.appendChild(dom)
+      tooltip.onclick = onClickPhoneNumber
+    }
+  }
+
+  loading = isLoading => {
+    if (isLoading) {
+      let {tooltip} = this.getRCTooltip()
+      let dom = tooltip.querySelector(`.${RCBTNCLS}`)
+      dom.appendChild(
+        createLoading()
+      )
+    } else {
+      let ld = document.querySelector(
+        `.${RCTOOLTIPCLS} .${RCLOADINGCLS}`
+      )
+      if (ld) {
+        ld.remove()
+      }
+    }
   }
 
   hideRCBtn = _.throttle(() => {

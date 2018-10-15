@@ -8,8 +8,8 @@ import {
   dirtyLoop,
   createCallBtnHtml,
   createElementFromHTML,
-  findParentBySel,
   callWithRingCentral,
+  onClickPhoneNumber,
   RCBTNCLS2
 } from './helpers'
 
@@ -89,13 +89,7 @@ class insertHandler {
       if (phoneNumbers.length === 1) {
         return callWithRingCentral(phoneNumbers[0].number)
       }
-      let {target} = e
-      let p = findParentBySel(target, '.rc-call-dd')
-      if (!p) {
-        return
-      }
-      let n = p.querySelector('b').textContent.trim()
-      callWithRingCentral(n)
+      onClickPhoneNumber(e)
     })
 
     elem[insertMethod](
