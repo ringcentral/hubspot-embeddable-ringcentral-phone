@@ -45,7 +45,7 @@ class HoverHandler {
     document.addEventListener('mouseenter', this.handleAddRCBtn, true)
   }
 
-  handleAddRCBtn = (e) => {
+  handleAddRCBtn = _.throttle((e) => {
     let {target} = e
     let {
       selector
@@ -61,7 +61,7 @@ class HoverHandler {
     this.currentRow = dom
     let {tooltip} = this.getRCTooltip()
     tooltip.setAttribute('style', this.buildStyle(e, dom))
-  }
+  }, 100)
 
   /**
    * build tooltip postition style from event
