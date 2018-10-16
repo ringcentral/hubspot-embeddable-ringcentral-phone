@@ -5,7 +5,7 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
  [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
 
 ## Youtube video
-https://youtu.be/zxHnCCR3Po4
+https://youtu.be/4okL0AxL-dg
 
 ## Screenshots
 | screenshots            |  screenshots |
