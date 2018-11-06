@@ -45,7 +45,7 @@ class HoverHandler {
     document.addEventListener('mouseenter', this.handleAddRCBtn, true)
   }
 
-  handleAddRCBtn = _.throttle((e) => {
+  handleAddRCBtn = _.debounce((e) => {
     let {target} = e
     let {
       selector
@@ -84,10 +84,11 @@ class HoverHandler {
    */
   getRCTooltip = () => {
     let tooltip = document.querySelector('.' + RCTOOLTIPCLS)
+    let hasToolTip = !!tooltip
     let isShowing = tooltip
       ? tooltip.style.display === 'block'
       : false
-    if (!tooltip) {
+    if (!hasToolTip) {
       tooltip = createElementFromHTML(`
         <div class="${RCTOOLTIPCLS}">
           ${createCallBtnHtml()}
@@ -97,7 +98,9 @@ class HoverHandler {
       tooltip.innerHTML = createCallBtnHtml()
     }
     tooltip.onclick = this.onClick
-    document.body.appendChild(tooltip)
+    if (!hasToolTip) {
+      document.body.appendChild(tooltip)
+    }
     return {tooltip, isShowing}
   }
 
@@ -149,7 +152,7 @@ class HoverHandler {
     }
   }
 
-  hideRCBtn = _.throttle(() => {
+  hideRCBtn = _.debounce(() => {
     this.currentRow = null
     let {tooltip} = this.getRCTooltip()
     tooltip.setAttribute('style', 'display:none')
