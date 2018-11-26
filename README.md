@@ -14,7 +14,7 @@ https://youtu.be/4okL0AxL-dg
 ![hubspot-list2](screenshots/hubspot-list2.png) | ![hubspot-list2](screenshots/hs1.png)
 ![hubspot-list2](screenshots/hs2.png) | ![hubspot-list2](screenshots/hs3.png)
 ![hubspot-list2](screenshots/hs4.png) | ![hubspot-list2](screenshots/hs5.png)
-![hubspot-list2](screenshots/hs6.png) |  
+![hubspot-list2](screenshots/hs6.png) | ![hubspot-list2](screenshots/hs7.png)
 
 ## Features
 - Click to call button
