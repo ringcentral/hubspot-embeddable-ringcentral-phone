@@ -1,7 +1,7 @@
 
 
 import main from './init'
-import {ringCentralConfigs} from './app-config'
+import {ringCentralConfigs} from './common/app-config'
 
 let {
   clientID,
@@ -23,3 +23,4 @@ if (clientID || appServer) {
 })()
 
 window.addEventListener('load', main)
+

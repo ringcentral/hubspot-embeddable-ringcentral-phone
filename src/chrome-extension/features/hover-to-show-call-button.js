@@ -5,7 +5,7 @@
  * but still, you can add custom behaviors if the config does not meet your needs
  */
 
-import {hoverShowClickToCallButton} from './content-insert-config'
+import {hoverShowClickToCallButton} from '../config'
 import _ from 'lodash'
 import {
   dirtyLoop,
@@ -19,8 +19,8 @@ import {
   RCLOADINGCLS,
   callWithRingCentral,
   RCTOOLTIPCLS
-} from './helpers'
-import createLoading from './loading'
+} from '../common/helpers'
+import createLoading from '../common/loading'
 
 class HoverHandler {
   constructor(config) {

@@ -1,23 +1,16 @@
 
 
-import initThirdPartyApi from './third-party-api'
-import insertClickToCall from './insert-click-to-call-button'
-import addHoverEvent from './hover-to-show-call-button'
+import initThirdPartyApi from './features/third-party-api'
+import insertClickToCall from './features/insert-click-to-call-button'
+import addHoverEvent from './features/hover-to-show-call-button'
+import convertPhoneLink from './features/make-phone-number-clickable'
 import {
   popup
-} from './helpers'
-import './style.styl'
+} from './common/helpers'
+import './common/style.styl'
+import './common/custom.styl'
 
 function registerService() {
-  // Listen message from background.js to open app window when user click icon.
-  chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      if (request.action === 'openAppWindow') {
-        popup()
-      }
-      sendResponse('ok')
-    }
-  )
 
   // handle contacts sync feature
   initThirdPartyApi()
@@ -27,9 +20,23 @@ function registerService() {
 
   // add event handler to developer configed element, show click-to-dial tooltip to the elements
   addHoverEvent()
+
+  // convert phonenumber text to click-to-dial link
+  convertPhoneLink()
+
+  // Listen message from background.js to open app window when user click icon.
+  chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+      if (request.action === 'openAppWindow') {
+        popup()
+      }
+      sendResponse('ok')
+    }
+  )
 }
 
 let registered = false
+
 export default () => {
   window.addEventListener('message', function (e) {
     const data = e.data

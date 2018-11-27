@@ -1,15 +1,44 @@
 import {parseNumber} from 'libphonenumber-js'
 import _ from 'lodash'
+import {jsonHeader, handleErr} from'./fetch'
 import RCLOGOSVG from './rc-logo'
+import {formatNumber} from 'libphonenumber-js'
 
 export const RCBTNCLS = 'call-with-ringccentral-btn'
 export const RCBTNCLS2 = 'call-with-rc-btn'
 export const RCTOOLTIPCLS = 'rc-tooltip'
 export const RCLOADINGCLS = 'rc-loading-wrap'
+export const lsKeys = {
+  accessTokenLSKey: 'third-party-access-token',
+  refreshTokenLSKey: 'third-party-refresh-token',
+  expireTimeLSKey: 'third-party-expire-time'
+}
+export const host = getHost()
+export const commonFetchOptions = (headers) => ({
+  headers: headers || {
+    Authorization: `Bearer ${window.rc.local.accessToken}`,
+    ...jsonHeader
+  },
+  handleErr: (res) => {
+    let {status} = res
+    if (status === 401) {
+      window.rc.updateToken(null)
+    }
+    if (status > 304) {
+      handleErr(res)
+    }
+  }
+})
 
-export function getHost() {
+const phoneFormat = 'National'
+
+function getHost() {
   let {host, protocol} = location
   return `${protocol}//${host}`
+}
+
+export function formatPhone(phone) {
+  return formatNumber(phone, phoneFormat)
 }
 
 export function getCSRFToken() {
