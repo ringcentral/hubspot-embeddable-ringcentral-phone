@@ -1,7 +1,13 @@
 
+/**
+ * content.js for chrome extension
+ */
 
-import main from './init'
-import {ringCentralConfigs} from './common/app-config'
+import createApp from 'ringcentral-embeddable-extension-common/src/spa/init'
+import * as config from './config'
+import {ringCentralConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import 'ringcentral-embeddable-extension-common/src/spa/style.styl'
+import './custom.styl'
 
 let {
   clientID,
@@ -22,5 +28,5 @@ if (clientID || appServer) {
   rcs0.parentNode.insertBefore(rcs, rcs0)
 })()
 
-window.addEventListener('load', main)
+window.addEventListener('load', createApp(config))
 

@@ -5,7 +5,7 @@
  */
 import {
   createElementFromHTML
-} from './helpers'
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
 
 function onCancel() {
   document.querySelector('.rc-sync-form').classList.remove('rc-sync-show')

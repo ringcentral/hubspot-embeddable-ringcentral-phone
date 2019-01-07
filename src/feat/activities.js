@@ -2,13 +2,13 @@
  * third party activies related feature
  */
 
-import {thirdPartyConfigs} from '../common/app-config'
+import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import _ from 'lodash'
 import {
-  notify,
-  commonFetchOptions
-} from '../common/helpers'
-import fetch from '../common/fetch'
+  notify
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
+import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
+import {commonFetchOptions} from './common'
 
 let {
   apiServerHS

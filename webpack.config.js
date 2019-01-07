@@ -2,18 +2,8 @@
 const webpack = require('webpack')
 const sysConfigDefault = require('./config.default')
 const ExtraneousFileCleanupPlugin = require('webpack-extraneous-file-cleanup-plugin')
-const packThreadCount = sysConfigDefault.devCPUCount // number
-const HappyPack = require('happypack')
-const happyThreadPool = packThreadCount === 0 ? null : HappyPack.ThreadPool({ size: packThreadCount })
 const path = require('path')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
-const express = require('express')
-
-const happyConf = {
-  loaders: ['babel-loader'],
-  threadPool: happyThreadPool,
-  verbose: true
-}
 
 const stylusSettingPlugin =  new webpack.LoaderOptionsPlugin({
   test: /\.styl$/,
@@ -24,7 +14,7 @@ const stylusSettingPlugin =  new webpack.LoaderOptionsPlugin({
 
 const opts = {
   extensions: ['.map', '.js'],
-  minBytes: 3789
+  minBytes: 3900
 }
 
 const pug = {
@@ -39,7 +29,9 @@ const pug = {
 var config = {
   mode: 'production',
   entry: {
-    content: './src/chrome-extension/content.js',
+    content: './src/content.js',
+    background: './src/background.js',
+    manifest: './src/manifest.json',
     redirect: './src/redirect/redirect.pug',
     '../app/redirect': './src/redirect/redirect.js'
   },
@@ -56,22 +48,51 @@ var config = {
   },
   resolveLoader: {
     modules: [
+      path.join(process.cwd(), 'loaders'),
       path.join(process.cwd(), 'node_modules')
     ]
   },
   optimization: {
-    // We no not want to minimize our code.
     minimize: sysConfigDefault.minimize
   },
   module: {
     rules: [
       {
-        test: /\.jsx?$/,
-        exclude: /node_modules/,
+        test: /manifest\.json$/,
         use: [
-          packThreadCount === 0
-            ? 'babel-loader?cacheDirectory'
-            : 'happypack/loader?cacheDirectory'
+          'manifest-loader'
+        ]
+      },
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules\/(?!(ringcentral-embeddable-extension-common)\/).*/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true,
+              presets: [
+                '@babel/preset-env'
+              ],
+              plugins: [
+                '@babel/plugin-proposal-class-properties',
+                'babel-plugin-lodash',
+                '@babel/plugin-syntax-dynamic-import',
+                [
+                  '@babel/plugin-proposal-decorators',
+                  {
+                    legacy: true
+                  }
+                ],
+                [
+                  '@babel/plugin-transform-runtime',
+                  {
+                    regenerator: true
+                  }
+                ]
+              ]
+            }
+          }
         ]
       },
       {
@@ -100,7 +121,6 @@ var config = {
   },
   devtool: 'source-map',
   plugins: [
-    packThreadCount === 0 ? null : new HappyPack(happyConf),
     stylusSettingPlugin,
     new LodashModuleReplacementPlugin({
       collections: true,
@@ -111,15 +131,7 @@ var config = {
       'process.env.ringCentralConfigs': JSON.stringify(sysConfigDefault.ringCentralConfigs),
       'process.env.thirdPartyConfigs': JSON.stringify(sysConfigDefault.thirdPartyConfigs)
     })
-  ],
-  devServer: {
-    port: sysConfigDefault.devPort,
-    contentBase: __dirname,
-    setup: function(app) {
-      app.use('/', express.static(__dirname))
-    }
-  }
-
+  ]
 }
 
 module.exports = config

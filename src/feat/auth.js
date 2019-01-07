@@ -2,16 +2,16 @@
  * auth related feature
  */
 
-import {thirdPartyConfigs} from '../common/app-config'
-import logo from '../common/rc-logo'
+import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import logo from 'ringcentral-embeddable-extension-common/src/common/rc-logo'
 import {
   createElementFromHTML,
   findParentBySel,
   lsKeys
-} from '../common/helpers'
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import _ from 'lodash'
-import * as ls from '../common/ls'
-import fetch from '../common/fetch'
+import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
+import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
 
 const blankUrl = 'about:blank'
 let tokenHandler

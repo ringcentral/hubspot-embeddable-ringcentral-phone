@@ -2,9 +2,9 @@
  * call log sync feature
  */
 
-import {thirdPartyConfigs} from '../common/app-config'
-import {createForm} from '../common/call-log-sync-form'
-import extLinkSvg from '../common/link-external.svg'
+import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import {createForm} from './call-log-sync-form'
+import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
 import {
   showAuthBtn
 } from './auth'
@@ -13,10 +13,10 @@ import {getContacts} from './contacts'
 import {
   notify,
   host,
-  formatPhone,
-  commonFetchOptions
-} from '../common/helpers'
-import fetch from '../common/fetch'
+  formatPhone
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
+import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
+import {commonFetchOptions} from './common'
 
 let {
   showCallLogSyncForm,

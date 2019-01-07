@@ -3,19 +3,19 @@
  */
 
 import _ from 'lodash'
-import {setCache, getCache} from '../common/cache'
+import {setCache, getCache} from 'ringcentral-embeddable-extension-common/src/common/cache'
 import {
   showAuthBtn
 } from './auth'
 import {
   popup,
   createElementFromHTML,
-  commonFetchOptions,
   formatPhone,
   host
-} from '../common/helpers'
-import fetch from '../common/fetch'
-import {thirdPartyConfigs} from '../common/app-config'
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
+import {commonFetchOptions} from './common'
+import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
+import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
 
 let {
   serviceName,
