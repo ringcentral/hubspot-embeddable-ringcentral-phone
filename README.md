@@ -42,7 +42,7 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
 
 ## Try it with private crx package
 
-- Download the private crx from release page: https://github.com/zxdong262/hubspot-embeddable-ringcentral-phone/releases
+- Download the private crx from release page: https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases
 - download the zip file, unpack it, get a dist folder, open your chrome extension page(chrome://extensions/), click load unpacked, select the dist folder
 - Go to `https://app.hubspot.com` to check
 
@@ -51,7 +51,7 @@ Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
 1. build `content.js`
 
 ```bash
-git clone https://github.com/zxdong262/hubspot-embeddable-ringcentral-phone.git
+git clone https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone.git
 cd hubspot-embeddable-ringcentral-phone
 npm i
 cp config.sample.js config.js
@@ -88,7 +88,7 @@ npm start
 
 ## Cli tool
 
-You can use [ringcentral-embeddable-extension-factory](https://github.com/zxdong262/ringcentral-embeddable-extension-factory) to create similar extensions.
+You can use [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory) to create similar extensions.
 
 ## License
 
