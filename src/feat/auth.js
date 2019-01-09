@@ -6,9 +6,9 @@ import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/com
 import logo from 'ringcentral-embeddable-extension-common/src/common/rc-logo'
 import {
   createElementFromHTML,
-  findParentBySel,
-  lsKeys
+  findParentBySel
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
+import {lsKeys} from './common'
 import _ from 'lodash'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
