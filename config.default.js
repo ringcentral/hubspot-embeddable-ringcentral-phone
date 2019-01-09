@@ -21,7 +21,7 @@ let config = {
   thirdPartyConfigs: {
     clientIDHS: '',
     clientSecretHS: '',
-    appRedirectHS: 'https://zxdong262.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
+    appRedirectHS: 'https://ringcentral.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
     appServerHS: 'https://app.hubspot.com',
     apiServerHS: 'https://api.hubspot.com',
     showCallLogSyncForm: true,
