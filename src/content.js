@@ -23,7 +23,7 @@ if (clientID || appServer) {
 ;(function() {
   console.log('import RingCentral Embeddable Voice to web page')
   var rcs = document.createElement('script')
-  rcs.src = 'https://ringcentral.github.io/ringcentral-embeddable/adapter.js' + appConfigQuery
+  rcs.src = 'https://ringcentral.github.io/ringcentral-embeddable/adapter.js?disableActiveCallControl=false' + appConfigQuery
   var rcs0 = document.getElementsByTagName('script')[0]
   rcs0.parentNode.insertBefore(rcs, rcs0)
 })()
