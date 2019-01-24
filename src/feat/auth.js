@@ -159,7 +159,7 @@ export async function getAuthToken({
     console.log('get token failed')
     console.log(res)
   } else {
-    let expireTime = res.expires_in * .8 + (+new Date)
+    let expireTime = res.expires_in * .8 * 1000 + (+new Date)
     await window.rc.updateToken({
       accessToken: res.access_token,
       refreshToken: res.refresh_token,
@@ -168,7 +168,7 @@ export async function getAuthToken({
     notifyRCAuthed()
     tokenHandler = setTimeout(
       getRefreshToken,
-      Math.floor(res.expires_in * .8)
+      Math.floor(res.expires_in * .8 * 1000)
     )
   }
 }

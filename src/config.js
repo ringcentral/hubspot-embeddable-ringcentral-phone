@@ -125,7 +125,8 @@ export const insertClickToCallButton = [
     parentsToInsertButton: [
       {
         getElem: () => {
-          return document.querySelector('.start-call').parentNode
+          let sc = document.querySelector('.start-call')
+          return sc ? sc.parentNode : null
         },
         insertMethod: 'insertBefore',
         shouldInsert: () => {
@@ -134,9 +135,8 @@ export const insertClickToCallButton = [
       },
       {
         getElem: () => {
-          return document
-            .querySelector('.panel-is-call button [data-key="twilio.notEnabled.skipOnboarding"]')
-            .parentNode.parentNode
+          let p = document.querySelector('.panel-is-call button [data-key="twilio.notEnabled.skipOnboarding"]')
+          return p ? p.parentNode.parentNode : null
         },
         insertMethod: 'insertBefore',
         shouldInsert: () => {
@@ -349,6 +349,8 @@ export async function initThirdParty() {
   let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
   let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
   let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
+  console.log(expireTime, 'expireTime')
+  console.log(+new Date(), '+new Date()')
   if (expireTime && expireTime > (+new Date())) {
     window.rc.local = {
       refreshToken,
