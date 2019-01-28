@@ -3,6 +3,7 @@
  */
 
 import _ from 'lodash'
+import loadingImg from 'ringcentral-embeddable-extension-common/src/common/loading.svg'
 import {setCache, getCache} from 'ringcentral-embeddable-extension-common/src/common/cache'
 import {
   showAuthBtn
@@ -11,7 +12,8 @@ import {
   popup,
   createElementFromHTML,
   formatPhone,
-  host
+  host,
+  notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import {commonFetchOptions} from './common'
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
@@ -22,6 +24,11 @@ let {
   apiServerHS
 } = thirdPartyConfigs
 
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
 /**
  * click contact info panel event handler
  * @param {Event} e
@@ -216,7 +223,7 @@ async function getContact(
 /**
  * get contact lists
  */
-export const getContacts = _.debounce(async () => {
+export const getContacts = _.debounce(async (noCache) => {
   if (!window.rc.rcLogined) {
     return []
   }
@@ -224,30 +231,78 @@ export const getContacts = _.debounce(async () => {
     showAuthBtn()
     return []
   }
-  let cached = await getCache(window.rc.cacheKey)
+  let cached = noCache
+    ? null
+    : await getCache(window.rc.cacheKey)
   if (cached) {
     console.log('use cache')
+    renderRefreshContacts()
     return cached
   }
+  window.rc.isFetchingContacts = true
   let contacts = []
   let res = await getContact()
   contacts = [
     ...contacts,
     ...res.contacts
   ]
+  let reqCount = 0
+  let shouldWait = reqCount > 7
+  let hasMore = res['has-more']
+  window.rc.shouldWait = shouldWait
+  let expire = 10000
+  if (hasMore) {
+    notify('Fetching contacts...may take some time, please wait', 'info', 99999999)
+    expire = 1000 * 60 * 60
+  }
   while (res['has-more']) {
+    reqCount ++
+    if (reqCount > 6) {
+      await delay(6000)
+    }
     res = await getContact(res['vid-offset'])
     contacts = [
       ...contacts,
       ...res.contacts
     ]
+    hasMore = res['has-more']
   }
+  window.rc.isFetchingContacts = false
   let final = formatContacts(contacts)
-  await setCache(window.rc.cacheKey, final)
+  await setCache(window.rc.cacheKey, final, expire)
+  notify('Fetching contacts done', 'info', 500)
+  renderRefreshContacts()
   return final
 }, 100, {
   leading: true
 })
+
+
+function renderRefreshContacts() {
+  if (window.rc.isFetchingContacts) {
+    return
+  }
+  let refreshContactsBtn = document.getElementById('rc-reload-contacts')
+  if (refreshContactsBtn) {
+    return
+  }
+  let elem = createElementFromHTML(
+    `
+    <img
+      src="${loadingImg}"
+      class="rc-reload-contacts"
+      width=16
+      height=16
+      title="reload contacts"
+    />
+    `
+  )
+  elem.onclick = () => {
+    elem.remove()
+    getContacts(true)
+  }
+  document.body.appendChild(elem)
+}
 
 export function hideContactInfoPanel() {
   let dom = document
