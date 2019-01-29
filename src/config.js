@@ -214,7 +214,6 @@ export function thirdPartyServiceConfig(serviceName) {
   // as example
   // read our document about third party features https://github.com/ringcentral/ringcentral-embeddable/blob/master/docs/third-party-service-in-widget.md
   let handleRCEvents = async e => {
-    console.log(e)
     let {data} = e
     if (!data) {
       return
@@ -349,8 +348,6 @@ export async function initThirdParty() {
   let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
   let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
   let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
-  console.log(expireTime, 'expireTime')
-  console.log(+new Date(), '+new Date()')
   if (expireTime && expireTime > (+new Date())) {
     window.rc.local = {
       refreshToken,

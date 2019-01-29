@@ -252,10 +252,12 @@ export const getContacts = _.debounce(async (noCache) => {
   window.rc.shouldWait = shouldWait
   let expire = 10000
   if (hasMore) {
-    notify('Fetching contacts...may take some time, please wait', 'info', 99999999)
     expire = 1000 * 60 * 60 * 24 * 30
   }
   while (res['has-more']) {
+    if (reqCount === 3) {
+      notify('Fetching contacts...may take some time, please wait', 'info', 99999999)
+    }
     reqCount ++
     if (reqCount > 6) {
       await delay(6000)
@@ -270,7 +272,9 @@ export const getContacts = _.debounce(async (noCache) => {
   window.rc.isFetchingContacts = false
   let final = formatContacts(contacts)
   await setCache(window.rc.cacheKey, final, expire)
-  notify('Fetching contacts done', 'info', 500)
+  if (reqCount >= 5) {
+    notify('Fetching contacts done', 'info', 500)
+  }
   renderRefreshContacts()
   return final
 }, 100, {
@@ -291,6 +295,7 @@ function renderRefreshContacts() {
     <img
       src="${loadingImg}"
       class="rc-reload-contacts"
+      id="rc-reload-contacts"
       width=16
       height=16
       title="reload contacts"
