@@ -253,7 +253,7 @@ export const getContacts = _.debounce(async (noCache) => {
   let expire = 10000
   if (hasMore) {
     notify('Fetching contacts...may take some time, please wait', 'info', 99999999)
-    expire = 1000 * 60 * 60
+    expire = 1000 * 60 * 60 * 24 * 30
   }
   while (res['has-more']) {
     reqCount ++
