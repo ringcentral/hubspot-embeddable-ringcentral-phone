@@ -3,8 +3,7 @@
 
 Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringcentral-embeddable) to hubspot contacts list and call contact page with chrome extension.
 
-Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
- [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
+Created with [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory), you could create similar extension for other CRM sites.
 
 ## Table of contents <!-- omit in toc -->
 
