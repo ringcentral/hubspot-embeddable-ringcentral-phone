@@ -10,12 +10,11 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 - [Youtube video](#youtube-video)
 - [Screenshots](#screenshots)
 - [Features](#features)
-- [Try it with private crx package](#try-it-with-private-crx-package)
+- [Try it](#try-it)
 - [Custom build and use](#custom-build-and-use)
 - [Build with custom RingCentral clientID/appServer](#build-with-custom-ringcentral-clientidappserver)
-- [Cli tool](#cli-tool)
+- [Credits](#credits)
 - [License](#license)
-
 
 ## Youtube video
 
@@ -39,10 +38,10 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 - Auto/manually sync call log to hubspot
 - Check hubspot activities from ringcentral contact panel
 
-## Try it with private crx package
+## Try it
 
-- Download the private crx from release page: https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases
-- download the zip file, unpack it, get a dist folder, open your chrome extension page(chrome://extensions/), click load unpacked, select the dist folder
+- Download the zip from release page: [https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases)
+- Unpack it, get a dist folder, open your chrome extension page(chrome://extensions/), click load unpacked, select the dist folder
 - Go to `https://app.hubspot.com` to check
 
 ## Custom build and use
@@ -85,9 +84,10 @@ npm start
   },
 ```
 
-## Cli tool
+## Credits
 
-You can use [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory) to create similar extensions.
+Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
+ [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
 
 ## License
 
