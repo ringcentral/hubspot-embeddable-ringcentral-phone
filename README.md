@@ -1,7 +1,7 @@
 
 # RingCentral Embeddable Voice for HubSpot(chrome extension) <!-- omit in toc -->
 
-Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringcentral-embeddable) to hubspot contacts list and call contact page with chrome extension.
+Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringcentral-embeddable) to hubspot contacts list and call contact page with Chrome/Firefox extension.
 
 Created with [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory), you could create similar extension for other CRM sites.
 
@@ -41,7 +41,7 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 ## Try it
 
 - Download the zip from release page: [https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases)
-- Unpack it, get a dist folder, open your chrome extension page(chrome://extensions/), click load unpacked, select the dist folder
+- Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
 - Go to `https://app.hubspot.com` to check
 
 ## Custom build and use
