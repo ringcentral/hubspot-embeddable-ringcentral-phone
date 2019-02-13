@@ -8,9 +8,7 @@ import {
   createElementFromHTML,
   findParentBySel
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import {lsKeys} from './common'
-import _ from 'lodash'
-import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
+import {rc} from './common'
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
 
 const blankUrl = 'about:blank'
@@ -27,44 +25,6 @@ const appRedirectHSCoded = encodeURIComponent(appRedirectHS)
 const authUrl = `${appServerHS}/oauth/authorize?` +
 `client_id=${clientIDHS}` +
 `&redirect_uri=${appRedirectHSCoded}&scope=contacts`
-
-window.rc = {
-  local: {
-    refreshToken: null,
-    accessToken: null,
-    expireTime: null
-  },
-  postMessage: data => {
-    document.querySelector('#rc-widget-adapter-frame')
-      .contentWindow
-      .postMessage(data, '*')
-  },
-  currentUserId: '',
-  rcLogined: false,
-  cacheKey: 'contacts' + '_' + '',
-  updateToken: async (newToken, type = 'apiKey') => {
-    if (!newToken){
-      await ls.clear()
-      window.rc.local = {
-        refreshToken: null,
-        accessToken: null,
-        expireTime: null
-      }
-    } else if (_.isString(newToken)) {
-      window.rc.local[type] = newToken
-      let key = lsKeys[`${type}LSKey`]
-      await ls.set(key, newToken)
-    } else {
-      Object.assign(window.rc.local, newToken)
-      let ext = Object.keys(newToken)
-        .reduce((prev, key) => {
-          prev[lsKeys[`${key}LSKey`]] = newToken[key]
-          return prev
-        }, {})
-      await ls.set(ext)
-    }
-  }
-}
 
 export function hideAuthBtn() {
   let dom = document.querySelector('.rc-auth-button-wrap')
@@ -96,7 +56,7 @@ export function hideAuthPanel() {
 }
 
 export function doAuth() {
-  if (window.rc.local.accessToken) {
+  if (rc.local.accessToken) {
     return
   }
   hideAuthBtn()
@@ -109,7 +69,7 @@ export function doAuth() {
 }
 
 export function notifyRCAuthed(authorized = true) {
-  window.rc.postMessage({
+  rc.postMessage({
     type: 'rc-adapter-update-authorization-status',
     authorized
   })
@@ -117,7 +77,7 @@ export function notifyRCAuthed(authorized = true) {
 
 export function getRefreshToken() {
   getAuthToken({
-    refresh_token: window.rc.local.refreshToken
+    refresh_token: rc.local.refreshToken
   })
 }
 
@@ -160,7 +120,7 @@ export async function getAuthToken({
     console.log(res)
   } else {
     let expireTime = res.expires_in * .8 * 1000 + (+new Date)
-    await window.rc.updateToken({
+    await rc.updateToken({
       accessToken: res.access_token,
       refreshToken: res.refresh_token,
       expireTime: expireTime
@@ -174,7 +134,7 @@ export async function getAuthToken({
 }
 
 export async function unAuth() {
-  await window.rc.updateToken(null)
+  await rc.updateToken(null)
   clearTimeout(tokenHandler)
   notifyRCAuthed(false)
 }

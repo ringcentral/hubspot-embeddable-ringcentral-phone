@@ -7,9 +7,9 @@
 .idea/
 /temp/
 .vscode/
-/dist/content.js*
-/dist/background*
-/dist/manifest.json
+/dist/
+/dist-firefox/
+
 package-lock.json
 /config.js
 *.zip

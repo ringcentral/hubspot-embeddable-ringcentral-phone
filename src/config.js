@@ -17,7 +17,7 @@ import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/com
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import fetch, {jsonHeader} from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import {getCSRFToken} from './feat/common'
-import {lsKeys} from './feat/common'
+import {lsKeys, rc} from './feat/common'
 import {
   showActivityDetail,
   getActivities
@@ -44,7 +44,7 @@ import {
   hideContactInfoPanel,
   showContactInfoPanel
 } from './feat/contacts.js'
-//*/
+
 let {
   apiServerHS
 } = thirdPartyConfigs
@@ -221,12 +221,12 @@ export function thirdPartyServiceConfig(serviceName) {
     let {type, loggedIn, path, call} = data
     if (type ===  'rc-login-status-notify') {
       console.log('rc logined', loggedIn)
-      window.rc.rcLogined = loggedIn
+      rc.rcLogined = loggedIn
     }
     if (
       type === 'rc-route-changed-notify' &&
       path === '/contacts' &&
-      !window.rc.local.accessToken
+      !rc.local.accessToken
     ) {
       showAuthBtn()
     } else if (
@@ -240,9 +240,7 @@ export function thirdPartyServiceConfig(serviceName) {
     if (type !== 'rc-post-message-request') {
       return
     }
-  
-    let {rc} = window
-  
+
     if (data.path === '/authorize') {
       if (rc.local.accessToken) {
         unAuth()
@@ -343,13 +341,13 @@ export function thirdPartyServiceConfig(serviceName) {
 export async function initThirdParty() {
   //hanlde contacts events
   let userId = getUserId()
-  window.rc.currentUserId = userId
-  window.rc.cacheKey = 'contacts' + '_' + userId
+  rc.currentUserId = userId
+  rc.cacheKey = 'contacts' + '_' + userId
   let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
   let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
   let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
   if (expireTime && expireTime > (+new Date())) {
-    window.rc.local = {
+    rc.local = {
       refreshToken,
       accessToken,
       expireTime
@@ -360,7 +358,7 @@ export async function initThirdParty() {
   renderAuthPanel()
   renderAuthButton()
 
-  if (window.rc.local.refreshToken) {
+  if (rc.local.refreshToken) {
     notifyRCAuthed()
     getRefreshToken()
   }

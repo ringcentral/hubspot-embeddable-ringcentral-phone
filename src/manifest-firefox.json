@@ -8,12 +8,16 @@
     "storage",
     "activeTab",
     "tabs",
-    "background",
-    "tabCapture",
     "unlimitedStorage",
     "https://*.hubspot.com/*"
   ],
-  "page_action": {
+  "applications": {
+    "gecko": {
+      "id": "drake.zhao@ringcentral.com",
+      "strict_min_version": "60.0"
+    }
+  },
+  "browser_action": {
     "default_title": "RingCentral Embeddable Voice for HubSpot",
     "default_icon": {
       "16": "icons/rc16.png",
@@ -33,11 +37,6 @@
       "matches": [
         "https://app.hubspot.com/*"
       ],
-      "exclude_matches": [
-        "https://app.hubspot.com/login*",
-        "https://app.hubspot.com/myaccounts-beta*",
-        "https://app.hubspot.com/developer"
-      ],
       "js": [
         "./content.js"
       ]
@@ -46,8 +45,7 @@
   "background": {
     "scripts": [
       "background.js"
-    ],
-    "persistent": true
+    ]
   },
   "content_security_policy": "script-src 'self' https://ringcentral.github.io/ringcentral-embeddable/index.html; object-src 'self'",
   "manifest_version": 2

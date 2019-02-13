@@ -15,7 +15,7 @@ import {
   host,
   notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import {commonFetchOptions} from './common'
+import {commonFetchOptions, rc} from './common'
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
 
@@ -224,22 +224,22 @@ async function getContact(
  * get contact lists
  */
 export const getContacts = _.debounce(async (noCache) => {
-  if (!window.rc.rcLogined) {
+  if (!rc.rcLogined) {
     return []
   }
-  if (!window.rc.local.accessToken) {
+  if (!rc.local.accessToken) {
     showAuthBtn()
     return []
   }
   let cached = noCache
     ? null
-    : await getCache(window.rc.cacheKey)
+    : await getCache(rc.cacheKey)
   if (cached) {
     console.log('use cache')
     renderRefreshContacts()
     return cached
   }
-  window.rc.isFetchingContacts = true
+  rc.isFetchingContacts = true
   let contacts = []
   let res = await getContact()
   contacts = [
@@ -249,7 +249,7 @@ export const getContacts = _.debounce(async (noCache) => {
   let reqCount = 0
   let shouldWait = reqCount > 7
   let hasMore = res['has-more']
-  window.rc.shouldWait = shouldWait
+  rc.shouldWait = shouldWait
   let expire = 10000
   if (hasMore) {
     expire = 1000 * 60 * 60 * 24 * 30
@@ -269,9 +269,9 @@ export const getContacts = _.debounce(async (noCache) => {
     ]
     hasMore = res['has-more']
   }
-  window.rc.isFetchingContacts = false
+  rc.isFetchingContacts = false
   let final = formatContacts(contacts)
-  await setCache(window.rc.cacheKey, final, expire)
+  await setCache(rc.cacheKey, final, expire)
   if (reqCount >= 5) {
     notify('Fetching contacts done', 'info', 500)
   }
@@ -283,7 +283,7 @@ export const getContacts = _.debounce(async (noCache) => {
 
 
 function renderRefreshContacts() {
-  if (window.rc.isFetchingContacts) {
+  if (rc.isFetchingContacts) {
     return
   }
   let refreshContactsBtn = document.getElementById('rc-reload-contacts')

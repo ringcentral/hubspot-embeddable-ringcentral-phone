@@ -16,7 +16,7 @@ import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
-import {commonFetchOptions} from './common'
+import {commonFetchOptions, rc} from './common'
 
 let {
   showCallLogSyncForm,
@@ -65,7 +65,7 @@ export async function syncCallLogToThirdParty(body) {
   if (!isAutoSync && !isManuallySync) {
     return
   }
-  if (!window.rc.local.accessToken) {
+  if (!rc.local.accessToken) {
     return isManuallySync ? showAuthBtn() : null
   }
   if (showCallLogSyncForm && isManuallySync) {
