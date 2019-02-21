@@ -60,6 +60,7 @@ export async function syncCallLogToThirdParty(body) {
   // if (result !== 'Call connected') {
   //   return
   // }
+  console.log('logsync body', body)
   let isManuallySync = !body.triggerType
   let isAutoSync = body.triggerType === 'callLogSync'
   if (!isAutoSync && !isManuallySync) {
@@ -80,36 +81,37 @@ export async function syncCallLogToThirdParty(body) {
 }
 
 async function getContactId(body) {
-  if (body.call) {
-    let obj = _.find(
-      [
-        ...body.call.toMatches,
-        ...body.call.fromMatches
-      ],
-      m => m.type === serviceName
-    )
-    return obj ? obj.id : null
-  }
-  else {
-    let n = body.direction === 'Outbound'
-      ? body.to.phoneNumber
-      : body.from.phoneNumber
-    let fn = formatPhone(n)
-    let contacts = await getContacts()
-    let res = _.find(
-      contacts,
-      contact => {
-        let {
-          phoneNumbers
-        } = contact
-        return _.find(phoneNumbers, nx => {
-          return fn === formatPhone(nx.phoneNumber)
-        })
-      }
-    )
 
-    return _.get(res, 'id')
+  let obj = _.find(
+    [
+      ..._.get(body, 'call.toMatches') || [],
+      ..._.get(body, 'call.fromMatches') || []
+    ],
+    m => m.type === serviceName
+  )
+  if (obj) {
+    return obj.id
   }
+
+  let nf = _.get(body, 'to.phoneNumber') || _.get(body.call, 'to.phoneNumber')
+  let nt = _.get(body, 'from.phoneNumber') || _.get(body.call, 'from.phoneNumber')
+  nf = formatPhone(nf)
+  nt = formatPhone(nt)
+  let contacts = await getContacts()
+  let res = _.find(
+    contacts,
+    contact => {
+      let {
+        phoneNumbers
+      } = contact
+      return _.find(phoneNumbers, nx => {
+        let t = formatPhone(nx.phoneNumber)
+        return nf === t || nt === t
+      })
+    }
+  )
+  return _.get(res, 'id')
+
 }
 
 async function getOwnerId() {
