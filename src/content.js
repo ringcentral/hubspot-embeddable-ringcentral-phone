@@ -16,7 +16,7 @@ let {
 
 let appConfigQuery = ''
 if (clientID || appServer) {
-  appConfigQuery = `&clientID=${clientID}&appServer=${encodeURIComponent(appServer)}`
+  appConfigQuery = `&appKey=${clientID}&appServer=${encodeURIComponent(appServer)}`
 }
 
 /* eslint-disable-next-line */
