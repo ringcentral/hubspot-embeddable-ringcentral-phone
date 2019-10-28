@@ -5,18 +5,20 @@
 
 import createApp from 'ringcentral-embeddable-extension-common/src/spa/init'
 import * as config from './config'
-import {ringCentralConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { ringCentralConfigs, thirdPartyConfigs, appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import 'ringcentral-embeddable-extension-common/src/spa/style.styl'
 import './custom.styl'
 
 let {
   clientID,
-  appServer
+  appServer,
+  clientSecret
 } = ringCentralConfigs
 
 let appConfigQuery = ''
+let { serviceName } = thirdPartyConfigs
 if (clientID || appServer) {
-  appConfigQuery = `?clientID=${clientID}&appServer=${encodeURIComponent(appServer)}`
+  appConfigQuery = `?prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}`
 }
 
 /* eslint-disable-next-line */
@@ -29,4 +31,3 @@ if (clientID || appServer) {
 })()
 
 window.addEventListener('load', createApp(config))
-

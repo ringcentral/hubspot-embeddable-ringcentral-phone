@@ -7,56 +7,60 @@
  *
  */
 
-///*
+/// *
 import _ from 'lodash'
 import {
   RCBTNCLS2,
   checkPhoneNumber
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import {thirdPartyConfigs} from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { upgrade } from 'ringcentral-embeddable-extension-common/src/feat/upgrade-notification'
+import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
-import fetch, {jsonHeader} from 'ringcentral-embeddable-extension-common/src/common/fetch'
-import {getCSRFToken} from './feat/common'
-import {lsKeys} from './feat/common'
+import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
+import { jsonHeader } from 'ringcentral-embeddable-extension-common/src/common/fetch'
+import { getCSRFToken, getIds, rc } from './feat/common'
+import { getDeals } from './feat/deal'
+import {
+  getCompanyById
+} from './feat/company'
+
 import {
   showActivityDetail,
   getActivities
 } from './feat/activities'
 import {
-  hideAuthBtn,
   showAuthBtn,
-  hideAuthPanel,
   doAuth,
   notifyRCAuthed,
-  getRefreshToken,
-  getAuthToken,
   unAuth,
-  renderAuthButton,
-  renderAuthPanel
+  renderAuthButton
 } from './feat/auth'
 import {
-  syncCallLogToThirdParty
-} from './feat/call-log-sync.js'
+  syncCallLogToThirdParty,
+  findMatchCallLog
+} from './feat/log-sync.js'
 import {
-  findMatchContacts,
-  searchContacts,
+  fetchAllContacts,
   getContacts,
-  hideContactInfoPanel,
   showContactInfoPanel
 } from './feat/contacts.js'
-//*/
+import {
+  search,
+  match
+} from 'ringcentral-embeddable-extension-common/src/common/db'
+
 let {
-  apiServerHS
+  apiServerHS,
+  pageSize
 } = thirdPartyConfigs
 
 let phoneTypeDict = {
-  phone: 'phone number',
-  company: 'company phone number',
-  mobilephone: 'mobile phone number'
+  phone: 'Phone number',
+  company: 'Company phone number',
+  mobilephone: 'Mobile phone number'
 }
 
-
-function formatNumbers(res) {
+function formatNumbers (res) {
   return Object.keys(res).reduce((prev, k) => {
     let v = res[k]
     if (!v) {
@@ -74,21 +78,7 @@ function formatNumbers(res) {
     .filter(o => checkPhoneNumber(o.number))
 }
 
-function getIds(href = location.href) {
-  let reg = /contacts\/(\d+)\/contact\/(\d+)/
-  let arr = href.match(reg) || []
-  let portalId = arr[1]
-  let vid = arr[2]
-  if (!portalId || !vid) {
-    return null
-  }
-  return {
-    portalId,
-    vid
-  }
-}
-
-async function getNumbers(ids = getIds()) {
+async function getNumbers (ids = getIds()) {
   if (!ids) {
     return []
   }
@@ -98,7 +88,7 @@ async function getNumbers(ids = getIds()) {
   } = ids
   let url = `${apiServerHS}/twilio/v1/phonenumberinfo/contactPhoneNumbersByProperty?portalId=${portalId}&clienttimeout=14000&contactVid=${vid}`
   let csrf = getCSRFToken()
-  let res = await fetch.get(url, {
+  let res = await fetchBg(url, {
     headers: {
       ...jsonHeader,
       'x-hubspot-csrf-hubspotapi': csrf
@@ -107,7 +97,46 @@ async function getNumbers(ids = getIds()) {
   return res ? formatNumbers(res) : []
 }
 
-export function getUserId() {
+async function getDealNumbers (ids = getIds()) {
+  if (!ids) {
+    return []
+  }
+  let deal = await getDeals('', Number(ids.vid))
+  if (!deal) {
+    return []
+  }
+  let vids = _.get(deal, 'associations.associatedVids') || []
+  let numbers = []
+  for (let vid of vids) {
+    let ids0 = {
+      portalId: ids.portalId,
+      vid
+    }
+    let ns = await getNumbers(ids0)
+    numbers = [
+      ...numbers,
+      ...ns
+    ]
+  }
+  return numbers
+}
+
+async function getCompanyPhoneNumbers () {
+  let ids = getIds(window.location.href)
+  if (!ids) {
+    return []
+  }
+  let company = await getCompanyById(ids.vid)
+  return company.phoneNumbers.map((p, i) => {
+    return {
+      id: i + '#' + company.companyId,
+      title: 'Company phone number',
+      number: p.phoneNumber
+    }
+  }).filter(o => checkPhoneNumber(o.number))
+}
+
+export function getUserId () {
   let emailDom = document.querySelector('.user-info-email')
   if (!emailDom) {
     return ''
@@ -119,35 +148,96 @@ export function getUserId() {
 export const insertClickToCallButton = [
   {
     shouldAct: href => {
-      return href.includes('?interaction=call')
+      return /contacts\/\d+\/contact\/\d+/.test(href)
     },
     getContactPhoneNumbers: getNumbers,
     parentsToInsertButton: [
       {
         getElem: () => {
-          return document.querySelector('.start-call').parentNode
+          let p = document.querySelector('[data-unit-test="highlightSubtitle"]')
+          return p
+            ? p.parentNode.parentNode : null
         },
-        insertMethod: 'insertBefore',
+        insertMethod: 'append',
         shouldInsert: () => {
-          return !document.querySelector('.' + RCBTNCLS2)
+          let all = document.querySelectorAll('.text-center .' + RCBTNCLS2)
+          if (all.length > 1) {
+            let arr = Array.from(all)
+            let i = 0
+            for (let ele of arr) {
+              if (i !== 0) {
+                ele.remove()
+              }
+              i++
+            }
+          }
+          return !all.length
         }
-      },
+      }
+    ]
+  },
+  {
+    shouldAct: href => {
+      return /contacts\/\d+\/deal\/\d+/.test(href)
+    },
+    getContactPhoneNumbers: getDealNumbers,
+    parentsToInsertButton: [
       {
         getElem: () => {
-          return document
-            .querySelector('.panel-is-call button [data-key="twilio.notEnabled.skipOnboarding"]')
-            .parentNode.parentNode
+          let p = document.querySelector('[class*="ProfileHighlightContainer__Wrapper"]')
+          return p
         },
-        insertMethod: 'insertBefore',
+        insertMethod: 'append',
         shouldInsert: () => {
-          return !document.querySelector('.' + RCBTNCLS2)
+          let all = document.querySelectorAll('[class*="ProfileHighlightContainer__Wrapper"] .' + RCBTNCLS2)
+          if (all.length > 1) {
+            let arr = Array.from(all)
+            let i = 0
+            for (let ele of arr) {
+              if (i !== 0) {
+                ele.remove()
+              }
+              i++
+            }
+          }
+          return !all.length
+        }
+      }
+    ]
+  },
+  {
+    shouldAct: href => {
+      return /contacts\/\d+\/company\/\d+/.test(href)
+    },
+    getContactPhoneNumbers: getCompanyPhoneNumbers,
+    parentsToInsertButton: [
+      {
+        getElem: () => {
+          let p = document.querySelector('[class*="CompanyContactEditableTitle"]')
+          return p
+            ? p.parentNode.parentNode.parentNode : null
+        },
+        insertMethod: 'append',
+        shouldInsert: () => {
+          let all = document.querySelectorAll('.text-center .' + RCBTNCLS2)
+          if (all.length > 1) {
+            let arr = Array.from(all)
+            let i = 0
+            for (let ele of arr) {
+              if (i !== 0) {
+                ele.remove()
+              }
+              i++
+            }
+          }
+          return !all.length
         }
       }
     ]
   }
 ]
 
-//hover contact node to show click to dial tooltip
+// hover contact node to show click to dial tooltip
 export const hoverShowClickToCallButton = [
   {
     shouldAct: href => {
@@ -155,36 +245,59 @@ export const hoverShowClickToCallButton = [
     },
     selector: 'table.table tbody tr',
     getContactPhoneNumbers: async elem => {
-      let phoneNode = elem.querySelector('.column-phone span span')
-      let txt = phoneNode
-        ? phoneNode.textContent.trim()
+      let linkElem = elem.querySelector('[href*="/contacts"]')
+      let href = linkElem
+        ? linkElem.getAttribute('href')
         : ''
-      if (checkPhoneNumber(txt)) {
-        return [{
-          id: '',
-          title: 'phone number',
-          number: txt
-        }]
-      }
+
+      let ids = getIds(href)
+      return getNumbers(ids)
+    }
+  },
+  {
+    shouldAct: href => {
+      return href.includes('companies/list/') || href.includes('companies/view/all/')
+    },
+    selector: 'table.table tbody tr',
+    getContactPhoneNumbers: async elem => {
       let linkElem = elem.querySelector('.name-cell a')
       let href = linkElem
         ? linkElem.getAttribute('href')
         : ''
       let ids = getIds(href)
-      return await getNumbers(ids)
+      if (!ids) {
+        return []
+      }
+      let company = await getCompanyById(ids.vid)
+      return company.phoneNumbers.map((p, i) => {
+        return {
+          id: i + '#' + company.companyId,
+          title: 'Company phone number',
+          number: p.phoneNumber
+        }
+      }).filter(o => checkPhoneNumber(o.number))
     }
   }
 ]
 
 // modify phone number text to click-to-call link
-export const phoneNumberSelectors = []
+export const phoneNumberSelectors = [{
+  shouldAct: (href) => {
+    return href.includes('/contacts')
+  },
+  selector: '[data-selenium-test="timeline-editable-section"] b'
+}, {
+  shouldAct: (href) => {
+    return href.includes('/contacts')
+  },
+  selector: '[data-measured-element="timeline-participant-details-right-content"] span'
+}]
 
 /**
  * thirdPartyService config
  * @param {*} serviceName
  */
-export function thirdPartyServiceConfig(serviceName) {
-
+export function thirdPartyServiceConfig (serviceName) {
   console.log(serviceName)
 
   let services = {
@@ -204,9 +317,14 @@ export function thirdPartyServiceConfig(serviceName) {
     callLoggerPath: '/callLogger',
     callLoggerTitle: `Log to ${serviceName}`,
 
+    messageLoggerPath: '/messageLogger',
+    messageLoggerTitle: `Log to ${serviceName}`,
+
     // show contact activities in ringcentral widgets
     activitiesPath: '/activities',
-    activityPath: '/activity'
+    activityPath: '/activity',
+    callLogEntityMatcherPath: '/callLogger/match',
+    messageLogEntityMatcherPath: '/messageLogger/match'
   }
 
   // handle ringcentral event
@@ -214,36 +332,38 @@ export function thirdPartyServiceConfig(serviceName) {
   // as example
   // read our document about third party features https://github.com/ringcentral/ringcentral-embeddable/blob/master/docs/third-party-service-in-widget.md
   let handleRCEvents = async e => {
-    console.log(e)
-    let {data} = e
+    let { data } = e
     if (!data) {
       return
     }
-    let {type, loggedIn, path, call} = data
-    if (type ===  'rc-login-status-notify') {
-      console.log('rc logined', loggedIn)
-      window.rc.rcLogined = loggedIn
+    console.debug(data)
+    let { type, loggedIn, path, call } = data
+    if (type === 'rc-login-status-notify') {
+      console.debug('rc logined', loggedIn)
+      rc.rcLogined = loggedIn
     }
     if (
       type === 'rc-route-changed-notify' &&
       path === '/contacts' &&
-      !window.rc.local.accessToken
+      !rc.local.accessToken
     ) {
       showAuthBtn()
     } else if (
-      type === 'rc-active-call-notify' ||
-      type === 'rc-call-start-notify'
+      type === 'rc-active-call-notify'
     ) {
       showContactInfoPanel(call)
-    } else if ('rc-call-end-notify' === type) {
-      hideContactInfoPanel()
     }
+    // else if (type === 'rc-call-end-notify') {
+    //   hideContactInfoPanel()
+    // }
+    // if (type === 'rc-inbound-message-notify') {
+    //   return console.log('rc-inbound-message-notify:', data.message, data)
+    // } else if (type === 'rc-message-updated-notify') {
+    //   return console.log('rc-message-updated-notify:', data.message, data)
+    // }
     if (type !== 'rc-post-message-request') {
       return
     }
-  
-    let {rc} = window
-  
     if (data.path === '/authorize') {
       if (rc.local.accessToken) {
         unAuth()
@@ -255,23 +375,40 @@ export function thirdPartyServiceConfig(serviceName) {
         responseId: data.requestId,
         response: { data: 'ok' }
       })
-    }
-    else if (path === '/contacts') {
-      let contacts = await getContacts()
+    } else if (path === '/contacts') {
+      let isMannulSync = _.get(data, 'body.type') === 'manual'
+      if (isMannulSync) {
+        fetchAllContacts()
+        rc.postMessage({
+          type: 'rc-post-message-response',
+          responseId: data.requestId,
+          response: {
+            data: []
+          }
+        })
+        return
+      }
+      let page = _.get(data, 'body.page') || 1
+      let contacts = await getContacts(page)
+      let nextPage = ((contacts.count || 0) - page * pageSize > 0) || contacts.hasMore
+        ? page + 1
+        : null
       rc.postMessage({
         type: 'rc-post-message-response',
         responseId: data.requestId,
         response: {
-          data: contacts,
-          nextPage: null
+          data: contacts.result,
+          nextPage
         }
-      }, '*')
-    }
-    else if (path === '/contacts/search') {
-      let contacts = await getContacts()
+      })
+    } else if (path === '/contacts/search') {
+      if (!rc.local.accessToken) {
+        return showAuthBtn()
+      }
+      let contacts = []
       let keyword = _.get(data, 'body.searchString')
       if (keyword) {
-        contacts = searchContacts(contacts, keyword)
+        contacts = await search(keyword)
       }
       rc.postMessage({
         type: 'rc-post-message-response',
@@ -279,12 +416,13 @@ export function thirdPartyServiceConfig(serviceName) {
         response: {
           data: contacts
         }
-      }, '*')
-    }
-    else if (path === '/contacts/match') {
-      let contacts = await getContacts()
+      })
+    } else if (path === '/contacts/match') {
+      if (!rc.local.accessToken) {
+        return showAuthBtn()
+      }
       let phoneNumbers = _.get(data, 'body.phoneNumbers') || []
-      let res = findMatchContacts(contacts, phoneNumbers)
+      let res = await match(phoneNumbers)
       rc.postMessage({
         type: 'rc-post-message-response',
         responseId: data.requestId,
@@ -292,8 +430,7 @@ export function thirdPartyServiceConfig(serviceName) {
           data: res
         }
       })
-    }
-    else if (path === '/callLogger') {
+    } else if (path === '/callLogger' || path === '/messageLogger') {
       // add your codes here to log call to your service
       syncCallLogToThirdParty(data.body)
       // response to widget
@@ -302,8 +439,20 @@ export function thirdPartyServiceConfig(serviceName) {
         responseId: data.requestId,
         response: { data: 'ok' }
       })
-    }
-    else if (path === '/activities') {
+    } else if (path === '/callLogger/match' || data.path === '/messageLogger/match') {
+      let matchRes = await findMatchCallLog(data)
+      rc.postMessage({
+        type: 'rc-post-message-response',
+        responseId: data.requestId,
+        response: { data: matchRes }
+      })
+      // data: {
+      //   '214705503020': [{ // call session id from request
+      //     id: '88888', // call log entity id from your platform
+      //     note: 'Note', // Note of this call log entity
+      //   }]
+      // }
+    } else if (path === '/activities') {
       const activities = await getActivities(data.body)
       /*
       [
@@ -320,8 +469,7 @@ export function thirdPartyServiceConfig(serviceName) {
         responseId: data.requestId,
         response: { data: activities }
       })
-    }
-    else if (path === '/activity') {
+    } else if (path === '/activity') {
       // response to widget
       showActivityDetail(data.body)
       rc.postMessage({
@@ -341,40 +489,24 @@ export function thirdPartyServiceConfig(serviceName) {
  * init third party
  * could init dom insert etc here
  */
-export async function initThirdParty() {
-  //hanlde contacts events
+export async function initThirdParty () {
+  // hanlde contacts events
   let userId = getUserId()
-  window.rc.currentUserId = userId
-  window.rc.cacheKey = 'contacts' + '_' + userId
-  let refreshToken = await ls.get(lsKeys.refreshTokenLSKey) || null
-  let accessToken = await ls.get(lsKeys.accessTokenLSKey) || null
-  let expireTime = await ls.get(lsKeys.expireTimeLSKey) || null
-  if (expireTime && expireTime > (+new Date())) {
-    window.rc.local = {
-      refreshToken,
-      accessToken,
-      expireTime
+  rc.currentUserId = userId
+  rc.cacheKey = 'contacts' + '_' + userId
+  let accessToken = await ls.get('accessToken') || null
+  if (accessToken) {
+    rc.local = {
+      accessToken
     }
   }
 
-  //get the html ready
-  renderAuthPanel()
+  // get the html ready
   renderAuthButton()
 
-  if (window.rc.local.refreshToken) {
+  if (rc.local.accessToken) {
     notifyRCAuthed()
-    getRefreshToken()
   }
 
-  //wait for auth token
-  window.addEventListener('message', function (e) {
-    const data = e.data
-    if (data && data.hsAuthCode) {
-      getAuthToken({
-        code: data.hsAuthCode
-      })
-      hideAuthPanel()
-      hideAuthBtn()
-    }
-  })
+  upgrade()
 }

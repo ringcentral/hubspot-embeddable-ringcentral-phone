@@ -1,50 +1,54 @@
 
-# RingCentral Embeddable Voice for HubSpot(chrome extension) <!-- omit in toc -->
+# RingCentral Embeddable for HubSpot (Chrome extension) <!-- omit in toc -->
 
-Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringcentral-embeddable) to hubspot contacts list and call contact page with chrome extension.
+Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringcentral-embeddable) to HubSpot contacts list and call contact page with Chrome/Firefox extension.
 
-Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
- [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
+Created with [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory), you could create similar extension for other CRM sites.
 
 ## Table of contents <!-- omit in toc -->
 
-- [Youtube video](#youtube-video)
-- [Screenshots](#screenshots)
-- [Features](#features)
-- [Try it with private crx package](#try-it-with-private-crx-package)
-- [Custom build and use](#custom-build-and-use)
-- [Build with custom RingCentral clientID/appServer](#build-with-custom-ringcentral-clientidappserver)
-- [Cli tool](#cli-tool)
-- [License](#license)
-
+- [Youtube video](#Youtube-video)
+- [Screenshots](#Screenshots)
+- [Features](#Features)
+- [Try it](#Try-it)
+- [Custom build and use](#Custom-build-and-use)
+- [Build with custom RingCentral clientID/appServer](#Build-with-custom-RingCentral-clientIDappServer)
+- [Credits](#Credits)
+- [License](#License)
 
 ## Youtube video
 
-[https://youtu.be/4okL0AxL-dg](https://youtu.be/4okL0AxL-dg)
+[https://youtu.be/eKRPRdGaVrs](https://youtu.be/eKRPRdGaVrs)
 
 ## Screenshots
 
 | screenshots            |  screenshots |
 :-------------------------:|:-------------------------:
-![hubspot-btn2](screenshots/hubspot-btn2.png) | ![hubspot-btn2](screenshots/hubspot1.png)
-![hubspot-list2](screenshots/hubspot-list2.png) | ![hubspot-list2](screenshots/hs1.png)
-![hubspot-list2](screenshots/hs2.png) | ![hubspot-list2](screenshots/hs3.png)
-![hubspot-list2](screenshots/hs4.png) | ![hubspot-list2](screenshots/hs5.png)
-![hubspot-list2](screenshots/hs6.png) | ![hubspot-list2](screenshots/hs7.png)
+![hubspot-btn2](docs/img/screenshots/hubspot-btn2.png) | ![hubspot-btn2](docs/img/screenshots/hubspot1.png)
+![hubspot-list2](docs/img/screenshots/hubspot-list2.png) | ![hubspot-list2](docs/img/screenshots/hs1.png)
+![hubspot-list2](docs/img/screenshots/hs2.png) | ![hubspot-list2](docs/img/screenshots/hs3.png)
+![hubspot-list2](docs/img/screenshots/hs4.png) | ![hubspot-list2](docs/img/screenshots/hs5.png)
+![hubspot-list2](docs/img/screenshots/hs6.png) | ![hubspot-list2](docs/img/screenshots/hs7.png)
 
 ## Features
 
 - Click to call button
-- Popup caller/callee info panel when call inbound
+- Popup callee info panel when call inbound
 - Build with custom app config
-- Auto/manually sync call log to hubspot
+- Auto/manually sync call log/voicemail/sms to hubspot, [About auto call log sync feature](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/issues/137).
 - Check hubspot activities from ringcentral contact panel
+- Custom X-USER-AGENT header for api request
+- Active call control
+- Sync call log to deal
+- Call log with call recording link
+- Call from deal page
 
-## Try it with private crx package
+## Try it
 
-- Download the private crx from release page: https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases
-- download the zip file, unpack it, get a dist folder, open your chrome extension page(chrome://extensions/), click load unpacked, select the dist folder
+- Download the zip from release page: [https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases)
+- Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
 - Go to `https://app.hubspot.com` to check
+- Make sure you ***turn off*** `Block third-party cookies` in `chrome://settings/content/cookies`
 
 ## Custom build and use
 
@@ -86,9 +90,10 @@ npm start
   },
 ```
 
-## Cli tool
+## Credits
 
-You can use [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory) to create similar extensions.
+Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
+ [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
 
 ## License
 

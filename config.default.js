@@ -2,30 +2,47 @@ const os = require('os')
 const extend = require('recursive-assign')
 let config = {
 
-  //dev related
+  // dev related
   devCPUCount: os.cpus().length,
   devPort: 8020,
 
-  //build options
+  // build options
   minimize: false,
 
-  //congfigs to build app
+  // congfigs to build app
 
-  //ringcentral config
+  // ringcentral config
   ringCentralConfigs: {
     clientID: '',
-    appServer: ''
+    clientSecret: '',
+    appServer: 'https://platform.ringcentral.com'
   },
 
-  //for third party related
+  // for third party related
   thirdPartyConfigs: {
-    clientIDHS: '',
-    clientSecretHS: '',
-    appRedirectHS: 'https://ringcentral.github.io/hubspot-embeddable-ringcentral-phone/app/redirect.html',
     appServerHS: 'https://app.hubspot.com',
     apiServerHS: 'https://api.hubspot.com',
     showCallLogSyncForm: true,
-    serviceName: 'Hubspot'
+    serviceName: 'Hubspot',
+    pageSize: 10000,
+    dbSchema: {
+      portalId: {
+        dataType: 'string'
+      },
+      companyId: {
+        dataType: 'string'
+      },
+      isCompany: {
+        dataType: 'string',
+        enableSearch: true
+      },
+      firstname: {
+        dataType: 'string'
+      },
+      lastname: {
+        dataType: 'string'
+      }
+    }
   }
 
 }
@@ -38,10 +55,6 @@ try {
   } else {
     console.log(e)
   }
-
 }
 
 module.exports = config
-
-
-

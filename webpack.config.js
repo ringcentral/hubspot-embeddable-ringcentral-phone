@@ -4,14 +4,44 @@ const sysConfigDefault = require('./config.default')
 const ExtraneousFileCleanupPlugin = require('webpack-extraneous-file-cleanup-plugin')
 const path = require('path')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const pack = require('./package.json')
 
-const stylusSettingPlugin =  new webpack.LoaderOptionsPlugin({
+const stylusSettingPlugin = new webpack.LoaderOptionsPlugin({
   test: /\.styl$/,
   stylus: {
     preferPathResolver: 'webpack'
   }
 })
 
+const from = path.resolve(
+  __dirname,
+  'node_modules/ringcentral-embeddable-extension-common/src/icons'
+)
+const to1 = path.resolve(
+  __dirname,
+  'dist/icons'
+)
+const to2 = path.resolve(
+  __dirname,
+  'dist-firefox/icons'
+)
+const f2 = path.resolve(
+  __dirname,
+  'node_modules/jsstore/dist/jsstore.min.js'
+)
+const f3 = path.resolve(
+  __dirname,
+  'node_modules/jsstore/dist/jsstore.worker.min.js'
+)
+const to4 = path.resolve(
+  __dirname,
+  'dist'
+)
+const to4f = path.resolve(
+  __dirname,
+  'dist-firefox'
+)
 const opts = {
   extensions: ['.map', '.js'],
   minBytes: 3900
@@ -32,11 +62,12 @@ var config = {
     content: './src/content.js',
     background: './src/background.js',
     manifest: './src/manifest.json',
-    redirect: './src/redirect/redirect.pug',
-    '../app/redirect': './src/redirect/redirect.js'
+    '../dist-firefox/content': './src/content.js',
+    '../dist-firefox/background': './src/background.js',
+    '../dist-firefox/manifest': './src/manifest-firefox.json'
   },
   output: {
-    path: __dirname + '/dist',
+    path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
     publicPath: '/',
     chunkFilename: '[name].[hash].js',
@@ -58,7 +89,7 @@ var config = {
   module: {
     rules: [
       {
-        test: /manifest\.json$/,
+        test: /manifest\.json$|manifest-firefox\.json$/,
         use: [
           'manifest-loader'
         ]
@@ -126,13 +157,38 @@ var config = {
       collections: true,
       paths: true
     }),
+    new CopyWebpackPlugin([{
+      from,
+      to: to1,
+      force: true
+    }, {
+      from,
+      to: to2,
+      force: true
+    }, {
+      from: f2,
+      to: to4,
+      force: true
+    }, {
+      from: f3,
+      to: to4,
+      force: true
+    }, {
+      from: f2,
+      to: to4f,
+      force: true
+    }, {
+      from: f3,
+      to: to4f,
+      force: true
+    }], {}),
     new ExtraneousFileCleanupPlugin(opts),
     new webpack.DefinePlugin({
       'process.env.ringCentralConfigs': JSON.stringify(sysConfigDefault.ringCentralConfigs),
-      'process.env.thirdPartyConfigs': JSON.stringify(sysConfigDefault.thirdPartyConfigs)
+      'process.env.thirdPartyConfigs': JSON.stringify(sysConfigDefault.thirdPartyConfigs),
+      'process.env.version': JSON.stringify(pack.version)
     })
   ]
 }
 
 module.exports = config
-
