@@ -1,0 +1,56 @@
+{
+  "name": "RingCentral Embeddable Voice for HubSpot",
+  "description": "RingCentral Embeddable Voice for HubSpot",
+  "version": "1.4.3",
+  "permissions": [
+    "http://*/",
+    "https://*/",
+    "storage",
+    "activeTab",
+    "tabs",
+    "background",
+    "tabCapture",
+    "unlimitedStorage",
+    "https://*.hubspot.com/*"
+  ],
+  "page_action": {
+    "default_title": "RingCentral Embeddable Voice for HubSpot",
+    "default_icon": {
+      "16": "icons/rc16.png",
+      "32": "icons/rc32.png",
+      "48": "icons/rc48.png",
+      "128": "icons/rc128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/rc16.png",
+    "32": "icons/rc32.png",
+    "48": "icons/rc48.png",
+    "128": "icons/rc128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.hubspot.com/*"
+      ],
+      "exclude_matches": [
+        "https://app.hubspot.com/login*",
+        "https://app.hubspot.com/myaccounts-beta*",
+        "https://app.hubspot.com/developer"
+      ],
+      "js": [
+        "./jsstore.worker.min.js",
+        "./jsstore.min.js",
+        "./content.js"
+      ]
+    }
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_security_policy": "script-src 'self' https://ringcentral.github.io/ringcentral-embeddable/index.html; object-src 'self'",
+  "manifest_version": 2
+}
