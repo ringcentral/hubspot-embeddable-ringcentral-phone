@@ -1,7 +1,7 @@
 {
   "name": "RingCentral Embeddable Voice for HubSpot",
   "description": "RingCentral Embeddable Voice for HubSpot",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "permissions": [
     "http://*/",
     "https://*/",
@@ -40,7 +40,6 @@
       ],
       "js": [
         "./jsstore.worker.min.js",
-        "./jsstore.min.js",
         "./content.js"
       ]
     }

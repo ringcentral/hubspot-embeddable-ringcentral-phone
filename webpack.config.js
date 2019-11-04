@@ -26,10 +26,10 @@ const to2 = path.resolve(
   __dirname,
   'dist-firefox/icons'
 )
-const f2 = path.resolve(
-  __dirname,
-  'node_modules/jsstore/dist/jsstore.min.js'
-)
+// const f2 = path.resolve(
+//   __dirname,
+//   'node_modules/jsstore/dist/jsstore.min.js'
+// )
 const f3 = path.resolve(
   __dirname,
   'node_modules/jsstore/dist/jsstore.worker.min.js'
@@ -165,19 +165,20 @@ var config = {
       from,
       to: to2,
       force: true
-    }, {
+    }, /* {
       from: f2,
       to: to4,
       force: true
-    }, {
+    }, */ {
       from: f3,
       to: to4,
       force: true
-    }, {
+    }, /* {
       from: f2,
       to: to4f,
       force: true
-    }, {
+    }, */
+    {
       from: f3,
       to: to4f,
       force: true
