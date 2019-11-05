@@ -17,9 +17,10 @@ export function getPortalId () {
   )
   if (!pid) {
     pid = _.get(
-      window.location.href.match(/https:\/\/app\.hubspot\.com\/.+\/(\d+)/), '[1]'
+      window.location.href.match(/https:\/\/app\.hubspot\.com\/[^/]+\/(\d+)/), '[1]'
     )
   }
+  console.log('portal id:', pid)
   return pid
 }
 
@@ -61,10 +62,10 @@ export const commonFetchOptions = (headers) => ({
 })
 
 export function getIds (href = window.location.href) {
-  let reg = /contacts\/(\d+)\/(contact|deal|company)\/(\d+)/
+  let reg = /[^/]+\/(\d+)\/[^/]+\/(\d+)/
   let arr = href.match(reg) || []
   let portalId = arr[1]
-  let vid = arr[3]
+  let vid = arr[2]
   if (!portalId || !vid) {
     return null
   }
