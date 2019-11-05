@@ -11,10 +11,16 @@ export function getCSRFToken () {
 }
 
 export function getPortalId () {
-  return _.get(
-    document.cookie.match(/hubspot\.hub\.id=([^=;]+);/),
+  let pid = _.get(
+    document.cookie.match(/hubspgot\.hub\.id=([^=;]+);/),
     '[1]'
   )
+  if (!pid) {
+    pid = _.get(
+      window.location.href.match(/https:\/\/app\.hubspot\.com\/.+\/(\d+)/), '[1]'
+    )
+  }
+  return pid
 }
 
 export const rc = {
