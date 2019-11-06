@@ -145,7 +145,8 @@ async function getOwnerId () {
 }
 
 async function getCompanyId (contactId) {
-  let url = `${apiServerHS}/crm-meta/v1/meta?portalId=4920570&clienttimeout=15000`
+  const pid = getPortalId()
+  let url = `${apiServerHS}/crm-meta/v1/meta?portalId=${pid}&clienttimeout=15000`
   let res = await fetchBg(url, {
     headers: commonFetchOptions().headers,
     method: 'post',
