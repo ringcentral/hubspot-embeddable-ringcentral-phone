@@ -1,5 +1,6 @@
 import initBackground from 'ringcentral-embeddable-extension-common/src/spa/background'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import _ from 'lodash'
 
 /**
  * for background.js, check current tab is extension target tab or not
@@ -21,7 +22,7 @@ if (thirdPartyConfigs.upgradeServer) {
   list.push(
     new RegExp(
       '^' +
-      thirdPartyConfigs.upgradeServer.replace(/\//g, '\\/').replace(/\./g, '\\.')
+      _.escapeRegExp(thirdPartyConfigs.upgradeServer)
     )
   )
 }
