@@ -352,6 +352,13 @@ export function thirdPartyServiceConfig (serviceName) {
       type === 'rc-active-call-notify'
     ) {
       showContactInfoPanel(call)
+    } else if (type === 'rc-region-settings-notify') {
+      const prevCountryCode = rc.countryCode || 'US'
+      const newCountryCode = data.countryCode
+      if (prevCountryCode !== newCountryCode) {
+        fetchAllContacts()
+      }
+      rc.countryCode = data.countryCode
     }
     // else if (type === 'rc-call-end-notify') {
     //   hideContactInfoPanel()
