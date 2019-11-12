@@ -23,8 +23,7 @@ export function getPortalId () {
   console.log('portal id:', pid)
   return pid
 }
-
-export const rc = {
+window.rc = {
   local: {
     accessToken: null
   },
@@ -44,7 +43,7 @@ export const rc = {
     }
   }
 }
-
+export const rc = window.rc
 export const commonFetchOptions = (headers) => ({
   headers: headers || {
     ...jsonHeader,
