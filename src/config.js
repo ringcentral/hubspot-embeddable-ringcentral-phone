@@ -354,11 +354,14 @@ export function thirdPartyServiceConfig (serviceName) {
       showContactInfoPanel(call)
     } else if (type === 'rc-region-settings-notify') {
       const prevCountryCode = rc.countryCode || 'US'
+      console.log('prev country code:', prevCountryCode)
       const newCountryCode = data.countryCode
+      console.log('new country code:', newCountryCode)
       if (prevCountryCode !== newCountryCode) {
         fetchAllContacts()
       }
-      rc.countryCode = data.countryCode
+      rc.countryCode = newCountryCode
+      ls.set('rc-country-code', newCountryCode)
     }
     // else if (type === 'rc-call-end-notify') {
     //   hideContactInfoPanel()
@@ -502,6 +505,8 @@ export async function initThirdParty () {
   rc.currentUserId = userId
   rc.cacheKey = 'contacts' + '_' + userId
   let accessToken = await ls.get('accessToken') || null
+  rc.countryCode = await ls.get('rc-country-code') || undefined
+  console.log('rc.countryCode:', rc.countryCode)
   if (accessToken) {
     rc.local = {
       accessToken
