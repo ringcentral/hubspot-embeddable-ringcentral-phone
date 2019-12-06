@@ -110,12 +110,13 @@ function buildPhone (contact) {
       phoneType: 'directPhone'
     })
   }
-  return {
+  const r = {
     phoneNumbersForSearch: res.map(
       d => formatPhone(d.phoneNumber)
     ).join(','),
     phoneNumbers: res
   }
+  return r
 }
 
 /**

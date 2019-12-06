@@ -71,7 +71,7 @@ function formatNumbers (res) {
       {
         id: k,
         title: phoneTypeDict[k],
-        number: v.formattedNumber
+        number: v.rawNumber
       }
     ]
   }, [])

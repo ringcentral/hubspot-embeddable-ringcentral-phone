@@ -92,17 +92,17 @@ export async function syncCallLogToThirdParty (body) {
 }
 
 async function getSyncContacts (body) {
-  let objs = _.filter(
-    [
-      ..._.get(body, 'call.toMatches') || [],
-      ..._.get(body, 'call.fromMatches') || [],
-      ...(_.get(body, 'correspondentEntity') ? [_.get(body, 'correspondentEntity')] : [])
-    ],
-    m => m.type === serviceName
-  )
-  if (objs.length) {
-    return objs
-  }
+  // let objs = _.filter(
+  //   [
+  //     ..._.get(body, 'call.toMatches') || [],
+  //     ..._.get(body, 'call.fromMatches') || [],
+  //     ...(_.get(body, 'correspondentEntity') ? [_.get(body, 'correspondentEntity')] : [])
+  //   ],
+  //   m => m.type === serviceName
+  // )
+  // if (objs.length) {
+  //   return objs
+  // }
   let all = []
   if (body.call) {
     let nf = _.get(body, 'to.phoneNumber') ||
