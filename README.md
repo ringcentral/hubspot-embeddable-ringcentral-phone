@@ -7,14 +7,14 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 
 ## Table of contents <!-- omit in toc -->
 
-- [Youtube video](#Youtube-video)
-- [Screenshots](#Screenshots)
-- [Features](#Features)
-- [Try it](#Try-it)
-- [Custom build and use](#Custom-build-and-use)
-- [Build with custom RingCentral clientID/appServer](#Build-with-custom-RingCentral-clientIDappServer)
-- [Credits](#Credits)
-- [License](#License)
+- [Youtube video](#youtube-video)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Try it](#try-it)
+- [Custom build and use](#custom-build-and-use)
+- [Build with custom RingCentral clientID/appServer](#build-with-custom-ringcentral-clientidappserver)
+- [Credits](#credits)
+- [License](#license)
 
 ## Youtube video
 
@@ -46,7 +46,7 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 ## Try it
 
 - Download the zip from release page: [https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases)
-- Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
+- Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), make sure you **enable the developer mode**, click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
 - Go to `https://app.hubspot.com` to check
 - Make sure you ***turn off*** `Block third-party cookies` in `chrome://settings/content/cookies`
 
