@@ -82,7 +82,6 @@ export async function syncCallLogToThirdParty (body) {
   }
   if (showCallLogSyncForm && isManuallySync) {
     let contactRelated = await getContactInfo(body, serviceName)
-    console.log(contactRelated, 'contactRelated')
     if (
       !contactRelated ||
       (!contactRelated.froms && !contactRelated.tos)
