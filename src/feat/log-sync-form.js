@@ -25,7 +25,7 @@ function clean () {
   clearTimeout(handler)
 }
 
-async function getContactInfo (body, serviceName) {
+export async function getContactInfo (body, serviceName) {
   if (!body) {
     return
   }
@@ -155,7 +155,7 @@ export async function createForm (body, serviceName, onSubmit) {
   // }
   let old = document.querySelector('.rc-sync-form')
   old && old.remove()
-  document.body.appendChild(dom)
+  document.getElementById('Hubspot-rc').appendChild(dom)
   handler = setTimeout(() => {
     dom.classList.add('rc-sync-show')
   }, 100)
