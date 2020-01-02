@@ -134,7 +134,7 @@ async function getSyncContacts (body) {
   return _.uniqBy(arr, d => d.id)
 }
 
-async function getOwnerId () {
+export async function getUserId () {
   let pid = getPortalId()
   let url = `${apiServerHS}/login-verify/hub-user-info?early=true&portalId=${pid}`
   let res = await fetchBg(url, {
@@ -238,7 +238,7 @@ async function doSyncOne (contact, body, formData) {
   if (!contactId) {
     return notify('No related contact', 'warn')
   }
-  let ownerId = await getOwnerId()
+  let ownerId = await getUserId()
   if (!ownerId) {
     return
   }

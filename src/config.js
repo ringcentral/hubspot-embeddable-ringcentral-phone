@@ -23,7 +23,6 @@ import { getDeals } from './feat/deal'
 import {
   getCompanyById
 } from './feat/company'
-
 import {
   showActivityDetail,
   getActivities
@@ -48,6 +47,7 @@ import {
   search,
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
+import onCallEndHandle from './feat/on-call-end'
 
 let {
   apiServerHS,
@@ -122,6 +122,7 @@ async function getDealNumbers (ids = getIds()) {
 }
 
 async function getCompanyPhoneNumbers () {
+  console.log('ffff')
   let ids = getIds(window.location.href)
   if (!ids) {
     return []
@@ -362,6 +363,9 @@ export function thirdPartyServiceConfig (serviceName) {
       }
       rc.countryCode = newCountryCode
       ls.set('rc-country-code', newCountryCode)
+    } else if (type === 'rc-call-end-notify') {
+      console.log('call end-------->')
+      onCallEndHandle(call)
     }
     // else if (type === 'rc-call-end-notify') {
     //   hideContactInfoPanel()

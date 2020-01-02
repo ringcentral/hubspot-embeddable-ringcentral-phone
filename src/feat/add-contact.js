@@ -80,7 +80,7 @@ function getEmail () {
 
 // let ownerIdGlob = null
 
-// async function getOwnerId () {
+// async function getUserId () {
 //   let pid = getPortalId()
 //   let url = `${apiServerHS}/login-verify/hub-user-info?early=true&portalId=${pid}`
 //   let res = await fetchBg(url, {
@@ -98,10 +98,16 @@ function getEmail () {
 //   return ownerId
 // }
 
-export async function addContact (i) {
+export async function addContact ({
+  ownerId,
+  contactEmail,
+  firstname,
+  lastname,
+  phone
+}) {
   let portalId = getPortalId()
   let email = getEmail()
-  // const oid = ownerIdGlob || await getOwnerId()
+  // const oid = ownerIdGlob || await getUserId()
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
 
@@ -115,25 +121,31 @@ export async function addContact (i) {
         source: 'CRM_UI'
       },
       {
-        value: 33620723,
+        value: ownerId,
         property: 'hubspot_owner_id',
         'source-id': email,
         source: 'CRM_UI'
       },
       {
-        value: `aa${i}@aa.com`,
+        value: contactEmail,
         property: 'email',
         'source-id': email,
         source: 'CRM_UI'
       },
       {
-        value: 'f' + i,
+        value: firstname,
         property: 'firstname',
         'source-id': email,
         source: 'CRM_UI'
       },
       {
-        value: 'l' + i,
+        value: phone,
+        property: 'phone',
+        'source-id': email,
+        source: 'CRM_UI'
+      },
+      {
+        value: lastname,
         property: 'lastname',
         'source-id': email,
         source: 'CRM_UI'
@@ -151,7 +163,7 @@ export async function addContact (i) {
     headers,
     method: 'post'
   })
-  console.log(i, res)
+  return res
 }
 
 async function addContacts (n, from = 0) {
@@ -161,5 +173,5 @@ async function addContacts (n, from = 0) {
 }
 
 export default function run () {
-  addContacts(2000, 1000)
+  addContacts(1, 1000)
 }

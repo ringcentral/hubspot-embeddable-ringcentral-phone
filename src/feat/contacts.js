@@ -187,16 +187,16 @@ query: ""
 sorts: [{property: "createdate", order: "DESC"}, {property: "vid", order: "DESC"}]
 
  */
-async function getContact (
-  page = 1
+export async function getContact (
+  page = 1, _count = 100
 ) {
-  let count = 100
+  let count = _count
   let vidOffset = (page - 1) * count
   let portalId = getPortalId()
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
 
-  let url = `${apiServerHS}/contacts/search/v1/search/contacts?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobile&property=phone&property=email`
+  let url = `${apiServerHS}/contacts/search/v1/search/contacts?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobile&property=phone&property=email&property=hubspot_owner_id`
   let data = {
     offset: vidOffset,
     count,
