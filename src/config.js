@@ -48,7 +48,8 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import onCallEndHandle from './feat/on-call-end'
-
+// import run from './feat/add-contacts'
+// run()
 let {
   apiServerHS,
   pageSize

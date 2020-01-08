@@ -27,7 +27,7 @@ export default async (call) => {
   }
 }
 
-async function getOwnerId () {
+export async function getOwnerId () {
   const conts = await getContact(1, 1)
   if (conts && conts.contacts && conts.contacts.length) {
     return _.get(

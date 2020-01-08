@@ -165,13 +165,3 @@ export async function addContact ({
   })
   return res
 }
-
-async function addContacts (n, from = 0) {
-  for (let i = from; i < n + from; i++) {
-    await addContact(i)
-  }
-}
-
-export default function run () {
-  addContacts(1, 1000)
-}
