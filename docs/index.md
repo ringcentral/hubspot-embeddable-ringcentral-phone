@@ -4,15 +4,20 @@ no_breadcrumb:true
 
 The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpot with a number of critical features that make using HubSpot as a CRM tool easier. 
 
-<iframe src="https://www.youtube.com/embed/4okL0AxL-dg?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/BtWgvuMvL74?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Features
 
-- Dial any HubSpot contact instantly with the click of a button
-- Sync your RingCentral and HubSpot contacts
-- Be notified of inbound calls via a HubSpot alert
-- Display detailed information about inbound callers
-- Easily attach call notes to your HubSpot contact activity log
+- Click to call button
+- Popup callee info panel when call inbound
+- Build with custom app config
+- Auto/manually sync call log/voicemail/sms to hubspot, [About auto call log sync feature](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/issues/137).
+- Check hubspot activities from ringcentral contact panel
+- Custom X-USER-AGENT header for api request
+- Active call control
+- Sync call log to deal
+- Call log with call recording link
+- Call from deal page
 
 <a class="btn btn-primary" href="install/">Install Now &raquo;</a>
 

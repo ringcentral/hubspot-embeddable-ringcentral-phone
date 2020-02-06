@@ -2,7 +2,7 @@
 
 ## Acknowledgements
 
-The RingCentral Embeddable extension for HubSpot was created using [Embbnux Ji](https://github.com/embbnux)'s tuturial: *[Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)* which walks you through the process of building a Chrome Extension and embedding RingCentral's phone into web pages. 
+The RingCentral Embeddable extension for HubSpot was created using [Embbnux Ji](https://github.com/embbnux)'s tuturial: *[Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)* which walks you through the process of building a Chrome Extension and embedding RingCentral's phone into web pages.
 
 ## License
 

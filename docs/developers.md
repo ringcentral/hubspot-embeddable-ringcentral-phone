@@ -54,7 +54,7 @@ Look for the following section, and enter in your RingCentral Client ID, and set
 //// ringcentral config
 ringCentralConfigs: {
   // your ringCentral app's Client ID
-  // clientID: 'qypCMJuSOOseWivhrrGVeCrw',
+  // clientID: 'aaaaaaaseWivhrrGgggVeCrw',
 
   // your ringCentral app's Auth Server URL
   // appServer: 'https://platform.devtest.ringcentral.com'

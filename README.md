@@ -5,7 +5,7 @@ Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringce
 
 Created with [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory), you could create similar extension for other CRM sites.
 
-**Important**: Due to Hubspot contacts API do not support contacts index more than 10000, so this extension do not support it either. This is the video shows the problem: [https://youtu.be/BtWgvuMvL74](https://youtu.be/BtWgvuMvL74)
+**Important**: Due to Hubspot contacts web API do not support contacts index more than 10000, so this extension do not support it either. This is the video shows the problem: [https://youtu.be/BtWgvuMvL74](https://youtu.be/BtWgvuMvL74)
 
 ## Table of contents <!-- omit in toc -->
 

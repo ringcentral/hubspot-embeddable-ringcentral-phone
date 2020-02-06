@@ -35,4 +35,3 @@ The extension is now installed.
 5. From the Firefox Debug Console, click "Load Temporary Add-on."
 
 6. Navigate to and select `dist-firefox/manifest.json`.
-
