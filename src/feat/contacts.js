@@ -196,28 +196,28 @@ export async function getContact (
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
 
-  let url = `${apiServerHS}/contacts/search/v1/search/contacts?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobile&property=phone&property=email&property=hubspot_owner_id`
-  let data = {
-    offset: vidOffset,
-    count,
-    filterGroups: [
-      {
-        filters: []
-      }
-    ],
-    // properties: [],
-    properties: ['firstname', 'phone', 'lastname', 'mobilephone', 'company'],
-    sorts: [
-      {
-        property: 'createdate',
-        order: 'DESC'
-      }, {
-        property: 'vid',
-        order: 'DESC'
-      }
-    ],
-    query: ''
-  }
+  let url = `${apiServerHS}/contacts/v1/lists/all/contacts/all?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobilephone&property=phone&property=email&property=firstname&property=lastname&property=hubspot_owner_id&vidOffset=${vidOffset}&count=${count}`
+  // let data = {
+  //   offset: vidOffset,
+  //   count,
+  //   filterGroups: [
+  //     {
+  //       filters: []
+  //     }
+  //   ],
+  //   // properties: [],
+  //   properties: ['firstname', 'phone', 'lastname', 'mobilephone', 'company'],
+  //   sorts: [
+  //     {
+  //       property: 'createdate',
+  //       order: 'DESC'
+  //     }, {
+  //       property: 'vid',
+  //       order: 'DESC'
+  //     }
+  //   ],
+  //   query: ''
+  // }
   let headers = {
     ...jsonHeader,
     Accept: 'application/json, text/javascript, */*; q=0.01',
@@ -225,9 +225,9 @@ export async function getContact (
     'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
   }
   let res = await fetchBg(url, {
-    body: data,
+    // body: data,
     headers,
-    method: 'post'
+    method: 'get'
   })
   if (res && res.contacts) {
     return res

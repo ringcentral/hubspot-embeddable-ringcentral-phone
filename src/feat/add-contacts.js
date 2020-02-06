@@ -17,5 +17,5 @@ async function addContacts (n, from = 0) {
 }
 
 export default function run () {
-  addContacts(8000, 0)
+  addContacts(10000, 0)
 }
