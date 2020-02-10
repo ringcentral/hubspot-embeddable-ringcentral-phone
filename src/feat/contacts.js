@@ -188,10 +188,10 @@ sorts: [{property: "createdate", order: "DESC"}, {property: "vid", order: "DESC"
 
  */
 export async function getContact (
-  page = 1, _count = 100
+  page = 1, _count = 100, _vidOffset
 ) {
   let count = _count
-  let vidOffset = (page - 1) * count
+  let vidOffset = _vidOffset || (page - 1) * count
   let portalId = getPortalId()
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
@@ -257,25 +257,29 @@ export async function fetchAllContacts () {
   let hasMore = true
   let hasMoreCompany = true
   let result = []
+  let offset = 0
+  let offsetCompany = 0
   await remove()
   while (hasMore) {
-    let res = await getContact(page)
+    let res = await getContact(page, undefined, offset)
     if (!res || !res.contacts) {
       return
     }
     result = formatContacts(res.contacts)
     page = page + 1
     hasMore = res['has-more']
+    offset = res['vid-offset']
     await insert(result)
   }
   while (hasMoreCompany) {
-    let res = await getCompany(pageCompany)
+    let res = await getCompany(pageCompany, undefined, offsetCompany)
     if (!res || !res.companies) {
       return
     }
     result = formatContacts(res.companies)
     pageCompany = pageCompany + 1
     hasMoreCompany = res['has-more']
+    offsetCompany = res['offset']
     await insert(result)
   }
   rc.isFetchingContacts = false

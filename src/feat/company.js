@@ -14,10 +14,11 @@ let {
 
 export async function getCompany (
   page = 1,
-  id = ''
+  id = '',
+  offset
 ) {
   let count = 100
-  let vidOffset = (page - 1) * count
+  let vidOffset = offset || (page - 1) * count
   let portalId = getPortalId()
   let url = `${apiServerHS}/contacts/search/v1/search/companies/v2?portalId=${portalId}&clienttimeout=60000`
   let filterGroups = id
