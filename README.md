@@ -24,11 +24,11 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 
 | screenshots            |  screenshots |
 :-------------------------:|:-------------------------:
-![hubspot-btn2](docs/img/screenshots/hubspot-btn2.png) | ![hubspot-btn2](docs/img/screenshots/hubspot1.png)
-![hubspot-list2](docs/img/screenshots/hubspot-list2.png) | ![hubspot-list2](docs/img/screenshots/hs1.png)
-![hubspot-list2](docs/img/screenshots/hs2.png) | ![hubspot-list2](docs/img/screenshots/hs3.png)
-![hubspot-list2](docs/img/screenshots/hs4.png) | ![hubspot-list2](docs/img/screenshots/hs5.png)
-![hubspot-list2](docs/img/screenshots/hs6.png) | ![hubspot-list2](docs/img/screenshots/hs7.png)
+![hubspot-btn2](docs/img/screenshots/ss1.jpg) | ![hubspot-btn2](docs/img/screenshots/ss2.jpg)
+![hubspot-list2](docs/img/screenshots/ss3.jpg) | ![hubspot-list2](docs/img/screenshots/ss4.jpg)
+![hubspot-list2](docs/img/screenshots/ss5.jpg) | ![hubspot-list2](docs/img/screenshots/ss6.jpg)
+![hubspot-list2](docs/img/screenshots/ss7.jpg) | ![hubspot-list2](docs/img/screenshots/ss8.jpg)
+![hubspot-list2](docs/img/screenshots/ss9.jpg) | ![hubspot-list2](docs/img/screenshots/ss1.jpg)
 
 ## Features
 

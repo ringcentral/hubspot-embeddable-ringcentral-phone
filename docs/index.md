@@ -34,31 +34,31 @@ The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpo
       <img class="d-block w-100" src="./img/screenshots/hubspot-list2.png" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs1.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss8.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs2.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss2.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs3.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss3.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs4.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss4.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs5.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss5.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs6.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss6.jpg" alt="Third slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hs7.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss7.jpg" alt="Third slide">
     </div>
     <div class="carousel-item active">
-      <img class="d-block w-100" src="./img/screenshots/hubspot-btn2.png" alt="First slide">
+      <img class="d-block w-100" src="./img/screenshots/ss1.jpg" alt="First slide">
     </div>
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hubspot1.png" alt="Second slide">
+      <img class="d-block w-100" src="./img/screenshots/ss9.jpg" alt="Second slide">
     </div>
   </div>
   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
