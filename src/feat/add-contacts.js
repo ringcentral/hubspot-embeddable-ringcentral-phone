@@ -10,12 +10,12 @@ async function addContacts (n, from = 0) {
       contactEmail: 'name' + i + '@test.com',
       firstname: 'name' + i,
       lastname: 'test',
-      phone: '6504377931'
+      phone: '6504377934'
     })
     console.log(r)
   }
 }
 
 export default function run () {
-  addContacts(10000, 0)
+  addContacts(400, 0)
 }
