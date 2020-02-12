@@ -310,27 +310,6 @@ export const getContacts = async (page) => {
     stopLoadingContacts()
     return cached
   }
-  let res = await getContact(page)
-  if (!res || !res.contacts) {
-    res = {
-      contacts: [],
-      'has-more': false
-    }
-  }
-  let res1 = await getCompany(page)
-  if (!res1 || !res1.companies) {
-    res = {
-      companies: [],
-      'has-more': false
-    }
-  }
-  final.result = formatContacts([
-    ...res.contacts,
-    ...res1.companies
-  ])
-  let hasMore = res['has-more']
-  let hasMoreCompany = res1['has-more']
-  final.hasMore = hasMore || hasMoreCompany
   fetchAllContacts()
   return final
 }
