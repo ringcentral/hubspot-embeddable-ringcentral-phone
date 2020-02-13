@@ -12,7 +12,8 @@
     "docs": "mkdocs serve",
     "docs-b": "mkdocs build",
     "docs-p": "mkdocs gh-deploy",
-    "deploy": "npm run docs-b && npm run docs-p"
+    "deploy": "npm run docs-b && npm run docs-p",
+    "pack": "node bin/pack"
   },
   "repository": {
     "type": "git",
