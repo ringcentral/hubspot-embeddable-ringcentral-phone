@@ -1,7 +1,7 @@
 {
   "name": "RingCentral Embeddable Voice for HubSpot",
   "description": "RingCentral Embeddable Voice for HubSpot",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "permissions": [
     "http://*/",
     "https://*/",
@@ -36,7 +36,9 @@
       "exclude_matches": [
         "https://app.hubspot.com/login*",
         "https://app.hubspot.com/myaccounts-beta*",
-        "https://app.hubspot.com/developer"
+        "https://app.hubspot.com/developer*",
+        "https://app.hubspot.com/oauth*",
+        "https://app.hubspot.com/ecosystem*"
       ],
       "js": [
         "./jsstore.worker.min.js",
