@@ -4,7 +4,7 @@
 
 import _ from 'lodash'
 import {
-  getCompany, formatCompanyContact
+  getAllCompany, formatCompanyContact
 } from './company'
 import {
   showAuthBtn
@@ -253,7 +253,6 @@ export async function fetchAllContacts () {
   rc.isFetchingContacts = true
   loadingContacts()
   let page = 1
-  let pageCompany = 1
   let hasMore = true
   let hasMoreCompany = true
   let result = []
@@ -272,12 +271,11 @@ export async function fetchAllContacts () {
     await insert(result)
   }
   while (hasMoreCompany) {
-    let res = await getCompany(pageCompany, undefined, offsetCompany)
+    let res = await getAllCompany(offsetCompany)
     if (!res || !res.companies) {
       return
     }
     result = formatContacts(res.companies)
-    pageCompany = pageCompany + 1
     hasMoreCompany = res['has-more']
     offsetCompany = res['offset']
     await insert(result)
