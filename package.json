@@ -13,7 +13,8 @@
     "docs-b": "mkdocs build",
     "docs-p": "mkdocs gh-deploy",
     "deploy": "npm run docs-b && npm run docs-p",
-    "pack": "node bin/pack"
+    "clean": "rm -rf dist dist-firefox",
+    "pack": "npm run clean && ./node_modules/.bin/cross-env NODE_ENV=production ./node_modules/.bin/webpack --progress && node bin/pack"
   },
   "repository": {
     "type": "git",
