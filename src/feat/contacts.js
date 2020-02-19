@@ -26,12 +26,14 @@ import {
   getByPage,
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
+import { setCache, getCache } from 'ringcentral-embeddable-extension-common/src/common/cache'
 
 let {
   serviceName,
   apiServerHS
 } = thirdPartyConfigs
-
+const lastSyncOffset = 'last-sync-offset'
+const lastSyncOffsetCompany = 'last-sync-offset-company'
 /**
  * click contact info panel event handler
  * @param {Event} e
@@ -256,10 +258,11 @@ export async function fetchAllContacts () {
   let hasMore = true
   let hasMoreCompany = true
   let result = []
-  let offset = 0
-  let offsetCompany = 0
+  let offset = await getCache(lastSyncOffset) || 0
+  let offsetCompany = await getCache(lastSyncOffsetCompany) || 0
   await remove()
   while (hasMore) {
+    await setCache(lastSyncOffset, offset, 'never')
     let res = await getContact(page, undefined, offset)
     if (!res || !res.contacts) {
       return
@@ -270,7 +273,9 @@ export async function fetchAllContacts () {
     offset = res['vid-offset']
     await insert(result)
   }
+  await setCache(lastSyncOffset, 0, 'never')
   while (hasMoreCompany) {
+    await setCache(lastSyncOffsetCompany, offsetCompany, 'never')
     let res = await getAllCompany(offsetCompany)
     if (!res || !res.companies) {
       return
@@ -280,6 +285,7 @@ export async function fetchAllContacts () {
     offsetCompany = res['offset']
     await insert(result)
   }
+  await setCache(lastSyncOffsetCompany, 0, 'never')
   rc.isFetchingContacts = false
   stopLoadingContacts()
   notifyReSyncContacts()
