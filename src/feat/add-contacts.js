@@ -1,5 +1,5 @@
 import { addContact } from './add-contact'
-import { getOwnerId } from './on-call-end'
+import { getOwnerId } from './contacts'
 
 async function addContacts (n, from = 0) {
   const oid = await getOwnerId()

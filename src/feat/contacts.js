@@ -126,7 +126,7 @@ function buildPhone (contact) {
  * @param {array} contacts
  * @return {array}
  */
-function formatContacts (contacts) {
+export function formatContacts (contacts) {
   return contacts.map(contact => {
     if (contact.companyId) {
       return formatCompanyContact(contact)
@@ -408,8 +408,54 @@ function stopLoadingContacts () {
   }
 }
 
-function notifyReSyncContacts () {
+export function notifyReSyncContacts () {
   rc.postMessage({
     type: 'rc-adapter-sync-third-party-contacts'
   })
+}
+
+export async function getOwnerId () {
+  let count = 1
+  let vidOffset = 0
+  let portalId = getPortalId()
+  // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
+  //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
+
+  let url = `${apiServerHS}/contacts/search/v1/search/contacts?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobile&property=phone&property=email&property=hubspot_owner_id`
+  let data = {
+    offset: vidOffset,
+    count,
+    filterGroups: [
+      {
+        filters: []
+      }
+    ],
+    // properties: [],
+    properties: ['firstname', 'phone', 'lastname', 'mobilephone', 'company', 'hubspot_owner_id'],
+    sorts: [
+      {
+        property: 'createdate',
+        order: 'DESC'
+      }, {
+        property: 'vid',
+        order: 'DESC'
+      }
+    ],
+    query: ''
+  }
+  let headers = {
+    ...jsonHeader,
+    Accept: 'application/json, text/javascript, */*; q=0.01',
+    'X-HS-Referer': window.location.href,
+    'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
+  }
+  let res = await fetchBg(url, {
+    body: data,
+    headers,
+    method: 'post'
+  })
+  return _.get(
+    res,
+    'contacts[0].properties.hubspot_owner_id.value'
+  )
 }

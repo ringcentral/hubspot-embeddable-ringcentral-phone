@@ -5,13 +5,13 @@
 import _ from 'lodash'
 import { rc } from './common'
 import {
-  match
+  match, insert
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import {
   createElementFromHTML, checkPhoneNumber, notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { addContact } from './add-contact'
-import { getContact, showAuthBtn } from './contacts'
+import { showAuthBtn, formatContacts, notifyReSyncContacts, getOwnerId } from './contacts'
 
 export default async (call) => {
   if (!rc.local.accessToken) {
@@ -25,17 +25,6 @@ export default async (call) => {
   if (_.isEmpty(res)) {
     showContactFormPanel(number)
   }
-}
-
-export async function getOwnerId () {
-  const conts = await getContact(1, 1)
-  if (conts && conts.contacts && conts.contacts.length) {
-    return _.get(
-      conts,
-      'contacts[0].properties.hubspot_owner_id.value'
-    )
-  }
-  return ''
 }
 
 function validateEmail (email) {
@@ -82,9 +71,15 @@ async function onSubmit (res) {
     ...res,
     ownerId: oid
   })
-  if (!r) {
+  if (!r || !r.vid) {
     notify('Create contact failed')
   } else {
+    if (r && r.vid) {
+      await insert(
+        formatContacts([r])
+      )
+      notifyReSyncContacts()
+    }
     notify('Contact cerated')
   }
 }
