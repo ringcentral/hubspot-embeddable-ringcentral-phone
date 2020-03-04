@@ -48,6 +48,7 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import onCallEndHandle from './feat/on-call-end'
+import { onRCMeetingCreate, onMeetingPanelOpen } from './feat/meeting'
 // import run from './feat/add-contacts'
 // run()
 let {
@@ -327,7 +328,11 @@ export function thirdPartyServiceConfig (serviceName) {
     activitiesPath: '/activities',
     activityPath: '/activity',
     callLogEntityMatcherPath: '/callLogger/match',
-    messageLogEntityMatcherPath: '/messageLogger/match'
+    messageLogEntityMatcherPath: '/messageLogger/match',
+
+    // meeting
+    meetingInvitePath: '/meeting/invite',
+    meetingInviteTitle: `Create and Copy to Clipboard`
   }
 
   // handle ringcentral event
@@ -357,17 +362,19 @@ export function thirdPartyServiceConfig (serviceName) {
       showContactInfoPanel(call)
     } else if (type === 'rc-region-settings-notify') {
       const prevCountryCode = rc.countryCode || 'US'
-      console.log('prev country code:', prevCountryCode)
+      console.debug('prev country code:', prevCountryCode)
       const newCountryCode = data.countryCode
-      console.log('new country code:', newCountryCode)
+      console.debug('new country code:', newCountryCode)
       if (prevCountryCode !== newCountryCode) {
         fetchAllContacts()
       }
       rc.countryCode = newCountryCode
       ls.set('rc-country-code', newCountryCode)
     } else if (type === 'rc-call-end-notify') {
-      console.log('call end-------->')
+      console.debug('call end-------->')
       onCallEndHandle(call)
+    } else if (type === 'UI_ADDON_INTEGRATIONS_DIRECTORY_APP_LOADED') {
+      onMeetingPanelOpen()
     }
     // else if (type === 'rc-call-end-notify') {
     //   hideContactInfoPanel()
@@ -493,6 +500,15 @@ export function thirdPartyServiceConfig (serviceName) {
         responseId: data.requestId,
         response: { data: 'ok' }
       })
+    } else if (path === '/meeting/invite') {
+      // add your codes here to handle meeting invite data
+      onRCMeetingCreate(data)
+      // response to widget
+      rc.postMessage({
+        type: 'rc-post-message-response',
+        responseId: data.requestId,
+        response: { data: 'ok' }
+      })
     }
   }
   return {
@@ -527,4 +543,5 @@ export async function initThirdParty () {
   }
 
   upgrade()
+  onMeetingPanelOpen()
 }
