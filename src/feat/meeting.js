@@ -5,7 +5,6 @@
 import {
   createElementFromHTML,
   popup,
-  notify,
   sendMsgToRCIframe
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import {
