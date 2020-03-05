@@ -7,6 +7,8 @@
     "https://*/",
     "storage",
     "activeTab",
+    "clipboardRead",
+    "clipboardWrite",
     "tabs",
     "unlimitedStorage",
     "https://*.hubspot.com/*"

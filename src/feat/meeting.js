@@ -68,29 +68,29 @@ export const onMeetingPanelOpen = async function () {
     placement: 'top'
   })
 }
+/*
+function insertTextAtCursor (text) {
+  var sel, range, textNode
+  if (window.getSelection) {
+    sel = window.getSelection()
+    if (sel.getRangeAt && sel.rangeCount) {
+      range = sel.getRangeAt(0)
+      range.deleteContents()
+      textNode = document.createTextNode(text)
+      range.insertNode(textNode)
 
-// function insertTextAtCursor (text) {
-//   var sel, range, textNode
-//   if (window.getSelection) {
-//     sel = window.getSelection()
-//     if (sel.getRangeAt && sel.rangeCount) {
-//       range = sel.getRangeAt(0)
-//       range.deleteContents()
-//       textNode = document.createTextNode(text)
-//       range.insertNode(textNode)
-
-//       // Move caret to the end of the newly inserted text node
-//       range.setStart(textNode, textNode.length)
-//       range.setEnd(textNode, textNode.length)
-//       sel.removeAllRanges()
-//       sel.addRange(range)
-//     }
-//   } else if (document.selection && document.selection.createRange) {
-//     range = document.selection.createRange()
-//     range.pasteHTML(text)
-//   }
-// }
-
+      // Move caret to the end of the newly inserted text node
+      range.setStart(textNode, textNode.length)
+      range.setEnd(textNode, textNode.length)
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  } else if (document.selection && document.selection.createRange) {
+    range = document.selection.createRange()
+    range.pasteHTML(text)
+  }
+}
+*/
 const copyToClipboard = str => {
   const el = document.createElement('textarea')
   el.value = str
@@ -112,9 +112,10 @@ export const onRCMeetingCreate = (data) => {
   const d = document.querySelector('.DraftEditor-editorContainer > div')
   if (d) {
     copyToClipboard(details)
-    notify('Meeting text copied to clipboard', 10000)
     d.focus()
-    // insertTextAtCursor('\n' + details + '\n')
+    setTimeout(() => {
+      document.execCommand('Paste')
+    }, 100)
   }
   popup(true)
   const ig = document.querySelector('.rc-meet-shade')

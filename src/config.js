@@ -332,7 +332,7 @@ export function thirdPartyServiceConfig (serviceName) {
 
     // meeting
     meetingInvitePath: '/meeting/invite',
-    meetingInviteTitle: `Create and Copy to Clipboard`
+    meetingInviteTitle: `Schedule meeting`
   }
 
   // handle ringcentral event

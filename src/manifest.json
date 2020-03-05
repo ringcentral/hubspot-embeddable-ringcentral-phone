@@ -11,6 +11,8 @@
     "background",
     "tabCapture",
     "unlimitedStorage",
+    "clipboardRead",
+    "clipboardWrite",
     "https://*.hubspot.com/*"
   ],
   "page_action": {
