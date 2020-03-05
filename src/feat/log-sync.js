@@ -21,6 +21,7 @@ import dayjs from 'dayjs'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
+import { getOwnerId } from './contacts'
 
 let {
   showCallLogSyncForm,
@@ -238,7 +239,7 @@ async function doSyncOne (contact, body, formData) {
   if (!contactId) {
     return notify('No related contact', 'warn')
   }
-  let ownerId = await getUserId()
+  let ownerId = await getOwnerId()
   if (!ownerId) {
     return
   }
@@ -286,7 +287,7 @@ async function doSyncOne (contact, body, formData) {
       contactIds,
       companyIds: companyId ? [Number(companyId)] : [],
       dealIds,
-      ownerIds: [ownerId]
+      ownerIds: []
     },
     attachments: [],
     metadata: {
@@ -295,7 +296,9 @@ async function doSyncOne (contact, body, formData) {
       toNumber,
       fromNumber,
       status,
-      durationMilliseconds
+      durationMilliseconds,
+      calleeObjectType: 'CONTACT',
+      calleeObjectId: contactId
     }
   }
   let portalId = getPortalId()
