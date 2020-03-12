@@ -231,6 +231,24 @@ function buildVoiceMailMsgs (body) {
   return `<h3>Voice mail logs:</h3><ul>${arr.join('')}</ul>`
 }
 
+function getCallInfo (contact, toNumber, fromNumber) {
+  const cnums = contact.phoneNumbers.map(n => formatPhone(n.phoneNumber))
+  const fn = formatPhone(fromNumber)
+  const tn = formatPhone(toNumber)
+  if (cnums.includes(tn)) {
+    return {
+      calleeObjectType: 'CONTACT',
+      calleeObjectId: contact.id
+    }
+  } else if (cnums.includes(fn)) {
+    return {
+      callerObjectType: 'CONTACT',
+      callerObjectId: contact.id
+    }
+  }
+  return {}
+}
+
 async function doSyncOne (contact, body, formData) {
   let { id: contactId, isCompany } = contact
   if (isCompany) {
@@ -297,8 +315,7 @@ async function doSyncOne (contact, body, formData) {
       fromNumber,
       status,
       durationMilliseconds,
-      calleeObjectType: 'CONTACT',
-      calleeObjectId: contactId
+      ...getCallInfo(contact, toNumber, fromNumber)
     }
   }
   let portalId = getPortalId()
