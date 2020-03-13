@@ -14,6 +14,9 @@ import { addContact } from './add-contact'
 import { showAuthBtn, formatContacts, notifyReSyncContacts, getOwnerId } from './contacts'
 
 export default async (call) => {
+  if (!call.sdsdf) {
+    return
+  }
   if (!rc.local.accessToken) {
     showAuthBtn()
     return

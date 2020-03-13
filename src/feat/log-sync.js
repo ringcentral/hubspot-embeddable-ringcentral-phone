@@ -21,7 +21,7 @@ import dayjs from 'dayjs'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
-import { getOwnerId } from './contacts'
+import getOwnerId from './get-owner-id'
 
 let {
   showCallLogSyncForm,
@@ -257,7 +257,8 @@ async function doSyncOne (contact, body, formData) {
   if (!contactId) {
     return notify('No related contact', 'warn')
   }
-  let ownerId = await getOwnerId()
+  const type = isCompany ? 'COMPANY' : 'CONTACT'
+  let ownerId = await getOwnerId(contact.id, type)
   if (!ownerId) {
     return
   }
