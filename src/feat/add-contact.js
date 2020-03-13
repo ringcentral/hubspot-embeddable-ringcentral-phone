@@ -120,12 +120,12 @@ export async function addContact ({
         'source-id': email,
         source: 'CRM_UI'
       },
-      // {
-      //   value: ownerId,
-      //   property: 'hubspot_owner_id',
-      //   'source-id': email,
-      //   source: 'CRM_UI'
-      // },
+      {
+        value: ownerId,
+        property: 'hubspot_owner_id',
+        'source-id': email,
+        source: 'CRM_UI'
+      },
       {
         value: contactEmail,
         property: 'email',
@@ -163,6 +163,6 @@ export async function addContact ({
     headers,
     method: 'post'
   })
-  console.log(res, '00000')
+  // console.log(res, '00000')
   return res
 }

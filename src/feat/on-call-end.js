@@ -11,12 +11,10 @@ import {
   createElementFromHTML, checkPhoneNumber, notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { addContact } from './add-contact'
-import { showAuthBtn, formatContacts, notifyReSyncContacts, getOwnerId } from './contacts'
+import { showAuthBtn, formatContacts, notifyReSyncContacts, getOwnerId as getVid } from './contacts'
+import getOwnerId from './get-owner-id'
 
 export default async (call) => {
-  if (!call.sdsdf) {
-    return
-  }
   if (!rc.local.accessToken) {
     showAuthBtn()
     return
@@ -66,7 +64,8 @@ function validate () {
 }
 
 async function onSubmit (res) {
-  const oid = await getOwnerId()
+  const vid = await getVid(true)
+  const oid = await getOwnerId(vid)
   if (!oid) {
     return notify('Add contact failed, can not get owner ID', 'error')
   }

@@ -414,7 +414,7 @@ export function notifyReSyncContacts () {
   })
 }
 
-export async function getOwnerId () {
+export async function getOwnerId (vid) {
   let count = 1
   let vidOffset = 0
   let portalId = getPortalId()
@@ -454,6 +454,9 @@ export async function getOwnerId () {
     headers,
     method: 'post'
   })
+  if (vid) {
+    return _.get(res, 'contacts[0].vid')
+  }
   return _.get(
     res,
     'contacts[0].properties.hubspot_owner_id.value'
