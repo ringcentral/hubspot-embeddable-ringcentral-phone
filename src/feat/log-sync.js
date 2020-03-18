@@ -36,7 +36,7 @@ let {
 //     : ''
 // }
 
-function notifySyncSuccess ({
+export function notifySyncSuccess ({
   id,
   logType,
   interactionType,
@@ -152,7 +152,7 @@ export async function getUserId () {
   return ownerId
 }
 
-async function getCompanyId (contactId) {
+export async function getCompanyId (contactId) {
   const pid = getPortalId()
   let url = `${apiServerHS}/crm-meta/v1/meta?portalId=${pid}&clienttimeout=15000`
   let res = await fetchBg(url, {
