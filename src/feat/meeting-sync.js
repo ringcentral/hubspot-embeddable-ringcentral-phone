@@ -3,6 +3,11 @@
  */
 
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
+import { render } from 'react-dom'
+import {
+  createElementFromHTML
+} from 'ringcentral-embeddable-extension-common/src/common/helpers'
+import MeetingSelect from './meeting-select'
 
 /**
  * ..Request URL: https://api.hubspot.com/engagements/v1/engagements/?portalId=4920570&clienttimeout=14000
@@ -160,4 +165,19 @@ export async function doSyncMeeting () {
       isCompany
     })
   }
+}
+
+export function onSyncMeeting (data) {
+  const id = 'rc-meeting-select'
+  const rootElement = document.getElementById(id)
+  if (rootElement) {
+    return
+  }
+  const div = createElementFromHTML(`<div id="${id}"></div>`)
+  const home = document.getElementById('Hubspot-rc')
+  home.appendChild(div)
+  render(
+    <MeetingSelect />,
+    rootElement
+  )
 }

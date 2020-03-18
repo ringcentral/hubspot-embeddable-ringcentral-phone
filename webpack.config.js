@@ -30,6 +30,14 @@ const to2 = path.resolve(
 //   __dirname,
 //   'node_modules/jsstore/dist/jsstore.min.js'
 // )
+const f31 = path.resolve(
+  __dirname,
+  'node_modules/react/umd/react.production.min.js'
+)
+const f32 = path.resolve(
+  __dirname,
+  'node_modules/react-dom/umd/react-dom.production.min.js'
+)
 const f3 = path.resolve(
   __dirname,
   'node_modules/jsstore/dist/jsstore.worker.min.js'
@@ -82,6 +90,10 @@ var config = {
       path.join(process.cwd(), 'node_modules')
     ]
   },
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM'
+  },
   optimization: {
     minimize: sysConfigDefault.minimize
   },
@@ -102,7 +114,13 @@ var config = {
             options: {
               cacheDirectory: true,
               presets: [
-                '@babel/preset-env'
+                '@babel/react',
+                ['@babel/env', {
+                  targets: {
+                    chrome: 58,
+                    node: 'current'
+                  }
+                }]
               ],
               plugins: [
                 '@babel/plugin-proposal-class-properties',
@@ -179,6 +197,24 @@ var config = {
     }, */
     {
       from: f3,
+      to: to4f,
+      force: true
+    }, {
+      from: f31,
+      to: to4,
+      force: true
+    },
+    {
+      from: f31,
+      to: to4f,
+      force: true
+    }, {
+      from: f32,
+      to: to4,
+      force: true
+    },
+    {
+      from: f32,
       to: to4f,
       force: true
     }], {}),

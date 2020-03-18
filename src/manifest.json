@@ -43,6 +43,8 @@
         "https://app.hubspot.com/ecosystem*"
       ],
       "js": [
+        "./react-dom.production.min.js",
+        "./react.production.min.js",
         "./jsstore.worker.min.js",
         "./content.js"
       ]

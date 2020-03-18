@@ -40,6 +40,8 @@
         "https://app.hubspot.com/*"
       ],
       "js": [
+        "./react-dom.production.min.js",
+        "./react.production.min.js",
         "./jsstore.worker.min.js",
         "./content.js"
       ]
