@@ -112,7 +112,7 @@ export async function createForm (body, serviceName, onSubmit) {
   clean()
   let res = await getContactInfo(body, serviceName)
   if (!res) {
-    return notify('No related contact')
+    return notify('No related contact, you may need resync contact data.')
   }
   let { froms, tos, time } = res
   // let wrapper = document.getElementById('rc-widget')

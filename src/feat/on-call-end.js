@@ -82,7 +82,7 @@ async function onSubmit (res) {
       )
       notifyReSyncContacts()
     }
-    notify('Contact cerated')
+    notify('Contact created')
   }
 }
 
