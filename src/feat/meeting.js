@@ -5,7 +5,8 @@
 import {
   createElementFromHTML,
   popup,
-  sendMsgToRCIframe
+  sendMsgToRCIframe,
+  notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import {
   rcIconSvg
@@ -13,6 +14,8 @@ import {
 import {
   createPopper
 } from '@popperjs/core'
+
+let isFromInsert = false
 
 function insertAfter (newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
@@ -28,6 +31,7 @@ function openRCMeeting () {
   `)
   document.body.appendChild(shade)
   popup()
+  isFromInsert = true
   sendMsgToRCIframe({
     type: 'rc-adapter-navigate-to',
     path: '/meeting'
@@ -108,17 +112,23 @@ export const onRCMeetingCreate = (data) => {
   if (t && !t.value) {
     t.value = topic
   }
+  copyToClipboard(details)
+  notify('Meeting info copied to clipboard', 10000)
   const d = document.querySelector('.DraftEditor-editorContainer > div')
   if (d) {
-    copyToClipboard(details)
     d.focus()
-    setTimeout(() => {
-      document.execCommand('Paste')
-    }, 100)
+    if (isFromInsert) {
+      setTimeout(() => {
+        document.execCommand('Paste')
+      }, 100)
+    }
   }
-  popup(true)
-  const ig = document.querySelector('.rc-meet-shade')
-  if (ig) {
-    return ig.remove()
+  if (isFromInsert) {
+    popup(true)
+    const ig = document.querySelector('.rc-meet-shade')
+    if (ig) {
+      return ig.remove()
+    }
+    isFromInsert = false
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "hubspot-embeddable-ringcentral-phone",
-  "version": "1.9.5",
+  "version": "1.10.0",
   "description": "RingCentral Embeddable Voice with chrome extension for HubSpot",
   "main": "index.js",
   "scripts": {
@@ -65,7 +65,7 @@
     "react": "16.13.0",
     "react-dom": "16.13.0",
     "recursive-assign": "0.2.0",
-    "ringcentral-embeddable-extension-common": "0.7.10",
+    "ringcentral-embeddable-extension-common": "0.8.0",
     "shelljs": "^0.8.2",
     "standard": "^12.0.1",
     "style-loader": "0.21.0",
