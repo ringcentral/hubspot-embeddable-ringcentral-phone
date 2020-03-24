@@ -3,10 +3,11 @@
  */
 
 import { Component } from 'react'
-import { Select, Spin, Button } from 'antd'
+import { AutoComplete, Select, Spin, Button } from 'antd'
 import {
   search
 } from 'ringcentral-embeddable-extension-common/src/common/db'
+import dayjs from 'dayjs'
 import _ from 'lodash'
 /**
  * sync meeting from rc to hs
@@ -23,9 +24,7 @@ let {
   apiServerHS
 } = thirdPartyConfigs
 
-export async function doSyncMeeting () {
-  const contact = {}
-  const meetingInfo = {}
+export async function doSyncMeeting (contact, meetingInfo) {
   const { title, body, endTime, startTime } = meetingInfo
   let { id: contactId, isCompany } = contact
   const type = isCompany ? 'COMPANY' : 'CONTACT'
@@ -76,8 +75,8 @@ export async function doSyncMeeting () {
       'X-SourceId': email
     }
   })
-  console.log(res)
-  if (res) {
+  console.debug('sync meeting result', res)
+  if (res && res.engagement) {
     notifySyncSuccess({
       id: contactId,
       logType: 'MEETING',
@@ -91,29 +90,77 @@ const { Option } = Select
 
 export default class App extends Component {
   state = {
-    show: true,
+    show: false,
     fetching: false,
     options: [],
-    selected: [],
-    syncing: false
+    data: {},
+    contact: {},
+    syncing: false,
+    value: undefined
   }
 
   componentDidMount () {
     window.addEventListener('message', e => {
-      if (e && e.data && e.data.path === '/meetingLogger') {
+      if (e && e.data && e.data.path === '/meetingLoggerForward') {
         this.setState({
+          data: e.data,
           show: true
         })
       }
     })
+    this.fetch()
   }
 
-  handleSync = () => {
+  handleSync = async () => {
+    const {
+      displayName,
+      startTime,
+      duration,
+      hostInfo,
+      participants // ,
+      // recordings
+    } = this.state.data.body.meeting
+    const ps = participants
+      .map(d => d.displayName)
+      .join(', ')
+    const body = `
+<p>Host: ${hostInfo.displayName || 'unknow'}</p>
+<p>Participants: ${ps}</p>`
 
+    const start = dayjs(startTime).valueOf()
+    const end = start + duration
+    const meetingInfo = {
+      title: displayName,
+      body,
+      startTime: start,
+      endTime: end
+    }
+    this.setState({
+      syncing: true
+    })
+    await doSyncMeeting(this.state.contact, meetingInfo)
+    this.setState({
+      syncing: false
+    })
   }
 
-  onChange = v => {
-    console.log(v)
+  handleCancel = () => {
+    this.setState({
+      show: false
+    })
+  }
+
+  handleSelect = (v, s) => {
+    this.setState({
+      contact: JSON.parse(s.props.json),
+      value: s.props.fullName
+    })
+  }
+
+  handleChange = v => {
+    this.setState({
+      value: v
+    })
   }
 
   fetch = _.debounce(async (v) => {
@@ -125,46 +172,66 @@ export default class App extends Component {
 
   renderItem = item => {
     return (
-      <Option value={item.id}>
-        {item.firstname} {item.lastname}
+      <Option
+        key={item.id}
+        value={item.id}
+        json={JSON.stringify(item)}
+        fullName={item.name}
+      >
+        <p>{item.name}</p>
       </Option>
     )
   }
 
   render () {
-    const { show, fetching, options, selected, syncing } = this.state
+    const { value, show, fetching, options, contact, syncing } = this.state
     if (!show) {
       return null
     }
     const props = {
+      value,
       placeholder: 'Search contact by name or number',
-      allowClear: true,
       autoFocus: true,
-      mode: 'multiple',
       onSearch: this.fetch,
-      onChange: this.onChange,
+      showSearch: true,
+      loading: fetching,
+      onSelect: this.handleSelect,
+      onChange: this.handleChange,
+      getPopupContainer: () => document.getElementById('rc-meeting-select'),
+      style: {
+        width: '100%'
+      },
       notFoundContent: fetching ? <Spin size='small' /> : null
     }
     return (
-      <Spin spinning={syncing}>
-        <div className='rc-meet-wrap'>
-          <h3>Select contact who joined the meeting</h3>
-          <Select {...props}>
-            {
-              options.map(this.renderItem)
-            }
-          </Select>
-          <div className='rc-pd1y'>
-            <Button
-              type='primary'
-              disabled={!selected.length}
-              onClick={this.handleSync}
-            >
-              Sync
-            </Button>
+      <div className='rc-meet-wrap'>
+        <Spin spinning={syncing}>
+          <div className='rc-meet-wrap-inner'>
+            <h2>Sync Meeting to HubSpot</h2>
+            <p className='pd1y'>Select Contact:</p>
+            <AutoComplete {...props}>
+              {
+                options.map(this.renderItem)
+              }
+            </AutoComplete>
+            <div className='rc-pd1y'>
+              <Button
+                type='primary'
+                disabled={!contact.id}
+                onClick={this.handleSync}
+              >
+                Sync
+              </Button>
+              <Button
+                onClick={this.handleCancel}
+                className='rc-mg1l'
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
-        </div>
-      </Spin>
+        </Spin>
+      </div>
     )
   }
 }

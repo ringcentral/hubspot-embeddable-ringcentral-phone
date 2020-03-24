@@ -209,9 +209,12 @@ function buildMsgs (body) {
       ? m.to
       : [m.from]
     n = n.map(m => formatPhoneLocal(m.phoneNumber)).join(', ')
-    return `<li><b>${m.subject}</b> - ${desc} <b>${n}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</li>`
+    return {
+      body: `<p><b>${m.subject}</b> - ${desc} <b>${n}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+      id: m.id
+    }
   })
-  return `<h3>SMS logs:</h3><ul>${arr.join('')}</ul>`
+  return arr
 }
 
 function buildVoiceMailMsgs (body) {
@@ -282,10 +285,11 @@ async function doSyncOne (contact, body, formData) {
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
+  let mainBodys = []
   if (body.call) {
     mainBody = `[${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
-    mainBody = buildMsgs(body)
+    mainBodys = buildMsgs(body)
   } else if (isVoiceMail) {
     mainBody = buildVoiceMailMsgs(body)
   }

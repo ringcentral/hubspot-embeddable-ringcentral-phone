@@ -2,12 +2,12 @@
  * sync meeting from rc to hs
  */
 
-import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import { render } from 'react-dom'
 import {
   createElementFromHTML
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import MeetingSelect from './meeting-select'
+import './meeting-sync.styl'
 
 /**
  * ..Request URL: https://api.hubspot.com/engagements/v1/engagements/?portalId=4920570&clienttimeout=14000
@@ -94,88 +94,15 @@ clienttimeout: 14000
 }
  */
 
-import getOwnerId from './get-owner-id'
-import { getCompanyId, notifySyncSuccess } from './log-sync'
-import { commonFetchOptions, getPortalId, getEmail } from './common'
-import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-
-let {
-  apiServerHS
-} = thirdPartyConfigs
-
-export async function doSyncMeeting () {
-  const contact = {}
-  const meetingInfo = {}
-  const { title, body, endTime, startTime } = meetingInfo
-  let { id: contactId, isCompany } = contact
-  const type = isCompany ? 'COMPANY' : 'CONTACT'
-  let email = getEmail()
-  let ownerId = await getOwnerId(contact.id, type)
-  let now = +new Date()
-  let contactIds = isCompany ? [] : [Number(contactId)]
-  let companyId = isCompany
-    ? contactId
-    : await getCompanyId(contactId)
-  let data = {
-    engagement: {
-      source: 'CRM_UI',
-      ownerId,
-      type: 'MEETING',
-      sourceId: email,
-      timestamp: now
-    },
-    associations: {
-      contactIds,
-      companyIds: companyId ? [Number(companyId)] : [],
-      dealIds: [],
-      ownerIds: [],
-      ticketIds: []
-    },
-    attachments: [
-    ],
-    scheduledTasks: [
-    ],
-    inviteeEmails: [
-    ],
-    metadata: {
-      title,
-      body,
-      endTime,
-      startTime,
-      source: 'CRM_UI'
-    }
-  }
-  let portalId = getPortalId()
-  let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
-  let res = await fetchBg(url, {
-    method: 'post',
-    body: data,
-    headers: {
-      ...commonFetchOptions().headers,
-      'X-Source': 'CRM_UI',
-      'X-SourceId': email
-    }
-  })
-  console.log(res)
-  if (res) {
-    notifySyncSuccess({
-      id: contactId,
-      logType: 'MEETING',
-      interactionType: '',
-      isCompany
-    })
-  }
-}
-
-export function onSyncMeeting (data) {
+export function initMeetingSelect (data) {
   const id = 'rc-meeting-select'
-  const rootElement = document.getElementById(id)
+  let rootElement = document.getElementById(id)
   if (rootElement) {
     return
   }
-  const div = createElementFromHTML(`<div id="${id}"></div>`)
+  rootElement = createElementFromHTML(`<div id="${id}"></div>`)
   const home = document.getElementById('Hubspot-rc')
-  home.appendChild(div)
+  home.appendChild(rootElement)
   render(
     <MeetingSelect />,
     rootElement

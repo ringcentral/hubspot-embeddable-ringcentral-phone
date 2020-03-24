@@ -34,7 +34,7 @@ function openRCMeeting () {
   isFromInsert = true
   sendMsgToRCIframe({
     type: 'rc-adapter-navigate-to',
-    path: '/meeting'
+    path: '/meeting/schedule'
   })
 }
 
