@@ -17,8 +17,11 @@ import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-wi
 
 import getOwnerId from './get-owner-id'
 import { getCompanyId, notifySyncSuccess } from './log-sync'
-import { commonFetchOptions, getPortalId, getEmail } from './common'
+import { commonFetchOptions, getPortalId, getEmail, rc } from './common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import {
+  showAuthBtn
+} from './auth'
 
 let {
   apiServerHS
@@ -102,6 +105,10 @@ export default class App extends Component {
   componentDidMount () {
     window.addEventListener('message', e => {
       if (e && e.data && e.data.path === '/meetingLoggerForward') {
+        if (!rc.local.accessToken) {
+          showAuthBtn()
+          return
+        }
         this.setState({
           data: e.data,
           show: true
@@ -117,18 +124,24 @@ export default class App extends Component {
       startTime,
       duration,
       hostInfo,
-      participants // ,
-      // recordings
+      participants,
+      recordings
     } = this.state.data.body.meeting
     const ps = participants
       .map(d => d.displayName)
       .join(', ')
-    const body = `
+    let body = `
 <p>Host: ${hostInfo.displayName || 'unknow'}</p>
 <p>Participants: ${ps}</p>`
+    if (recordings && recordings.length) {
+      const rcds = recordings.map(r => {
+        return `<p><a href="${r.link}">${r.link}</a></p>`
+      })
+      body = `${body}<p></p><p>Recordings:</p>${rcds.join('')}`
+    }
 
     const start = dayjs(startTime).valueOf()
-    const end = start + duration
+    const end = start + (duration || 0)
     const meetingInfo = {
       title: displayName,
       body,
@@ -140,7 +153,8 @@ export default class App extends Component {
     })
     await doSyncMeeting(this.state.contact, meetingInfo)
     this.setState({
-      syncing: false
+      syncing: false,
+      open: false
     })
   }
 

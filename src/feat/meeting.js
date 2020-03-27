@@ -21,7 +21,7 @@ function insertAfter (newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling)
 }
 
-function openRCMeeting () {
+export function openRCMeeting () {
   const ig = document.querySelector('.rc-meet-shade')
   if (ig) {
     return false

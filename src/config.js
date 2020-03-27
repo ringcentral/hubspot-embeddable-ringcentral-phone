@@ -48,7 +48,7 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import onCallEndHandle from './feat/on-call-end'
-import { onRCMeetingCreate, onMeetingPanelOpen } from './feat/meeting'
+import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
 import { initMeetingSelect } from './feat/meeting-sync'
 // import run from './feat/add-contacts'
 // run()
@@ -125,7 +125,6 @@ async function getDealNumbers (ids = getIds()) {
 }
 
 async function getCompanyPhoneNumbers () {
-  console.log('ffff')
   let ids = getIds(window.location.href)
   if (!ids) {
     return []
@@ -155,6 +154,10 @@ export const insertClickToCallButton = [
       return /contacts\/\d+\/contact\/\d+/.test(href)
     },
     getContactPhoneNumbers: getNumbers,
+    onClickMeeting: function () {
+      document.querySelector('[data-icon-name="meetings"]').click()
+      openRCMeeting()
+    },
     parentsToInsertButton: [
       {
         getElem: () => {
