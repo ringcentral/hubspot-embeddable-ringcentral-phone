@@ -14,7 +14,7 @@ let {
 
 export async function getAllCompany (offset = 0, limit = 250) {
   let portalId = getPortalId()
-  let url = `${apiServerHS}/companies/v2/companies/paged?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only`
+  let url = `${apiServerHS}/companies/v2/companies/paged?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
   let headers = {
     ...jsonHeader,
     Accept: 'application/json, text/javascript, */*; q=0.01',

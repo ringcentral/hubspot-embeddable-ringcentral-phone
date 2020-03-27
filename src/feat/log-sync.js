@@ -22,6 +22,7 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import getOwnerId from './get-owner-id'
+import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 
 let {
   showCallLogSyncForm,
@@ -92,10 +93,10 @@ export async function syncCallLogToThirdParty (body) {
     return createForm(
       body,
       serviceName,
-      (formData) => doSync(body, formData)
+      (formData) => doSync(body, formData, isManuallySync)
     )
   } else {
-    doSync(body, {})
+    doSync(body, {}, isManuallySync)
   }
 }
 
@@ -189,19 +190,20 @@ export async function getCompanyId (contactId) {
  * @param {*} body
  * @param {*} formData
  */
-async function doSync (body, formData) {
+async function doSync (body, formData, isManuallySync) {
   let contacts = await getSyncContacts(body)
   if (!contacts.length) {
     return notify('No related contacts')
   }
   for (let contact of contacts) {
-    await doSyncOne(contact, body, formData)
+    await doSyncOne(contact, body, formData, isManuallySync)
   }
 }
 
 function buildMsgs (body) {
   let msgs = _.get(body, 'conversation.messages')
-  let arr = msgs.map(m => {
+  const arr = []
+  for (const m of msgs) {
     let desc = m.direction === 'Outbound'
       ? 'to'
       : 'from'
@@ -209,17 +211,18 @@ function buildMsgs (body) {
       ? m.to
       : [m.from]
     n = n.map(m => formatPhoneLocal(m.phoneNumber)).join(', ')
-    return {
-      body: `<p><b>${m.subject}</b> - ${desc} <b>${n}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+    arr.push({
+      body: `<p>SMS: <b>${m.subject}</b> - ${desc} <b>${n}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
       id: m.id
-    }
-  })
+    })
+  }
   return arr
 }
 
 function buildVoiceMailMsgs (body) {
   let msgs = _.get(body, 'conversation.messages')
-  let arr = msgs.map(m => {
+  const arr = []
+  for (const m of msgs) {
     let isOut = m.direction === 'Outbound'
     let desc = isOut
       ? 'to'
@@ -229,9 +232,21 @@ function buildVoiceMailMsgs (body) {
       : [m.from]
     n = n.map(m => formatPhoneLocal(m.phoneNumber || m.extensionNumber)).join(', ')
     let links = m.attachments.map(t => t.link).join(', ')
-    return `<li>${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</li>`
-  })
-  return `<h3>Voice mail logs:</h3><ul>${arr.join('')}</ul>`
+    arr.push({
+      body: `<p>Voice mail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+      id: m.id
+    })
+  }
+  return arr
+}
+
+function buildKey (id, email) {
+  return `rc-log-${email}-${id}`
+}
+
+async function saveLog (id, email, engageId) {
+  const key = buildKey(id, email)
+  await ls.set(key, engageId)
 }
 
 function getCallInfo (contact, toNumber, fromNumber) {
@@ -252,7 +267,19 @@ function getCallInfo (contact, toNumber, fromNumber) {
   return {}
 }
 
-async function doSyncOne (contact, body, formData) {
+async function filterLoggered (arr, email) {
+  const res = []
+  for (const m of arr) {
+    const key = buildKey(m.id, email)
+    const ig = await ls.get(key)
+    if (!ig) {
+      res.push(m)
+    }
+  }
+  return res
+}
+
+async function doSyncOne (contact, body, formData, isManuallySync) {
   let { id: contactId, isCompany } = contact
   if (isCompany) {
     return
@@ -285,67 +312,83 @@ async function doSyncOne (contact, body, formData) {
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
-  let mainBodys = []
   if (body.call) {
     mainBody = `[${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
-    mainBodys = buildMsgs(body)
+    mainBody = buildMsgs(body)
   } else if (isVoiceMail) {
     mainBody = buildVoiceMailMsgs(body)
   }
   let interactionType = body.call || isVoiceMail ? 'CALL' : 'NOTE'
   let logType = body.call || isVoiceMail ? 'Call' : ctype
-  let bodyAll = `<p>${formData.description || ''}</p><p>${mainBody}</p>${recording}`
-  let companyId = isCompany
-    ? contactId
-    : await getCompanyId(contactId)
-  let data = {
-    engagement: {
-      active: true,
-      ownerId,
-      type: interactionType,
-      timestamp: now
-    },
-    associations: {
-      contactIds,
-      companyIds: companyId ? [Number(companyId)] : [],
-      dealIds,
-      ownerIds: []
-    },
-    attachments: [],
-    metadata: {
-      externalId,
-      body: bodyAll,
-      toNumber,
-      fromNumber,
-      status,
-      durationMilliseconds,
-      ...getCallInfo(contact, toNumber, fromNumber)
-    }
+  if (!_.isArray(mainBody)) {
+    mainBody = [{
+      body: mainBody,
+      id: externalId
+    }]
   }
-  let portalId = getPortalId()
-  let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
-  let res = await fetchBg(url, {
-    method: 'post',
-    body: data,
-    headers: {
-      ...commonFetchOptions().headers,
-      'X-Source': 'CRM_UI',
-      'X-SourceId': email
+  if (!isManuallySync) {
+    mainBody = await filterLoggered(mainBody, email)
+  }
+  let bodyAll = mainBody.map(mm => {
+    return {
+      id: mm.id,
+      body: `<p>${formData.description || ''}</p><p>${mm.body}</p>${recording}`
     }
   })
-  // let res = await fetch.post(url, data, commonFetchOptions())
-  if (res && res.engagement) {
-    notifySyncSuccess({
-      id: contactId,
-      logType,
-      interactionType,
-      isCompany
+  for (const uit of bodyAll) {
+    let companyId = isCompany
+      ? contactId
+      : await getCompanyId(contactId)
+    let data = {
+      engagement: {
+        active: true,
+        ownerId,
+        type: interactionType,
+        timestamp: now
+      },
+      associations: {
+        contactIds,
+        companyIds: companyId ? [Number(companyId)] : [],
+        dealIds,
+        ownerIds: []
+      },
+      attachments: [],
+      metadata: {
+        externalId: uit.id,
+        body: uit.body,
+        toNumber,
+        fromNumber,
+        status,
+        durationMilliseconds,
+        ...getCallInfo(contact, toNumber, fromNumber)
+      }
+    }
+    let portalId = getPortalId()
+    let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
+    let res = await fetchBg(url, {
+      method: 'post',
+      body: data,
+      headers: {
+        ...commonFetchOptions().headers,
+        'X-Source': 'CRM_UI',
+        'X-SourceId': email
+      }
     })
-  } else {
-    notify('call log sync to hubspot failed', 'warn')
-    console.log('post engagements/v1/engagements error')
-    console.log(res)
+    // let res = await fetch.post(url, data, commonFetchOptions())
+    if (res && res.engagement) {
+      await saveLog(uit.id, email, res.engagement.id)
+      notifySyncSuccess({
+        id: contactId,
+        logType,
+        interactionType,
+        isCompany
+      })
+    } else {
+      notify('call log sync to hubspot failed', 'warn')
+      console.log('post engagements/v1/engagements error')
+      console.log(res)
+    }
   }
 }
 
@@ -401,3 +444,17 @@ export async function findMatchCallLog (data) {
   }, {})
   return x
 }
+
+/**
+Contact to engagement 9
+get
+/crm-associations/v1/associations/:objectId/HUBSPOT_DEFINED/:definitionId?limit=100&offset=0
+{
+  "results": [
+    259674,
+    259727
+  ],
+  "hasMore": false,
+  "offset": 259727
+}
+ */
