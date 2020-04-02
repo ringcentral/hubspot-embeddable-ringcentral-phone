@@ -11,6 +11,7 @@
     "clipboardWrite",
     "tabs",
     "unlimitedStorage",
+    "debugger",
     "https://*.hubspot.com/*"
   ],
   "applications": {

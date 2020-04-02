@@ -31,7 +31,7 @@ The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpo
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hubspot-list2.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss1.png" alt="Third slide">
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss8.jpg" alt="Third slide">
@@ -53,9 +53,6 @@ The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpo
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss7.jpg" alt="Third slide">
-    </div>
-    <div class="carousel-item active">
-      <img class="d-block w-100" src="./img/screenshots/ss1.jpg" alt="First slide">
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss9.jpg" alt="Second slide">
