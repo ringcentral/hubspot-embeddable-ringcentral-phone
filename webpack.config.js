@@ -106,6 +106,23 @@ var config = {
         ]
       },
       {
+        test: /\.less$/,
+        use: [
+          {
+            loader: 'style-loader'
+          },
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              javascriptEnabled: true
+            }
+          }
+        ]
+      },
+      {
         test: /\.jsx?$/,
         exclude: /node_modules\/(?!(ringcentral-embeddable-extension-common)\/).*/,
         use: [
@@ -136,6 +153,14 @@ var config = {
                   '@babel/plugin-transform-runtime',
                   {
                     regenerator: true
+                  }
+                ],
+                [
+                  'import',
+                  {
+                    libraryName: 'antd',
+                    libraryDirectory: 'es',
+                    style: true
                   }
                 ]
               ]

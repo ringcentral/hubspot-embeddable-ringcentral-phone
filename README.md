@@ -42,6 +42,9 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 - Sync call log to deal
 - Call log with call recording link
 - Call from deal page
+- Insert meeting content to HubSpot or sync meeting info to HubSpot
+- Click to open schedule meeting page.
+- Support RingCentral Video
 
 ## Try it
 

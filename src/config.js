@@ -48,7 +48,8 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import onCallEndHandle from './feat/on-call-end'
-import { onRCMeetingCreate, onMeetingPanelOpen } from './feat/meeting'
+import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
+import { initMeetingSelect } from './feat/meeting-sync'
 // import run from './feat/add-contacts'
 // run()
 let {
@@ -124,7 +125,6 @@ async function getDealNumbers (ids = getIds()) {
 }
 
 async function getCompanyPhoneNumbers () {
-  console.log('ffff')
   let ids = getIds(window.location.href)
   if (!ids) {
     return []
@@ -154,6 +154,10 @@ export const insertClickToCallButton = [
       return /contacts\/\d+\/contact\/\d+/.test(href)
     },
     getContactPhoneNumbers: getNumbers,
+    onClickMeeting: function () {
+      document.querySelector('[data-icon-name="meetings"]').click()
+      openRCMeeting()
+    },
     parentsToInsertButton: [
       {
         getElem: () => {
@@ -302,7 +306,7 @@ export const phoneNumberSelectors = [{
  */
 export function thirdPartyServiceConfig (serviceName) {
   console.log(serviceName)
-
+  const logTitle = `Log to ${serviceName}`
   let services = {
     name: serviceName,
     // show contacts in ringcentral widgets
@@ -319,10 +323,10 @@ export function thirdPartyServiceConfig (serviceName) {
 
     // Enable call log sync feature
     callLoggerPath: '/callLogger',
-    callLoggerTitle: `Log to ${serviceName}`,
+    callLoggerTitle: logTitle,
 
     messageLoggerPath: '/messageLogger',
-    messageLoggerTitle: `Log to ${serviceName}`,
+    messageLoggerTitle: logTitle,
 
     // show contact activities in ringcentral widgets
     activitiesPath: '/activities',
@@ -332,7 +336,9 @@ export function thirdPartyServiceConfig (serviceName) {
 
     // meeting
     meetingInvitePath: '/meeting/invite',
-    meetingInviteTitle: `Schedule meeting`
+    meetingInviteTitle: `Schedule meeting`,
+    meetingLoggerPath: '/meetingLogger',
+    meetingLoggerTitle: logTitle
   }
 
   // handle ringcentral event
@@ -453,8 +459,10 @@ export function thirdPartyServiceConfig (serviceName) {
           data: res
         }
       })
+    } else if (path === '/meetingLogger') {
+      e.data.path = '/meetingLoggerForward'
+      window.postMessage(e.data, '*')
     } else if (path === '/callLogger' || path === '/messageLogger') {
-      // add your codes here to log call to your service
       syncCallLogToThirdParty(data.body)
       // response to widget
       rc.postMessage({
@@ -544,4 +552,5 @@ export async function initThirdParty () {
 
   upgrade()
   onMeetingPanelOpen()
+  initMeetingSelect()
 }
