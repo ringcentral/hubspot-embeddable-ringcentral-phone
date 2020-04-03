@@ -23,6 +23,7 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
+import copy from 'json-deep-copy'
 
 let {
   showCallLogSyncForm,
@@ -65,7 +66,39 @@ export function notifySyncSuccess ({
   notify(msg, type, 9000)
 }
 
+let prev = {
+  time: Date.now(),
+  sessionId: '',
+  body: {}
+}
+
+function checkMerge (body) {
+  const maxDiff = 100
+  const now = Date.now()
+  const sid = _.get(body, 'conversation.conversationId')
+  const type = _.get(body, 'conversation.type')
+  if (type !== 'SMS') {
+    return body
+  }
+  if (prev.sessionId === sid && prev.time - now < maxDiff) {
+    let msgs = [
+      ...body.conversation.messages,
+      ...prev.body.conversation.messages
+    ]
+    msgs = _.uniqBy(msgs, (e) => e.id)
+    body.conversation.messages = msgs
+    prev.body = copy(body)
+    return body
+  } else {
+    prev.time = now
+    prev.sessionId = sid
+    prev.body = copy(body)
+    return body
+  }
+}
+
 export async function syncCallLogToThirdParty (body) {
+  console.log(new Date().getTime(), '---')
   // let result = _.get(body, 'call.result')
   // if (result !== 'Call connected') {
   //   return
@@ -83,6 +116,7 @@ export async function syncCallLogToThirdParty (body) {
     return isManuallySync ? showAuthBtn() : null
   }
   if (showCallLogSyncForm && isManuallySync) {
+    body = checkMerge(body)
     let contactRelated = await getContactInfo(body, serviceName)
     if (
       !contactRelated ||
@@ -327,7 +361,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       id: externalId
     }]
   }
-  if (!isManuallySync) {
+  if (!(isManuallySync && logType === 'Call')) {
     mainBody = await filterLoggered(mainBody, email)
   }
   let bodyAll = mainBody.map(mm => {
