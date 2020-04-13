@@ -4,7 +4,7 @@ no_breadcrumb:true
 
 The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpot with a number of critical features that make using HubSpot as a CRM tool easier. 
 
-<iframe src="https://www.youtube.com/embed/MciDRtxx1VQ?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/2T5F9Y-x63E?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Features
 
@@ -31,7 +31,7 @@ The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpo
   </ol>
   <div class="carousel-inner">
     <div class="carousel-item">
-      <img class="d-block w-100" src="./img/screenshots/hubspot-list2.png" alt="Third slide">
+      <img class="d-block w-100" src="./img/screenshots/ss1.png" alt="Third slide">
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss8.jpg" alt="Third slide">
@@ -53,9 +53,6 @@ The RingCentral Embeddable plugin for Firefox and Chrome greatly enhances HubSpo
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss7.jpg" alt="Third slide">
-    </div>
-    <div class="carousel-item active">
-      <img class="d-block w-100" src="./img/screenshots/ss1.jpg" alt="First slide">
     </div>
     <div class="carousel-item">
       <img class="d-block w-100" src="./img/screenshots/ss9.jpg" alt="Second slide">

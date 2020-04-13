@@ -110,7 +110,11 @@ export const onRCMeetingCreate = (data) => {
   } = data.body.meeting
   const t = document.querySelector('input[data-selenium-test="meeting-title-input"]')
   if (t && !t.value) {
-    t.value = topic
+    copyToClipboard(topic)
+    t.focus()
+    if (isFromInsert) {
+      document.execCommand('Paste')
+    }
   }
   copyToClipboard(details)
   notify('Meeting info copied to clipboard', 10000)
