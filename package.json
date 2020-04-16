@@ -14,7 +14,8 @@
     "docs-p": "mkdocs gh-deploy",
     "deploy": "npm run docs-b && npm run docs-p",
     "clean": "rm -rf dist dist-firefox",
-    "pack": "npm run clean && ./node_modules/.bin/cross-env NODE_ENV=production ./node_modules/.bin/webpack --progress && node bin/pack"
+    "key": "node bin/deploy-key.js",
+    "pack": "npm run clean && ./node_modules/.bin/cross-env NODE_ENV=production ./node_modules/.bin/webpack --progress && npm run key && node bin/pack"
   },
   "repository": {
     "type": "git",
@@ -78,9 +79,13 @@
     "webpack": "4.32.2",
     "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.3.1",
-    "webpack-extraneous-file-cleanup-plugin": "2.0.0"
+    "webpack-extraneous-file-cleanup-plugin": "2.0.0",
+    "webpack-noodle-plugin": "^1.0.9"
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "globals": [
+      "chrome"
+    ]
   }
 }
