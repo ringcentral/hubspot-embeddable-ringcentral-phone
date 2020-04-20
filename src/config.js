@@ -53,6 +53,8 @@ import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/mee
 import { initMeetingSelect } from './feat/meeting-sync'
 // import run from './feat/add-contacts'
 // run()
+// import run from './feat/add-companies'
+// run()
 let {
   apiServerHS,
   pageSize
