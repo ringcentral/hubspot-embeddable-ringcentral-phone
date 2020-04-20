@@ -14,8 +14,8 @@
     "docs-p": "mkdocs gh-deploy",
     "deploy": "npm run docs-b && npm run docs-p",
     "clean": "rm -rf dist dist-firefox",
-    "key": "node bin/deploy-key.js",
-    "pack": "npm run clean && ./node_modules/.bin/cross-env NODE_ENV=production ./node_modules/.bin/webpack --progress && npm run key && node bin/pack"
+    "down": "node bin/download-adapter.js",
+    "pack": "rm -rf dist && cross-env NODE_ENV=production ./node_modules/.bin/webpack && npm run down && node bin/pack"
   },
   "repository": {
     "type": "git",

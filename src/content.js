@@ -26,7 +26,6 @@ if (clientID || appServer) {
   console.log('import RingCentral Embeddable Voice to web page')
   var rcs = document.createElement('script')
   var u = chrome.runtime.getURL('embeddable/adapter.js') + appConfigQuery
-  console.log(u)
   rcs.src = u
   var rcs0 = document.getElementsByTagName('script')[0]
   rcs0.parentNode.insertBefore(rcs, rcs0)

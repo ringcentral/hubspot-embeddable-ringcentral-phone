@@ -16,10 +16,6 @@ const config = [
   {
     name: 'google-chrome',
     folder: 'dist'
-  },
-  {
-    name: 'mozilla-firefox',
-    folder: 'dist-firefox'
   }
 ]
 

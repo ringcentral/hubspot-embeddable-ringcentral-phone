@@ -51,6 +51,7 @@ import {
 import onCallEndHandle from './feat/on-call-end'
 import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
 import { initMeetingSelect } from './feat/meeting-sync'
+import initReact from './lib/react-entry'
 // import run from './feat/add-contacts'
 // run()
 // import run from './feat/add-companies'
@@ -403,7 +404,9 @@ export function thirdPartyServiceConfig (serviceName) {
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
       if (isMannulSync) {
-        fetchAllContacts()
+        window.postMessage({
+          type: 'rc-show-sync-menu'
+        }, '*')
         rc.postMessage({
           type: 'rc-post-message-response',
           responseId: data.requestId,
@@ -549,4 +552,5 @@ export async function initThirdParty () {
   upgrade()
   onMeetingPanelOpen()
   initMeetingSelect()
+  initReact()
 }
