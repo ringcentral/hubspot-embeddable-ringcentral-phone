@@ -1,6 +1,6 @@
 {
   "name": "hubspot-embeddable-ringcentral-phone",
-  "version": "1.11.3",
+  "version": "2.0.0",
   "description": "RingCentral Embeddable Voice with chrome extension for HubSpot",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "docs-p": "mkdocs gh-deploy",
     "deploy": "npm run docs-b && npm run docs-p",
     "clean": "rm -rf dist dist-firefox",
-    "pack": "npm run clean && ./node_modules/.bin/cross-env NODE_ENV=production ./node_modules/.bin/webpack --progress && node bin/pack"
+    "down": "node bin/download-adapter.js",
+    "pack": "rm -rf dist && cross-env NODE_ENV=production ./node_modules/.bin/webpack && npm run down && node bin/pack"
   },
   "repository": {
     "type": "git",
@@ -78,9 +79,13 @@
     "webpack": "4.32.2",
     "webpack-cli": "3.3.0",
     "webpack-dev-server": "3.3.1",
-    "webpack-extraneous-file-cleanup-plugin": "2.0.0"
+    "webpack-extraneous-file-cleanup-plugin": "2.0.0",
+    "webpack-noodle-plugin": "^1.0.9"
   },
   "standard": {
-    "parser": "babel-eslint"
+    "parser": "babel-eslint",
+    "globals": [
+      "chrome"
+    ]
   }
 }

@@ -190,15 +190,20 @@ sorts: [{property: "createdate", order: "DESC"}, {property: "vid", order: "DESC"
 
  */
 export async function getContact (
-  page = 1, _count = 100, _vidOffset
+  page = 1,
+  _count = 100,
+  _vidOffset,
+  getRecent = false
 ) {
   let count = _count
   let vidOffset = _vidOffset || (page - 1) * count
   let portalId = getPortalId()
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
-
-  let url = `${apiServerHS}/contacts/v1/lists/all/contacts/all?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobilephone&property=phone&property=email&property=firstname&property=lastname&property=hubspot_owner_id&vidOffset=${vidOffset}&count=${count}`
+  const baseUrl = getRecent
+    ? '/contacts/v1/lists/recently_updated/contacts/recent'
+    : '/contacts/v1/lists/all/contacts/all'
+  let url = `${apiServerHS}${baseUrl}?resolveOwner=false&showSourceMetadata=false&identityProfileMode=all&showPastListMemberships=false&formSubmissionMode=none&showPublicToken=false&propertyMode=value_only&showAnalyticsDetails=false&resolveAssociations=true&portalId=${portalId}&clienttimeout=14000&property=mobilephone&property=phone&property=email&property=firstname&property=lastname&property=hubspot_owner_id&vidOffset=${vidOffset}&count=${count}`
   // let data = {
   //   offset: vidOffset,
   //   count,
@@ -244,7 +249,7 @@ export async function getContact (
   }
 }
 
-export async function fetchAllContacts () {
+export async function fetchAllContacts (getRecent) {
   if (!rc.local.accessToken) {
     showAuthBtn()
     return
@@ -263,7 +268,7 @@ export async function fetchAllContacts () {
   await remove()
   while (hasMore) {
     await setCache(lastSyncOffset, offset, 'never')
-    let res = await getContact(page, undefined, offset)
+    let res = await getContact(page, undefined, offset, getRecent)
     if (!res || !res.contacts) {
       return
     }
@@ -276,7 +281,7 @@ export async function fetchAllContacts () {
   await setCache(lastSyncOffset, 0, 'never')
   while (hasMoreCompany) {
     await setCache(lastSyncOffsetCompany, offsetCompany, 'never')
-    let res = await getAllCompany(offsetCompany)
+    let res = await getAllCompany(offsetCompany, undefined, getRecent)
     if (!res || !res.companies) {
       return
     }

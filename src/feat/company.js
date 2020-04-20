@@ -12,9 +12,16 @@ let {
   apiServerHS
 } = thirdPartyConfigs
 
-export async function getAllCompany (offset = 0, limit = 250) {
+export async function getAllCompany (
+  offset = 0,
+  limit = 250,
+  getRecent = false
+) {
   let portalId = getPortalId()
-  let url = `${apiServerHS}/companies/v2/companies/paged?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
+  const baseUrl = getRecent
+    ? '/companies/v2/companies/recent/modified'
+    : 'companies/v2/companies/paged'
+  let url = `${apiServerHS}${baseUrl}?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
   let headers = {
     ...jsonHeader,
     Accept: 'application/json, text/javascript, */*; q=0.01',

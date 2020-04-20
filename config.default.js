@@ -9,10 +9,15 @@ let config = {
   // build options
   minimize: false,
 
+  // extension Key
+  extensionKey: 'yyyyyyyyyyyyyyyyyyyyyy',
+
   // congfigs to build app
 
   // ringcentral config
   ringCentralConfigs: {
+    // extensionId
+    extensionId: 'extensionidstringxxxxxxxxxxxxxx',
     clientID: '',
     clientSecret: '',
     appServer: 'https://platform.ringcentral.com'
