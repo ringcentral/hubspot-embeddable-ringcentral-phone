@@ -34,6 +34,9 @@ let {
 } = thirdPartyConfigs
 const lastSyncOffset = 'last-sync-offset'
 const lastSyncOffsetCompany = 'last-sync-offset-company'
+const lastSyncOffsetRecent = 'last-sync-offset-recent'
+const lastSyncOffsetCompanyRecent = 'last-sync-offset-company-recent'
+
 /**
  * click contact info panel event handler
  * @param {Event} e
@@ -263,11 +266,17 @@ export async function fetchAllContacts (getRecent) {
   let hasMore = true
   let hasMoreCompany = true
   let result = []
-  let offset = await getCache(lastSyncOffset) || 0
-  let offsetCompany = await getCache(lastSyncOffsetCompany) || 0
+  const syncOffset = getRecent
+    ? lastSyncOffsetRecent
+    : lastSyncOffset
+  const syncOffsetCom = getRecent
+    ? lastSyncOffsetCompanyRecent
+    : lastSyncOffsetCompany
+  let offset = await getCache(syncOffset) || 0
+  let offsetCompany = await getCache(syncOffsetCom) || 0
   await remove()
   while (hasMore) {
-    await setCache(lastSyncOffset, offset, 'never')
+    await setCache(syncOffset, offset, 'never')
     let res = await getContact(page, undefined, offset, getRecent)
     if (!res || !res.contacts) {
       return
@@ -278,9 +287,9 @@ export async function fetchAllContacts (getRecent) {
     offset = res['vid-offset']
     await insert(result)
   }
-  await setCache(lastSyncOffset, 0, 'never')
+  await setCache(syncOffset, 0, 'never')
   while (hasMoreCompany) {
-    await setCache(lastSyncOffsetCompany, offsetCompany, 'never')
+    await setCache(syncOffsetCom, offsetCompany, 'never')
     let res = await getAllCompany(offsetCompany, undefined, getRecent)
     if (!res || !res.companies) {
       return
@@ -290,7 +299,7 @@ export async function fetchAllContacts (getRecent) {
     offsetCompany = res['offset']
     await insert(result)
   }
-  await setCache(lastSyncOffsetCompany, 0, 'never')
+  await setCache(syncOffsetCom, 0, 'never')
   rc.isFetchingContacts = false
   stopLoadingContacts()
   notifyReSyncContacts()

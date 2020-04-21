@@ -22,10 +22,6 @@ const to1 = path.resolve(
   __dirname,
   'dist/icons'
 )
-const to2 = path.resolve(
-  __dirname,
-  'dist-firefox/icons'
-)
 // const f2 = path.resolve(
 //   __dirname,
 //   'node_modules/jsstore/dist/jsstore.min.js'
@@ -46,10 +42,6 @@ const to4 = path.resolve(
   __dirname,
   'dist'
 )
-const to4f = path.resolve(
-  __dirname,
-  'dist-firefox'
-)
 const opts = {
   extensions: ['.map', '.js'],
   minBytes: 3900
@@ -69,10 +61,7 @@ var config = {
   entry: {
     content: './src/content.js',
     background: './src/background.js',
-    manifest: './src/manifest.json',
-    '../dist-firefox/content': './src/content.js',
-    '../dist-firefox/background': './src/background.js',
-    '../dist-firefox/manifest': './src/manifest-firefox.json'
+    manifest: './src/manifest.json'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -203,10 +192,6 @@ var config = {
       from,
       to: to1,
       force: true
-    }, {
-      from,
-      to: to2,
-      force: true
     }, /* {
       from: f2,
       to: to4,
@@ -221,26 +206,13 @@ var config = {
       force: true
     }, */
     {
-      from: f3,
-      to: to4f,
-      force: true
-    }, {
       from: f31,
       to: to4,
       force: true
     },
     {
-      from: f31,
-      to: to4f,
-      force: true
-    }, {
       from: f32,
       to: to4,
-      force: true
-    },
-    {
-      from: f32,
-      to: to4f,
       force: true
     }], {}),
     new ExtraneousFileCleanupPlugin(opts),
