@@ -20,7 +20,7 @@ export async function getAllCompany (
   let portalId = getPortalId()
   const baseUrl = getRecent
     ? '/companies/v2/companies/recent/modified'
-    : 'companies/v2/companies/paged'
+    : '/companies/v2/companies/paged'
   let url = `${apiServerHS}${baseUrl}?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
   let headers = {
     ...jsonHeader,
