@@ -274,7 +274,7 @@ export async function fetchAllContacts (getRecent) {
     : lastSyncOffsetCompany
   let offset = await getCache(syncOffset) || 0
   let offsetCompany = await getCache(syncOffsetCom) || 0
-  if (!getRecent) {
+  if (!getRecent && !offset) {
     await remove()
   }
   while (hasMore) {
