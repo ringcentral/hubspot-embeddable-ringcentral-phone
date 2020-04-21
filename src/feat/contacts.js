@@ -34,8 +34,6 @@ let {
 } = thirdPartyConfigs
 const lastSyncOffset = 'last-sync-offset'
 const lastSyncOffsetCompany = 'last-sync-offset-company'
-const lastSyncOffsetRecent = 'last-sync-offset-recent'
-const lastSyncOffsetCompanyRecent = 'last-sync-offset-company-recent'
 
 /**
  * click contact info panel event handler
@@ -266,14 +264,14 @@ export async function fetchAllContacts (getRecent) {
   let hasMore = true
   let hasMoreCompany = true
   let result = []
-  const syncOffset = getRecent
-    ? lastSyncOffsetRecent
-    : lastSyncOffset
-  const syncOffsetCom = getRecent
-    ? lastSyncOffsetCompanyRecent
-    : lastSyncOffsetCompany
-  let offset = await getCache(syncOffset) || 0
-  let offsetCompany = await getCache(syncOffsetCom) || 0
+  const syncOffset = lastSyncOffset
+  const syncOffsetCom = lastSyncOffsetCompany
+  let offset = getRecent
+    ? 0
+    : await getCache(syncOffset) || 0
+  let offsetCompany = getRecent
+    ? 0
+    : await getCache(syncOffsetCom) || 0
   if (!getRecent && !offset) {
     await remove()
   }
