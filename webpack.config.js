@@ -71,7 +71,10 @@ var config = {
     libraryTarget: 'var'
   },
   resolve: {
-    extensions: ['.js', '.json']
+    extensions: ['.js', '.json'],
+    alias: {
+      'antd/dist/antd.less$': path.resolve(__dirname, 'src/lib/antd.less')
+    }
   },
   resolveLoader: {
     modules: [
@@ -102,6 +105,9 @@ var config = {
           },
           {
             loader: 'css-loader'
+          },
+          {
+            loader: 'postcss-loader'
           },
           {
             loader: 'less-loader',

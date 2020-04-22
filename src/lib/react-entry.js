@@ -7,7 +7,6 @@ import {
   createElementFromHTML
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import App from './react-ele'
-import './box.styl'
 
 export default () => {
   const id = 'rc-react-entry'

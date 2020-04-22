@@ -162,21 +162,7 @@ export const insertClickToCallButton = [
           return p
             ? p.parentNode.parentNode : null
         },
-        insertMethod: 'append',
-        shouldInsert: () => {
-          let all = document.querySelectorAll('.text-center .' + RCBTNCLS2)
-          if (all.length > 1) {
-            let arr = Array.from(all)
-            let i = 0
-            for (let ele of arr) {
-              if (i !== 0) {
-                ele.remove()
-              }
-              i++
-            }
-          }
-          return !all.length
-        }
+        insertMethod: 'append'
       }
     ]
   },

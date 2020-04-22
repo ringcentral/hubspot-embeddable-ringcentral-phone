@@ -6,6 +6,8 @@ import { useEffect } from 'react'
 import { Modal, Button } from 'antd'
 import { SyncOutlined } from '@ant-design/icons'
 import { fetchAllContacts } from '../feat/contacts'
+import './antd.less'
+import 'antd/dist/antd.less'
 
 function showSyncMenu () {
   let mod = null
@@ -22,25 +24,25 @@ function showSyncMenu () {
   }
   const content = (
     <div>
-      <div className='pd2b'>After Sync contacts, conatacts data will update, so auto call log can match right contacts, you could choose sync only recent updated/created contacts or sync all contacts.</div>
+      <div className='rc-pd2b'>After Sync contacts, conatacts data will update, so auto call log can match right contacts, you could choose sync only recent updated/created contacts or sync all contacts.</div>
       <div>
         <Button
           type='primary'
-          className='mg1r mg1b'
+          className='rc-mg1r rc-mg1b'
           onClick={syncRecent}
         >
           Sync recent update/created contacts
         </Button>
         <Button
           type='primary'
-          className='mg1r mg1b'
+          className='rc-mg1r rc-mg1b'
           onClick={syncAll}
         >
           Sync all contacts
         </Button>
         <Button
           type='ghost'
-          className='mg1r mg1b'
+          className='rc-mg1r rc-mg1b'
           onClick={destroyMod}
         >
           Cancel
@@ -50,7 +52,7 @@ function showSyncMenu () {
   )
   const btnProps = {
     disabled: true,
-    className: 'hide'
+    className: 'rc-hide'
   }
   mod = Modal.confirm({
     title: 'Sync contacts',
