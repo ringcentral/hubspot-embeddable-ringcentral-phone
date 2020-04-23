@@ -17,13 +17,13 @@ import {
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail } from './common'
 import { getDeals } from './deal'
-import dayjs from 'dayjs'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
+import dayjs from 'dayjs'
 
 let {
   showCallLogSyncForm,
@@ -331,6 +331,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let contactIds = isCompany ? [] : [Number(contactId)]
   let toNumber = _.get(body, 'call.to.phoneNumber')
   let fromNumber = _.get(body, 'call.from.phoneNumber')
+  let fmtime = dayjs(_.get(body, 'call.startTime')).format('MMM DD, YYYY h:mm A')
   let status = 'COMPLETED'
   let durationMilliseconds = _.get(body, 'call.duration')
   durationMilliseconds = durationMilliseconds
@@ -347,7 +348,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
   if (body.call) {
-    mainBody = `[${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
+    mainBody = `${fmtime}: [${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
     mainBody = buildMsgs(body)
   } else if (isVoiceMail) {
