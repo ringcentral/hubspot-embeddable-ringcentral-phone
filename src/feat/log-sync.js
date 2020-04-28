@@ -15,7 +15,7 @@ import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail } from './common'
+import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
 import { getDeals } from './deal'
 import {
   match
@@ -321,6 +321,12 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (!contactId) {
     return notify('No related contact', 'warn')
   }
+  let desc = formData.description
+  const sid = _.get(body, 'call.telephonySessionId') || 'not-exist'
+  const sessid = autoLogPrefix + sid
+  if (!isManuallySync) {
+    desc = await ls.get(sessid) || ''
+  }
   const type = isCompany ? 'COMPANY' : 'CONTACT'
   let ownerId = await getOwnerId(contact.id, type)
   if (!ownerId) {
@@ -368,7 +374,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let bodyAll = mainBody.map(mm => {
     return {
       id: mm.id,
-      body: `<p>${formData.description || ''}</p><p>${mm.body}</p>${recording}`
+      body: `<p>${desc || ''}</p><p>${mm.body}</p>${recording}`
     }
   })
   for (const uit of bodyAll) {

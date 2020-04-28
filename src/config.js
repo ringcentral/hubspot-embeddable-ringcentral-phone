@@ -31,8 +31,7 @@ import {
   showAuthBtn,
   doAuth,
   notifyRCAuthed,
-  unAuth,
-  renderAuthButton
+  unAuth
 } from './feat/auth'
 import {
   syncCallLogToThirdParty,
@@ -52,6 +51,7 @@ import onCallEndHandle from './feat/on-call-end'
 import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
 import { initMeetingSelect } from './feat/meeting-sync'
 import initReact from './lib/react-entry'
+import initInner from './lib/inner-entry'
 // import run from './feat/add-contacts'
 // run()
 // import run from './feat/add-companies'
@@ -393,14 +393,6 @@ export function thirdPartyServiceConfig (serviceName) {
         window.postMessage({
           type: 'rc-show-sync-menu'
         }, '*')
-        rc.postMessage({
-          type: 'rc-post-message-response',
-          responseId: data.requestId,
-          response: {
-            data: []
-          }
-        })
-        return
       }
       let page = _.get(data, 'body.page') || 1
       let contacts = await getContacts(page)
@@ -528,9 +520,6 @@ export async function initThirdParty () {
     }
   }
 
-  // get the html ready
-  renderAuthButton()
-
   if (rc.local.accessToken) {
     notifyRCAuthed()
   }
@@ -539,4 +528,5 @@ export async function initThirdParty () {
   onMeetingPanelOpen()
   initMeetingSelect()
   initReact()
+  initInner()
 }

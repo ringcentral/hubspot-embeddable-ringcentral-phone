@@ -91,3 +91,5 @@ export function getEmail () {
   }
   return emailDom.textContent.trim()
 }
+
+export const autoLogPrefix = 'rc-auto-log-id:'
