@@ -200,7 +200,6 @@ export async function getCompanyId (contactId) {
       },
       timeoutMillis: 5000,
       types: [
-        'MINKOWSKI',
         'CONTACT',
         'CONTACT_ASSOCIATIONS_FIRST_PAGE'
       ]
@@ -211,7 +210,7 @@ export async function getCompanyId (contactId) {
   if (res && res.data) {
     companyId = _.get(res, 'data.CONTACT.properties.associatedcompanyid.value') + ''
   } else {
-    console.log('fetch ownerId error')
+    console.log('fetch company error')
     console.log(res)
   }
   return companyId
