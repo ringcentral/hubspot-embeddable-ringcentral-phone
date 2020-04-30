@@ -106,10 +106,16 @@ export default () => {
         showAuthBtn()
         return
       }
-      const { call } = e.data
-      const phone = call.direction === 'Inbound'
-        ? _.get(call, 'from.phoneNumber') || _.get(call, 'from')
-        : _.get(call, 'to.phoneNumber') || _.get(call, 'to')
+      const { call = {} } = e.data
+      let phone = _.get(
+        e.data,
+        'conversation.correspondents[0].phoneNumber'
+      )
+      if (!phone) {
+        phone = call.direction === 'Inbound'
+          ? _.get(call, 'from.phoneNumber') || _.get(call, 'from')
+          : _.get(call, 'to.phoneNumber') || _.get(call, 'to')
+      }
       const name = call.direction === 'Inbound'
         ? _.get(call, 'from.name')
         : _.get(call, 'to.name')
