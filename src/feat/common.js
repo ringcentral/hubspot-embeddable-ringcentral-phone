@@ -20,7 +20,6 @@ export function getPortalId () {
       window.location.href.match(/https:\/\/app\.hubspot\.com\/[^/]+\/(\d+)/), '[1]'
     )
   }
-  console.log('portal id:', pid)
   return pid
 }
 window.rc = {

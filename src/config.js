@@ -47,7 +47,7 @@ import {
   search,
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
-import onCallEndHandle from './feat/on-call-end'
+import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
 import { initMeetingSelect } from './feat/meeting-sync'
 import initReact from './lib/react-entry'
@@ -360,8 +360,9 @@ export function thirdPartyServiceConfig (serviceName) {
       rc.countryCode = newCountryCode
       ls.set('rc-country-code', newCountryCode)
     } else if (type === 'rc-call-end-notify') {
-      console.debug('call end-------->')
-      onCallEndHandle(call)
+      const dd = copy(data)
+      dd.type = 'rc-show-add-contact-panel'
+      window.postMessage(dd, '*')
     } else if (type === 'UI_ADDON_INTEGRATIONS_DIRECTORY_APP_LOADED') {
       onMeetingPanelOpen()
     }

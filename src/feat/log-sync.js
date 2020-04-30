@@ -98,7 +98,6 @@ function checkMerge (body) {
 }
 
 export async function syncCallLogToThirdParty (body) {
-  console.log(new Date().getTime(), '---')
   // let result = _.get(body, 'call.result')
   // if (result !== 'Call connected') {
   //   return
@@ -122,7 +121,9 @@ export async function syncCallLogToThirdParty (body) {
       !contactRelated ||
       (!contactRelated.froms && !contactRelated.tos)
     ) {
-      return notify('No related contact')
+      const b = copy(body)
+      b.type = 'rc-show-add-contact-panel'
+      return window.postMessage(b, '*')
     }
     return createForm(
       body,
