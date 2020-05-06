@@ -52,10 +52,11 @@ import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/mee
 import { initMeetingSelect } from './feat/meeting-sync'
 import initReact from './lib/react-entry'
 import initInner from './lib/inner-entry'
+import { resyncCheck } from './lib/auto-resync'
 // import run from './feat/add-contacts'
+// import run1 from './feat/add-companies'
 // run()
-// import run from './feat/add-companies'
-// run()
+// run1()
 let {
   apiServerHS,
   pageSize
@@ -530,4 +531,5 @@ export async function initThirdParty () {
   initMeetingSelect()
   initReact()
   initInner()
+  resyncCheck()
 }

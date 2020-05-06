@@ -7,7 +7,7 @@ import { Modal, Button } from 'antd'
 import { SyncOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { fetchAllContacts } from '../feat/contacts'
 import { doAuth } from '../feat/auth'
-import { rc } from '../feat/common'
+import AutoSync from './auto-resync'
 import './antd.less'
 import 'antd/dist/antd.less'
 
@@ -49,6 +49,7 @@ function showSyncMenu () {
         >
           Cancel
         </Button>
+        <AutoSync />
       </div>
     </div>
   )
@@ -132,9 +133,6 @@ export default () => {
   }
   useEffect(() => {
     window.addEventListener('message', onEvent)
-    if (!rc.local.accessToken) {
-      showAuthPanel()
-    }
     return () => {
       window.removeEventListener('message', onEvent)
     }

@@ -250,7 +250,7 @@ export async function getContact (
   }
 }
 
-export async function fetchAllContacts (getRecent) {
+export async function fetchAllContacts (_getRecent) {
   if (!rc.local.accessToken) {
     showAuthBtn()
     return
@@ -258,6 +258,7 @@ export async function fetchAllContacts (getRecent) {
   if (rc.isFetchingContacts) {
     return
   }
+  let getRecent = !!_getRecent
   rc.isFetchingContacts = true
   loadingContacts()
   let page = 1
@@ -266,17 +267,20 @@ export async function fetchAllContacts (getRecent) {
   let result = []
   const syncOffset = lastSyncOffset
   const syncOffsetCom = lastSyncOffsetCompany
-  let offset = getRecent
-    ? 0
-    : await getCache(syncOffset) || 0
-  let offsetCompany = getRecent
-    ? 0
-    : await getCache(syncOffsetCom) || 0
+  let offset = await getCache(syncOffset) || 0
+  let offsetCompany = await getCache(syncOffsetCom) || 0
+  console.log(offset, 'offset', getRecent)
+  console.log(offsetCompany, 'offsetCompany')
+  if (offset) {
+    getRecent = false
+  }
   if (!getRecent && !offset) {
     await remove()
   }
   while (hasMore) {
-    await setCache(syncOffset, offset, 'never')
+    if (!getRecent) {
+      await setCache(syncOffset, offset, 'never')
+    }
     let res = await getContact(page, undefined, offset, getRecent)
     if (!res || !res.contacts) {
       return
@@ -287,9 +291,13 @@ export async function fetchAllContacts (getRecent) {
     offset = res['vid-offset']
     await insert(result)
   }
-  await setCache(syncOffset, 0, 'never')
+  if (!getRecent) {
+    await setCache(syncOffset, 0, 'never')
+  }
   while (hasMoreCompany) {
-    await setCache(syncOffsetCom, offsetCompany, 'never')
+    if (!getRecent) {
+      await setCache(syncOffsetCom, offsetCompany, 'never')
+    }
     let res = await getAllCompany(offsetCompany, undefined, getRecent)
     if (!res || !res.companies) {
       return
@@ -299,7 +307,9 @@ export async function fetchAllContacts (getRecent) {
     offsetCompany = res['offset']
     await insert(result)
   }
-  await setCache(syncOffsetCom, 0, 'never')
+  if (!getRecent) {
+    await setCache(syncOffsetCom, 0, 'never')
+  }
   rc.isFetchingContacts = false
   stopLoadingContacts()
   notifyReSyncContacts()
