@@ -66,6 +66,7 @@ export default function AutoResync () {
         />
         <span className='rc-mg1l'>minutes</span>
       </p>
+      <p>* Auto resync will pause when page inactive or hidden</p>
     </div>
   )
 }
