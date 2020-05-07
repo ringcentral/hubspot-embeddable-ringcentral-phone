@@ -5,7 +5,7 @@
 import { useEffect } from 'react'
 import { Modal, Button } from 'antd'
 import { SyncOutlined, InfoCircleOutlined } from '@ant-design/icons'
-import { fetchAllContacts } from '../feat/contacts'
+import { fetchAllContacts, notifyReSyncContacts } from '../feat/contacts'
 import { doAuth } from '../feat/auth'
 import AutoSync from './auto-resync'
 import './antd.less'
@@ -19,6 +19,10 @@ function showSyncMenu () {
   }
   function syncAll () {
     fetchAllContacts()
+    destroyMod()
+  }
+  function onCancel () {
+    notifyReSyncContacts()
     destroyMod()
   }
   function destroyMod () {
@@ -45,7 +49,7 @@ function showSyncMenu () {
         <Button
           type='ghost'
           className='rc-mg1r rc-mg1b'
-          onClick={destroyMod}
+          onClick={onCancel}
         >
           Cancel
         </Button>

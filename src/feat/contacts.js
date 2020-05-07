@@ -32,6 +32,7 @@ let {
   serviceName,
   apiServerHS
 } = thirdPartyConfigs
+
 const lastSyncOffset = 'last-sync-offset'
 const lastSyncOffsetCompany = 'last-sync-offset-company'
 
@@ -244,7 +245,7 @@ export async function getContact (
     console.log(res)
     return {
       contacts: [],
-      'has-more': false,
+      'has-more': true,
       'offset': vidOffset
     }
   }
@@ -269,48 +270,64 @@ export async function fetchAllContacts (_getRecent) {
   const syncOffsetCom = lastSyncOffsetCompany
   let offset = await getCache(syncOffset) || 0
   let offsetCompany = await getCache(syncOffsetCom) || 0
-  console.log(offset, 'offset', getRecent)
-  console.log(offsetCompany, 'offsetCompany')
-  if (offset) {
+  console.debug(offset, 'offset', getRecent)
+  console.debug(offsetCompany, 'offsetCompany')
+  let dbTest = await getByPage(1, 1)
+  console.debug('getRecent', getRecent)
+  console.debug('dbTest', dbTest)
+  if (!dbTest || !dbTest.count || offset || offsetCompany) {
     getRecent = false
   }
-  if (!getRecent && !offset) {
+  console.debug('getRecent2', getRecent)
+  if (!getRecent && !offset && !offsetCompany) {
     await remove()
   }
-  while (hasMore) {
+  let countRecentMax = 3
+  let countRecent = 0
+  let countRecentCompanyMax = 3
+  let countRecentCompany = 0
+  while (
+    hasMore &&
+    (countRecent < countRecentMax)
+  ) {
     if (!getRecent) {
       await setCache(syncOffset, offset, 'never')
     }
     let res = await getContact(page, undefined, offset, getRecent)
-    if (!res || !res.contacts) {
-      return
-    }
     result = formatContacts(res.contacts)
     page = page + 1
     hasMore = res['has-more']
     offset = res['vid-offset']
+    if (getRecent) {
+      countRecent++
+    }
     await insert(result)
   }
   if (!getRecent) {
     await setCache(syncOffset, 0, 'never')
   }
-  while (hasMoreCompany) {
+  while (
+    hasMoreCompany &&
+    (countRecentCompany < countRecentCompanyMax)
+  ) {
     if (!getRecent) {
       await setCache(syncOffsetCom, offsetCompany, 'never')
     }
     let res = await getAllCompany(offsetCompany, undefined, getRecent)
-    if (!res || !res.companies) {
-      return
-    }
     result = formatContacts(res.companies)
     hasMoreCompany = res['has-more']
     offsetCompany = res['offset']
+    if (getRecent) {
+      countRecentCompany++
+    }
     await insert(result)
   }
   if (!getRecent) {
     await setCache(syncOffsetCom, 0, 'never')
   }
   rc.isFetchingContacts = false
+  rc.syncTimeStamp = Date.now()
+  await setCache('rc-sync-timestamp', rc.syncTimeStamp, 'never')
   stopLoadingContacts()
   notifyReSyncContacts()
   notify('Syncing contacts done', 'info', 1000)
@@ -331,11 +348,9 @@ export const getContacts = async (page) => {
     showAuthBtn()
     return final
   }
-  loadingContacts()
   let cached = await getByPage(page).catch(e => console.log(e.stack))
   if (cached && cached.result && cached.result.length) {
     console.debug('use cache')
-    stopLoadingContacts()
     return cached
   }
   fetchAllContacts()
@@ -419,7 +434,7 @@ function loadingContacts () {
       class="rc-reloading-contacts"
       id="rc-reloading-contacts"
       title="Reload contacts"
-    />Syncing contacts</span>
+    />Syncing contacts, please stay in this page until it is done</span>
     `
   )
   document.body.appendChild(elem)

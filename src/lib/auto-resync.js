@@ -15,13 +15,15 @@ const initState = {
   interval: step * 4
 }
 
-export async function resyncCheck () {
+export async function resyncCheck (delay = false) {
   console.log('resyncCheck', new Date())
   const state = await ls.get(key) || copy(initState)
   console.log('resyncCheck state', state)
   console.log('document.hidden', document.hidden)
   if (!document.hidden && state.on) {
-    fetchAllContacts(true)
+    if (!delay) {
+      fetchAllContacts(true)
+    }
   }
   setTimeout(resyncCheck, state.interval)
 }

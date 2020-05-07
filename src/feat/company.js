@@ -39,7 +39,7 @@ export async function getAllCompany (
     console.log(res)
     return {
       companies: [],
-      'has-more': false,
+      'has-more': true,
       offset
     }
   }

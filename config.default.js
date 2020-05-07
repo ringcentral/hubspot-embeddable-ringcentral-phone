@@ -29,7 +29,7 @@ let config = {
     apiServerHS: 'https://api.hubspot.com',
     showCallLogSyncForm: true,
     serviceName: 'Hubspot',
-    pageSize: 10000,
+    pageSize: 200000,
     dbSchema: {
       portalId: {
         dataType: 'string'

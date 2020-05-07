@@ -45,7 +45,8 @@ import {
 } from './feat/contacts.js'
 import {
   search,
-  match
+  match,
+  getByPage
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
@@ -391,22 +392,41 @@ export function thirdPartyServiceConfig (serviceName) {
       })
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
-      if (isMannulSync) {
+      let page = _.get(data, 'body.page') || 1
+      if (isMannulSync && page === 1) {
         window.postMessage({
           type: 'rc-show-sync-menu'
         }, '*')
+        return rc.postMessage({
+          type: 'rc-post-message-response',
+          responseId: data.requestId,
+          response: {
+            data: []
+          }
+        })
       }
-      let page = _.get(data, 'body.page') || 1
+      const now = Date.now()
+      window.postMessage({
+        type: 'rc-transferring-data',
+        transferringData: true
+      }, '*')
       let contacts = await getContacts(page)
       let nextPage = ((contacts.count || 0) - page * pageSize > 0) || contacts.hasMore
         ? page + 1
         : null
+      const no2 = Date.now()
+      console.debug(no2 - now)
+      window.postMessage({
+        type: 'rc-transferring-data',
+        transferringData: false
+      }, '*')
       rc.postMessage({
         type: 'rc-post-message-response',
         responseId: data.requestId,
         response: {
           data: contacts.result,
-          nextPage
+          nextPage,
+          syncTimeStamp: rc.syncTimeStamp
         }
       })
     } else if (path === '/contacts/search') {
@@ -515,6 +535,13 @@ export async function initThirdParty () {
   rc.cacheKey = 'contacts' + '_' + userId
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
+  const syncTimeStamp = await ls.get('rc-sync-timestamp')
+  if (!syncTimeStamp) {
+    rc.syncTimeStamp = Date.now()
+    await ls.set('rc-sync-timestamp', rc.syncTimeStamp)
+  } else {
+    rc.syncTimeStamp = syncTimeStamp
+  }
   console.log('rc.countryCode:', rc.countryCode)
   if (accessToken) {
     rc.local = {
@@ -531,5 +558,6 @@ export async function initThirdParty () {
   initMeetingSelect()
   initReact()
   initInner()
-  resyncCheck()
+  const db = await getByPage(1, 1)
+  resyncCheck(db && db.count)
 }
