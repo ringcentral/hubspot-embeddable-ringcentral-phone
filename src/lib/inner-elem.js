@@ -154,7 +154,7 @@ export default () => {
       window.removeEventListener('message', onEvent)
     }
   }, [note])
-  console.log(state, 'state')
+  const isCallPath = path.startsWith('/calls/') || path.startsWith('/dialer')
   if (path === '/contacts' && transferringData) {
     return (
       <Tooltip title='Rebuilding data...' overlayClassName='rc-toolt-tip-card'>
@@ -180,7 +180,7 @@ export default () => {
   if (!calling) {
     return null
   }
-  if (hideForm && path === '/dialer') {
+  if (hideForm && isCallPath) {
     return (
       <Tooltip title='Show note edit form' overlayClassName='rc-toolt-tip-card'>
         <EditOutlined
@@ -191,7 +191,7 @@ export default () => {
         />
       </Tooltip>
     )
-  } else if (path === '/dialer') {
+  } else if (isCallPath) {
     return (
       <div className='rc-call-note-form'>
         <div className='pd1'>
