@@ -32,7 +32,7 @@ window.rc = {
   cacheKey: 'contacts' + '_' + '',
   updateToken: async (newToken, type = 'accessToken') => {
     if (!newToken) {
-      await ls.clear()
+      await ls.remove(type)
       rc.local = {
         accessToken: null
       }
