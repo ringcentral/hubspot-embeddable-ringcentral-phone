@@ -238,15 +238,20 @@ function buildMsgs (body) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
   for (const m of msgs) {
-    let desc = m.direction === 'Outbound'
-      ? 'to'
-      : 'from'
-    let n = m.direction === 'Outbound'
-      ? m.to
-      : [m.from]
-    n = n.map(m => formatPhoneLocal(m.phoneNumber)).join(', ')
+    const fromN = _.get(m, 'from.phoneNumber') ||
+      _.get(m, 'from[0].phoneNumber') || ''
+    const fromName = _.get(m, 'from.name') ||
+      (_.get(m, 'from') || []).map(d => d.name).join(', ') || ''
+    const toN = _.get(m, 'to.phoneNumber') ||
+      _.get(m, 'to[0].phoneNumber') || ''
+    const toName = _.get(m, 'to.name') ||
+      (_.get(m, 'to') || []).map(d => d.name).join(', ') || ''
+    const from = fromN +
+      (fromName ? `(${fromName})` : '')
+    const to = toN +
+      (toName ? `(${toName})` : '')
     arr.push({
-      body: `<p>SMS: <b>${m.subject}</b> - ${desc} <b>${n}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+      body: `<p>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
       id: m.id
     })
   }
