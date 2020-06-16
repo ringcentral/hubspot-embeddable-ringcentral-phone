@@ -365,7 +365,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   } else if (isVoiceMail) {
     mainBody = buildVoiceMailMsgs(body)
   }
-  let interactionType = body.call || isVoiceMail ? 'CALL' : 'NOTE'
+  let interactionType = 'CALL' // body.call || isVoiceMail ? 'CALL' : 'NOTE'
   let logType = body.call || isVoiceMail ? 'Call' : ctype
   if (!_.isArray(mainBody)) {
     mainBody = [{
