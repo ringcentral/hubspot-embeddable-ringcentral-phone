@@ -15,7 +15,7 @@ import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
+import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix, callResultListKey } from './common'
 import { getDeals } from './deal'
 import {
   match
@@ -97,6 +97,12 @@ function checkMerge (body) {
   }
 }
 
+function buildId (body) {
+  return body.id ||
+  _.get(body, 'call.sessionId') ||
+  _.get(body, 'conversation.conversationLogId')
+}
+
 export async function syncCallLogToThirdParty (body) {
   // let result = _.get(body, 'call.result')
   // if (result !== 'Call connected') {
@@ -114,6 +120,7 @@ export async function syncCallLogToThirdParty (body) {
   if (!rc.local.accessToken) {
     return isManuallySync ? showAuthBtn() : null
   }
+  const id = buildId(body)
   if (showCallLogSyncForm && isManuallySync) {
     body = checkMerge(body)
     let contactRelated = await getContactInfo(body, serviceName)
@@ -125,13 +132,17 @@ export async function syncCallLogToThirdParty (body) {
       b.type = 'rc-show-add-contact-panel'
       return window.postMessage(b, '*')
     }
-    return createForm(
+    window.postMessage({
+      id,
       body,
-      serviceName,
-      (formData) => doSync(body, formData, isManuallySync)
-    )
+      isManuallySync
+    }, '*')
   } else {
-    doSync(body, {}, isManuallySync)
+    window.postMessage({
+      id,
+      body,
+      isManuallySync: false
+    }, '*')
   }
 }
 
@@ -224,7 +235,7 @@ export async function getCompanyId (contactId) {
  * @param {*} body
  * @param {*} formData
  */
-async function doSync (body, formData, isManuallySync) {
+export async function doSync (body, formData, isManuallySync) {
   let contacts = await getSyncContacts(body)
   if (!contacts.length) {
     return notify('No related contacts')
@@ -348,9 +359,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   durationMilliseconds = durationMilliseconds
     ? durationMilliseconds * 1000
     : undefined
-  let externalId = body.id ||
-    _.get(body, 'call.sessionId') ||
-    _.get(body, 'conversation.conversationLogId')
+  let externalId = buildId(body)
   let recording = _.get(body, 'call.recording')
     ? `<p>Recording link: ${body.call.recording.link}</p>`
     : ''
@@ -391,7 +400,8 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
         active: true,
         ownerId,
         type: interactionType,
-        timestamp: now
+        timestamp: now,
+        disposition: formData.callResult
       },
       associations: {
         contactIds,
