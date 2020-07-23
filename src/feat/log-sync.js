@@ -3,7 +3,7 @@
  */
 
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-import { createForm, getContactInfo } from './log-sync-form'
+import { getContactInfo } from './log-sync-form'
 import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
 import {
   showAuthBtn
@@ -24,6 +24,7 @@ import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
+import updateLog from './update-call-log'
 
 let {
   showCallLogSyncForm,
@@ -97,6 +98,12 @@ function checkMerge (body) {
   }
 }
 
+function buildId (body) {
+  return body.id ||
+  _.get(body, 'call.sessionId') ||
+  _.get(body, 'conversation.conversationLogId')
+}
+
 export async function syncCallLogToThirdParty (body) {
   // let result = _.get(body, 'call.result')
   // if (result !== 'Call connected') {
@@ -114,6 +121,7 @@ export async function syncCallLogToThirdParty (body) {
   if (!rc.local.accessToken) {
     return isManuallySync ? showAuthBtn() : null
   }
+  const id = buildId(body)
   if (showCallLogSyncForm && isManuallySync) {
     body = checkMerge(body)
     let contactRelated = await getContactInfo(body, serviceName)
@@ -125,13 +133,25 @@ export async function syncCallLogToThirdParty (body) {
       b.type = 'rc-show-add-contact-panel'
       return window.postMessage(b, '*')
     }
-    return createForm(
-      body,
-      serviceName,
-      (formData) => doSync(body, formData, isManuallySync)
-    )
+    window.postMessage({
+      type: 'rc-init-call-log-form',
+      isManuallySync,
+      callLogProps: {
+        id,
+        isManuallySync,
+        body
+      }
+    }, '*')
   } else {
-    doSync(body, {}, isManuallySync)
+    window.postMessage({
+      type: 'rc-init-call-log-form',
+      isManuallySync,
+      callLogProps: {
+        id,
+        isManuallySync,
+        body
+      }
+    }, '*')
   }
 }
 
@@ -224,7 +244,7 @@ export async function getCompanyId (contactId) {
  * @param {*} body
  * @param {*} formData
  */
-async function doSync (body, formData, isManuallySync) {
+export async function doSync (body, formData, isManuallySync) {
   let contacts = await getSyncContacts(body)
   if (!contacts.length) {
     return notify('No related contacts')
@@ -348,9 +368,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   durationMilliseconds = durationMilliseconds
     ? durationMilliseconds * 1000
     : undefined
-  let externalId = body.id ||
-    _.get(body, 'call.sessionId') ||
-    _.get(body, 'conversation.conversationLogId')
+  let externalId = buildId(body)
   let recording = _.get(body, 'call.recording')
     ? `<p>Recording link: ${body.call.recording.link}</p>`
     : ''
@@ -424,6 +442,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     // let res = await fetch.post(url, data, commonFetchOptions())
     if (res && res.engagement) {
       await saveLog(uit.id, email, res.engagement.id)
+      await updateLog(res.engagement.id, formData.callResult)
       notifySyncSuccess({
         id: contactId,
         logType,

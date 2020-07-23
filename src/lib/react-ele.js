@@ -8,8 +8,11 @@ import { SyncOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { fetchAllContacts, notifyReSyncContacts } from '../feat/contacts'
 import { doAuth } from '../feat/auth'
 import AutoSync from './auto-resync'
+import getCallResultList from '../feat/get-call-result-list.js'
 import './antd.less'
 import 'antd/dist/antd.less'
+import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
+import { callResultListKey } from '../feat/common'
 
 function showSyncMenu () {
   let mod = null
@@ -135,7 +138,13 @@ export default () => {
       showAuthPanel()
     }
   }
+  async function init () {
+    const callResultList = await getCallResultList()
+    console.log('callResultList', callResultList)
+    await ls.set(callResultListKey, callResultList)
+  }
   useEffect(() => {
+    init()
     window.addEventListener('message', onEvent)
     return () => {
       window.removeEventListener('message', onEvent)

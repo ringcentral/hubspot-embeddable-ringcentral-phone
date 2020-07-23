@@ -3,6 +3,7 @@ import { jsonHeader, handleErr } from 'ringcentral-embeddable-extension-common/s
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { sendMsgToRCIframe, formatPhone } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 
+export const callResultListKey = 'rc-call-result-list'
 export function getCSRFToken () {
   return _.get(
     document.cookie.match(/hubspotapi-csrf=([^=;]+);/),

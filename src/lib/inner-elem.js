@@ -33,7 +33,10 @@ export default () => {
     note: '',
     hideForm: false,
     showAddContactForm: false,
+    showCallLogForm: false,
+    callLogProps: {},
     submitting: false,
+    loadingCallLogData: false,
     transferringData: false
   })
   const [data, setData] = useState({})
@@ -86,7 +89,7 @@ export default () => {
     if (!e || !e.data || !e.data.type) {
       return
     }
-    const { type, path, transferringData } = e.data
+    const { type, path, transferringData, callLogProps } = e.data
     if (type === 'rc-transferring-data') {
       setState({
         transferringData
@@ -141,6 +144,11 @@ export default () => {
           showAddContactForm: true
         })
       }
+    } else if (type === 'rc-call-log-form') {
+      setState({
+        showCallLogForm: true,
+        callLogProps
+      })
     }
   }
   function handleChangeNote (e) {
