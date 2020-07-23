@@ -18,6 +18,9 @@ let {
 } = thirdPartyConfigs
 
 export default async function (eid, statusId) {
+  if (!statusId) {
+    return
+  }
   let portalId = getPortalId()
   let email = getEmail()
   let url = `${apiServerHS}/engagements/v2/engagements/${eid}?portalId=${portalId}&clienttimeout=14000`
@@ -34,7 +37,7 @@ export default async function (eid, statusId) {
   }
   await fetchBg(url, {
     body,
-    method: 'post',
+    method: 'put',
     headers: {
       ...commonFetchOptions().headers,
       'X-Source': 'CRM_UI',

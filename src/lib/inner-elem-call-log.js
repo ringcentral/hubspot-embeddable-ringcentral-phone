@@ -6,9 +6,12 @@ import { useState, useEffect } from 'react'
 import _ from 'lodash'
 import CallLogForm from './call-log-form'
 import copy from 'json-deep-copy'
+import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
+import { callResultListKey } from '../feat/common'
 
 export default () => {
   const [forms, setStateOri] = useState([])
+  const [callResultList, setCallResultList] = useState([])
   function update (id, data) {
     setStateOri(s => {
       const arr = copy(s)
@@ -39,7 +42,12 @@ export default () => {
       add(callLogProps)
     }
   }
+  async function initCallResultList () {
+    const arr = await ls.get(callResultListKey)
+    setCallResultList(arr)
+  }
   useEffect(() => {
+    initCallResultList()
     window.addEventListener('message', onEvent)
     return () => {
       window.removeEventListener('message', onEvent)
@@ -54,6 +62,7 @@ export default () => {
         form={form}
         key={form.id}
         update={update}
+        callResultList={callResultList}
         remove={remove}
       />
     )

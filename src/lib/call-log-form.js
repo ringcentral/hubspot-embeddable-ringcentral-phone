@@ -34,15 +34,15 @@ export default function AddContactForm (props) {
     }))
   }
   function renderList (prop, numberProp, title) {
-    if (!state['numberProp']) {
+    if (!state[numberProp]) {
       return null
     }
-    const froms = state['prop']
-      ? `(${state['prop'].join(', ')})`
+    const froms = state[prop]
+      ? `(${state[prop].join(', ')})`
       : ''
     return (
       <li>
-        {title}: <b>{state['numberProp']}</b>
+        {title}: <b>{state[numberProp]}</b>
         {froms}
       </li>
     )
@@ -50,10 +50,13 @@ export default function AddContactForm (props) {
   const {
     body, isManuallySync
   } = props.form
+  const isCall = !!body.call
+  const timer = isCall ? 20000 : 100
+  const cls = isCall ? 'rc-add-call-log-form' : 'rc-hide'
   function onFinish (data) {
     doSync(
       body,
-      data,
+      data || {},
       isManuallySync
     )
     handleCancel()
@@ -122,11 +125,17 @@ export default function AddContactForm (props) {
   function handleCancel () {
     props.remove(props.form.id)
   }
+  function getBox () {
+    return document.getElementById('Hubspot-rc')
+  }
   let ref
+  function onTimeout () {
+    form.submit()
+  }
   useEffect(() => {
     checkContacts()
     if (!props.form.isManuallySync) {
-      ref = setTimeout(handleCancel, 10000)
+      ref = setTimeout(onTimeout, timer)
     }
     return () => {
       clearTimeout(ref)
@@ -141,7 +150,7 @@ export default function AddContactForm (props) {
     )
   }
   return (
-    <div className='rc-call-log-form'>
+    <div className={cls}>
       <div className='rc-pd2'>
         <Spin spinning={loading}>
           <Form
@@ -152,9 +161,9 @@ export default function AddContactForm (props) {
             initialValues={{}}
           >
             <h3 class='rc-sync-title rc-pd1b'>
-              Sync call log to ${serviceName}
+              Sync call log to {serviceName}
             </h3>
-            <ul class='rc-pd2b'>
+            <ul class='rc-pd1b'>
               {
                 renderList('fromNames', 'fromNumber', 'From')
               }
@@ -162,11 +171,11 @@ export default function AddContactForm (props) {
                 renderList('toNames', 'toNumber', 'To')
               }
               <li>
-                time: <b>${props.time}</b>
+                time: <b>{state.time}</b>
               </li>
             </ul>
             {
-              props.form.isManuallySync
+              isCall && props.form.isManuallySync
                 ? (
                   <FormItem
                     name='description'
@@ -181,7 +190,10 @@ export default function AddContactForm (props) {
               name='callResult'
               label='Call Result'
             >
-              <Select>
+              <Select
+                getPopupContainer={getBox}
+                placeholder='Select Result'
+              >
                 {
                   props.callResultList.map(obj => {
                     return (
@@ -194,10 +206,10 @@ export default function AddContactForm (props) {
               </Select>
             </FormItem>
             <Button type='primary' htmlType='submit'>
-              Submit
+              Submit {renderCountDown()}
             </Button>
             <Button onClick={handleCancel} className='rc-mg1l'>
-              Cancel {renderCountDown()}
+              Cancel
             </Button>
           </Form>
         </Spin>

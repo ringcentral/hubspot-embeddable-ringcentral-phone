@@ -3,7 +3,7 @@
  */
 
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-import { createForm, getContactInfo } from './log-sync-form'
+import { getContactInfo } from './log-sync-form'
 import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
 import {
   showAuthBtn
@@ -15,7 +15,7 @@ import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix, callResultListKey } from './common'
+import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
 import { getDeals } from './deal'
 import {
   match
@@ -24,6 +24,7 @@ import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
+import updateLog from './update-call-log'
 
 let {
   showCallLogSyncForm,
@@ -133,15 +134,23 @@ export async function syncCallLogToThirdParty (body) {
       return window.postMessage(b, '*')
     }
     window.postMessage({
-      id,
-      body,
-      isManuallySync
+      type: 'rc-init-call-log-form',
+      isManuallySync,
+      callLogProps: {
+        id,
+        isManuallySync,
+        body
+      }
     }, '*')
   } else {
     window.postMessage({
-      id,
-      body,
-      isManuallySync: false
+      type: 'rc-init-call-log-form',
+      isManuallySync,
+      callLogProps: {
+        id,
+        isManuallySync,
+        body
+      }
     }, '*')
   }
 }
@@ -400,8 +409,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
         active: true,
         ownerId,
         type: interactionType,
-        timestamp: now,
-        disposition: formData.callResult
+        timestamp: now
       },
       associations: {
         contactIds,
@@ -434,6 +442,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     // let res = await fetch.post(url, data, commonFetchOptions())
     if (res && res.engagement) {
       await saveLog(uit.id, email, res.engagement.id)
+      await updateLog(res.engagement.id, formData.callResult)
       notifySyncSuccess({
         id: contactId,
         logType,
