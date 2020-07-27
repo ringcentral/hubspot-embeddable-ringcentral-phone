@@ -48,7 +48,7 @@ export function notifySyncSuccess ({
   let type = 'success'
   let portalId = getPortalId()
   let cat = isCompany ? 'company' : 'contact'
-  let url = `${host}/contacts/${portalId}/${cat}/${id}/?interaction=${interactionType}`
+  let url = `${host}/contacts/${portalId}/${cat}/${id}`
   let msg = `
     <div>
       <div class="rc-pd1b">
