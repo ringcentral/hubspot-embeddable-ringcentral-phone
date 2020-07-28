@@ -393,7 +393,7 @@ export async function showContactInfoPanel (call) {
   // if (contactTrLinkElem) {
   //   return showNativeContact(contact, contactTrLinkElem)
   // }
-  let url = `${host}/contacts/${contact.portalId}/${type}/${contact.id}/?interaction=note`
+  let url = `${host}/contacts/${contact.portalId}/${type}/${contact.id}/?interaction=logged-call`
   let elem = createElementFromHTML(
     `
     <div class="animate rc-contact-panel" draggable="false">
