@@ -16,7 +16,7 @@ import {
   host,
   notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import { rc, getPortalId, getCSRFToken } from './common'
+import { rc, getPortalId, getCSRFToken, getFullNumber } from './common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import { jsonHeader } from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
@@ -27,7 +27,6 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import { setCache, getCache } from 'ringcentral-embeddable-extension-common/src/common/cache'
-import { getFullNumber } from '../feat/common'
 
 let {
   serviceName,

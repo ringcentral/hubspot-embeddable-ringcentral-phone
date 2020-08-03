@@ -15,7 +15,7 @@ import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
+import { getFullNumber, commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
 import { getDeals } from './deal'
 import {
   match
@@ -25,7 +25,6 @@ import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import updateLog from './update-call-log'
-import { getFullNumber } from '../feat/common'
 
 let {
   showCallLogSyncForm,
