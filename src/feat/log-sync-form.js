@@ -5,12 +5,11 @@
  */
 import {
   createElementFromHTML,
-  notify,
-  formatPhone
+  notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import _ from 'lodash'
 import dayjs from 'dayjs'
-import { formatPhoneLocal } from './common'
+import { formatPhoneLocal, getFullNumber } from './common'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
@@ -52,7 +51,7 @@ export async function getContactInfo (body, serviceName) {
     toText = 'Correspondents'
     tos = _.get(body, 'correspondentEntity')
     tos = tos ? [tos] : []
-    let selfNumber = formatPhone(_.get(body, 'conversation.self.phoneNumber'))
+    let selfNumber = getFullNumber(_.get(body, 'conversation.self'))
     froms = await match([selfNumber])
     froms = froms[selfNumber] || []
     time = _.get(body, 'conversation.date')
@@ -71,8 +70,7 @@ export async function getContactInfo (body, serviceName) {
     froms = ''
   } else {
     froms = froms.join(', ')
-    let f = formatPhoneLocal(_.get(body, 'call.from.phoneNumber') ||
-      _.get(body, 'conversation.self.phoneNumber') || '')
+    let f = formatPhoneLocal(getFullNumber(_.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self')))
     froms = `<li>
       ${fromText}: <b>${f}${froms ? '(' + froms + ')' : ''}</b>
     </li>`
@@ -84,7 +82,7 @@ export async function getContactInfo (body, serviceName) {
     tos = ''
   } else {
     tos = tos.join(', ')
-    let t = formatPhoneLocal(_.get(body, 'call.to.phoneNumber') || '')
+    let t = formatPhoneLocal(getFullNumber(_.get(body, 'call.to')))
     tos = `<li>
       ${toText}: <b>${t}${tos ? '(' + tos + ')' : '-'}</b>
     </li>

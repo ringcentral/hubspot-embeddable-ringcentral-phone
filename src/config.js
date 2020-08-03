@@ -11,7 +11,8 @@
 import _ from 'lodash'
 import {
   RCBTNCLS2,
-  checkPhoneNumber
+  checkPhoneNumber,
+  formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { upgrade } from 'ringcentral-embeddable-extension-common/src/feat/upgrade-notification'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
@@ -76,7 +77,7 @@ function formatNumbers (res) {
     return {
       id: p.phoneNumber,
       title: 'Direct',
-      number: p.phoneNumber
+      number: formatPhone(p.phoneNumber.replace('*', '#')).replace(' ext. ', '#')
     }
   })
 }

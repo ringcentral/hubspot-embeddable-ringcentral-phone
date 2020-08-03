@@ -25,6 +25,7 @@ import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import updateLog from './update-call-log'
+import { getFullNumber } from '../feat/common'
 
 let {
   showCallLogSyncForm,
@@ -169,15 +170,15 @@ async function getSyncContacts (body) {
   // }
   let all = []
   if (body.call) {
-    let nf = _.get(body, 'to.phoneNumber') ||
-      _.get(body, 'call.to.phoneNumber')
-    let nt = _.get(body, 'from.phoneNumber') ||
-      _.get(body.call, 'from.phoneNumber')
+    let nf = getFullNumber(_.get(body, 'to')) ||
+      getFullNumber(_.get(body, 'call.to'))
+    let nt = getFullNumber(_.get(body, 'from')) ||
+      getFullNumber(_.get(body.call, 'from'))
     all = [nt, nf]
   } else {
     all = [
-      _.get(body, 'conversation.self.phoneNumber'),
-      ...body.conversation.correspondents.map(d => d.phoneNumber)
+      getFullNumber(_.get(body, 'conversation.self')),
+      ...body.conversation.correspondents.map(d => getFullNumber(d))
     ]
   }
   all = all.map(s => formatPhone(s))
@@ -258,12 +259,12 @@ function buildMsgs (body) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
   for (const m of msgs) {
-    const fromN = _.get(m, 'from.phoneNumber') ||
-      _.get(m, 'from[0].phoneNumber') || ''
+    const fromN = getFullNumber(_.get(m, 'from')) ||
+      getFullNumber(_.get(m, 'from[0]')) || ''
     const fromName = _.get(m, 'from.name') ||
       (_.get(m, 'from') || []).map(d => d.name).join(', ') || ''
-    const toN = _.get(m, 'to.phoneNumber') ||
-      _.get(m, 'to[0].phoneNumber') || ''
+    const toN = getFullNumber(_.get(m, 'to')) ||
+      getFullNumber(_.get(m, 'to[0]')) || ''
     const toName = _.get(m, 'to.name') ||
       (_.get(m, 'to') || []).map(d => d.name).join(', ') || ''
     const from = fromN +
@@ -289,7 +290,7 @@ function buildVoiceMailMsgs (body) {
     let n = isOut
       ? m.to
       : [m.from]
-    n = n.map(m => formatPhoneLocal(m.phoneNumber || m.extensionNumber)).join(', ')
+    n = n.map(m => formatPhoneLocal(getFullNumber(m))).join(', ')
     let links = m.attachments.map(t => t.link).join(', ')
     arr.push({
       body: `<p>Voice mail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
@@ -360,8 +361,8 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let email = getEmail()
   let now = +new Date()
   let contactIds = isCompany ? [] : [Number(contactId)]
-  let toNumber = _.get(body, 'call.to.phoneNumber')
-  let fromNumber = _.get(body, 'call.from.phoneNumber')
+  let toNumber = getFullNumber(_.get(body, 'call.to'))
+  let fromNumber = getFullNumber(_.get(body, 'call.from'))
   let fmtime = dayjs(_.get(body, 'call.startTime')).format('MMM DD, YYYY h:mm A')
   let status = 'COMPLETED'
   let durationMilliseconds = _.get(body, 'call.duration')

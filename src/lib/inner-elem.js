@@ -7,7 +7,7 @@ import { Tooltip, Input, notification } from 'antd'
 import { EditOutlined, LeftCircleOutlined, SyncOutlined } from '@ant-design/icons'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 // prefix telephonySessionId
-import { autoLogPrefix, rc } from '../feat/common'
+import { autoLogPrefix, rc, getFullNumber } from '../feat/common'
 import ContactForm from './add-contact-form'
 import { getOwnerId as getVid, formatContacts, notifyReSyncContacts } from '../feat/contacts'
 import getOwnerId from '../feat/get-owner-id'
@@ -140,14 +140,14 @@ export default () => {
         return
       }
       const { call = {} } = e.data
-      let phone = _.get(
+      let phone = getFullNumber(_.get(
         e.data,
-        'conversation.correspondents[0].phoneNumber'
-      )
+        'conversation.correspondents[0]'
+      ))
       if (!phone) {
         phone = call.direction === 'Inbound'
-          ? _.get(call, 'from.phoneNumber') || _.get(call, 'from')
-          : _.get(call, 'to.phoneNumber') || _.get(call, 'to')
+          ? getFullNumber(_.get(call, 'from'))
+          : getFullNumber(_.get(call, 'to'))
       }
       const name = call.direction === 'Inbound'
         ? _.get(call, 'from.name')

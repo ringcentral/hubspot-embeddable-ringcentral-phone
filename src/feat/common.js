@@ -75,7 +75,7 @@ export function getIds (href = window.location.href) {
 }
 
 export function formatPhoneLocal (number) {
-  return formatPhone(number, undefined, 'formatNational')
+  return formatPhone(number, undefined)
 }
 
 export function delay (ms) {
@@ -93,3 +93,17 @@ export function getEmail () {
 }
 
 export const autoLogPrefix = 'rc-auto-log-id:'
+
+export function getFullNumber (numberObj) {
+  if (!numberObj) {
+    return ''
+  } else if (_.isString(numberObj)) {
+    return numberObj
+  }
+  const {
+    extensionNumber,
+    phoneNumber = ''
+  } = numberObj
+  return phoneNumber +
+    (extensionNumber ? '#' + extensionNumber : '')
+}

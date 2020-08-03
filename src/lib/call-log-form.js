@@ -15,6 +15,7 @@ import {
   notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import CountDown from './countdown'
+import { getFullNumber } from '../feat/common'
 
 let {
   serviceName
@@ -89,7 +90,7 @@ export default function AddContactForm (props) {
       toText = 'Correspondents'
       toNames = _.get(body, 'correspondentEntity')
       toNames = toNames ? [toNames] : []
-      let selfNumber = _.get(body, 'conversation.self.phoneNumber')
+      let selfNumber = getFullNumber(_.get(body, 'conversation.self'))
       fromNames = await match([selfNumber])
       fromNames = fromNames[selfNumber] || []
       time = _.get(body, 'conversation.date')
@@ -104,13 +105,11 @@ export default function AddContactForm (props) {
     fromNames = fromNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    fromNumber = _.get(body, 'call.from.phoneNumber') ||
-      _.get(body, 'conversation.self.phoneNumber') || ''
-
+    fromNumber = getFullNumber(_.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self'))
     toNames = toNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    toNumber = _.get(body, 'call.to.phoneNumber') || ''
+    toNumber = getFullNumber(_.get(body, 'call.to'))
     setLoding(false)
     setState({
       fromNames,

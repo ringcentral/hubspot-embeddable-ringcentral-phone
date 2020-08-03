@@ -27,6 +27,7 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import { setCache, getCache } from 'ringcentral-embeddable-extension-common/src/common/cache'
+import { getFullNumber } from '../feat/common'
 
 let {
   serviceName,
@@ -376,7 +377,7 @@ export async function showContactInfoPanel (call) {
     return
   }
   popup()
-  let phone = _.get(call, 'from.phoneNumber') || _.get(call, 'from')
+  let phone = getFullNumber(_.get(call, 'from')) || _.get(call, 'from')
   if (!phone) {
     return
   }
