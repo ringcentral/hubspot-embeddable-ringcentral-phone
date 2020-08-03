@@ -32,23 +32,36 @@ export default () => {
     calling: false,
     note: '',
     hideForm: false,
+    shouldShowNote: false,
     showAddContactForm: false,
     showCallLogForm: false,
     callLogProps: {},
     submitting: false,
     loadingCallLogData: false,
-    transferringData: false
+    transferringData: false,
+    noteId: ''
   })
+  let refer
   const [data, setData] = useState({})
-  const { note, hideForm, calling, showAddContactForm, submitting, path, transferringData } = state
+  const { noteId, shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path, transferringData } = state
   function setState (obj) {
     setStateOri(s => ({
       ...s,
       ...obj
     }))
   }
-  function saveNote (id) {
+  function saveNote (id = noteId) {
+    if (!id) {
+      return
+    }
     ls.set(id, note)
+  }
+  function autoHide (sec) {
+    refer = setTimeout(() => {
+      setState({
+        shouldShowNote: false
+      })
+    }, sec * 1000)
   }
   async function onFinish (data) {
     setState({
@@ -99,10 +112,13 @@ export default () => {
         path
       })
     } else if (type === 'rc-call-start-notify') {
+      clearTimeout(refer)
       setState({
         calling: true,
         note: '',
-        hideForm: false
+        noteId: '',
+        hideForm: false,
+        shouldShowNote: true
       })
     } else if (type === 'rc-call-end-notify') {
       // setState({
@@ -113,7 +129,11 @@ export default () => {
         return
       }
       const id = autoLogPrefix + sid
+      setState({
+        noteId: id
+      })
       saveNote(id)
+      autoHide(10)
     } else if (type === 'rc-show-add-contact-panel') {
       if (!rc.local.accessToken) {
         showAuthBtn()
@@ -149,12 +169,18 @@ export default () => {
         showCallLogForm: true,
         callLogProps
       })
+    } else if (type === 'rc-call-log-form-hide') {
+      setState({
+        shouldShowNote: false
+      })
     }
   }
   function handleChangeNote (e) {
+    const v = e.target.value
     setState({
-      note: e.target.value
+      note: v
     })
+    saveNote()
   }
   useEffect(() => {
     window.addEventListener('message', onEvent)
@@ -188,7 +214,7 @@ export default () => {
   if (!calling) {
     return null
   }
-  if (hideForm && isCallPath) {
+  if (shouldShowNote && hideForm && isCallPath) {
     return (
       <Tooltip title='Show note edit form' overlayClassName='rc-toolt-tip-card'>
         <EditOutlined
@@ -199,7 +225,7 @@ export default () => {
         />
       </Tooltip>
     )
-  } else if (isCallPath) {
+  } else if (shouldShowNote && isCallPath) {
     return (
       <div className='rc-call-note-form'>
         <div className='pd1'>

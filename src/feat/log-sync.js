@@ -454,6 +454,9 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       console.log('post engagements/v1/engagements error')
       console.log(res)
     }
+    window.postMessage({
+      type: 'rc-call-log-form-hide'
+    }, '*')
   }
 }
 
