@@ -394,10 +394,14 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (!(isManuallySync && logType === 'Call')) {
     mainBody = await filterLoggered(mainBody, email)
   }
+  const descFormatted = (desc || '')
+    .split('\n')
+    .map(d => `<p>${d}</p>`)
+    .join('')
   let bodyAll = mainBody.map(mm => {
     return {
       id: mm.id,
-      body: `<p>${desc || ''}</p><p>${mm.body}</p>${recording}`
+      body: `<div>${descFormatted}</div><p>${mm.body}</p>${recording}`
     }
   })
   for (const uit of bodyAll) {

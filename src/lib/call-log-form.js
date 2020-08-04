@@ -12,7 +12,7 @@ import _ from 'lodash'
 import dayjs from 'dayjs'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import {
-  notify
+  notify, formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import CountDown from './countdown'
 import { getFullNumber } from '../feat/common'
@@ -105,11 +105,15 @@ export default function AddContactForm (props) {
     fromNames = fromNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    fromNumber = getFullNumber(_.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self'))
+    fromNumber = formatPhone(
+      getFullNumber(
+        _.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self')
+      )
+    )
     toNames = toNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    toNumber = getFullNumber(_.get(body, 'call.to'))
+    toNumber = formatPhone(getFullNumber(_.get(body, 'call.to')))
     setLoding(false)
     setState({
       fromNames,
