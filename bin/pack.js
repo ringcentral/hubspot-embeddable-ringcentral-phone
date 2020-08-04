@@ -12,7 +12,7 @@ const replace = require('replace-in-file')
 const { resolve } = require('path')
 const options = {
   files: resolve(__dirname, '../dist/content.js'),
-  from: /messageLoggerPath/g,
+  from: /messageLoggerPath|callLoggerPath/g,
   to: '// messageLoggerPath:'
 }
 
@@ -34,7 +34,7 @@ async function run () {
     exec(cmd)
     cp('dist/content.js', 'content.js.bak.js')
     await replace(options)
-    let cmd1 = `zip -vr ${pack.name}-${v.name}-no-msg-log-sync-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
+    let cmd1 = `zip -vr ${pack.name}-${v.name}-no-auto-log-sync-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
     exec(cmd1)
     cp('content.js.bak.js', 'dist/content.js')
     rm('content.js.bak.js')
