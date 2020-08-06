@@ -338,10 +338,24 @@ export function thirdPartyServiceConfig (serviceName) {
       return
     }
     console.debug(data)
-    let { type, loggedIn, path, call } = data
+    let { type, loggedIn, path, call, requestId, sessionIds } = data
     if (type === 'rc-login-status-notify') {
       console.debug('rc logined', loggedIn)
       rc.rcLogined = loggedIn
+    }
+    if (type === 'rc-sync-log-success') {
+      // response to widget
+      rc.postMessage({
+        type: 'rc-post-message-response',
+        responseId: requestId,
+        response: { data: 'ok' }
+      })
+      setTimeout(() => {
+        rc.postMessage({
+          type: 'rc-adapter-trigger-call-logger-match',
+          sessionIds
+        })
+      }, 8000)
     }
     if (
       type === 'rc-route-changed-notify' &&
@@ -464,12 +478,9 @@ export function thirdPartyServiceConfig (serviceName) {
       e.data.path = '/meetingLoggerForward'
       window.postMessage(e.data, '*')
     } else if (path === '/callLogger' || path === '/messageLogger') {
-      syncCallLogToThirdParty(data.body)
-      // response to widget
-      rc.postMessage({
-        type: 'rc-post-message-response',
-        responseId: data.requestId,
-        response: { data: 'ok' }
+      syncCallLogToThirdParty({
+        ...data.body,
+        requestId: data.requestId
       })
     } else if (path === '/callLogger/match' || data.path === '/messageLogger/match') {
       let matchRes = await findMatchCallLog(data)

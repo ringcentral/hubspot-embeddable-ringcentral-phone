@@ -43,7 +43,9 @@ export function notifySyncSuccess ({
   id,
   logType,
   interactionType,
-  isCompany
+  isCompany,
+  requestId,
+  sessionIds
 }) {
   let type = 'success'
   let portalId = getPortalId()
@@ -65,6 +67,11 @@ export function notifySyncSuccess ({
     </div>
   `
   notify(msg, type, 9000)
+  window.postMessage({
+    type: 'rc-sync-log-success',
+    requestId,
+    sessionIds
+  }, '*')
 }
 
 let prev = {
@@ -451,7 +458,9 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
         id: contactId,
         logType,
         interactionType,
-        isCompany
+        isCompany,
+        requestId: body.requestId,
+        sessionIds: bodyAll.map(t => t.id)
       })
     } else {
       notify('call log sync to hubspot failed', 'warn')
