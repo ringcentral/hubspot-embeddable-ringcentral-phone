@@ -245,8 +245,9 @@ export async function getContact (
     console.log(res)
     return {
       contacts: [],
+      errored: true,
       'has-more': true,
-      'offset': vidOffset
+      'vid-offset': vidOffset
     }
   }
 }
