@@ -22,7 +22,7 @@ export async function resyncCheck (delay = false) {
   console.log('document.hidden', document.hidden)
   if (!document.hidden && state.on) {
     if (!delay) {
-      fetchAllContacts(true)
+      fetchAllContacts(true, false)
     }
   }
   setTimeout(resyncCheck, state.interval)

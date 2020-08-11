@@ -27,6 +27,7 @@ import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import { setCache, getCache } from 'ringcentral-embeddable-extension-common/src/common/cache'
+import { Modal } from 'antd'
 
 let {
   serviceName,
@@ -252,7 +253,7 @@ export async function getContact (
   }
 }
 
-export async function fetchAllContacts (_getRecent) {
+export async function fetchAllContacts (_getRecent, showModal = true) {
   if (!rc.local.accessToken) {
     showAuthBtn()
     return
@@ -263,6 +264,13 @@ export async function fetchAllContacts (_getRecent) {
   let getRecent = !!_getRecent
   rc.isFetchingContacts = true
   loadingContacts()
+  if (showModal) {
+    Modal.info({
+      zIndex: 2334,
+      title: 'Syncing contacts, please stay in this page',
+      content: 'Please stay in this page until the syncing finished, it may take minutes according to your contacts count, you can close this modal.'
+    })
+  }
   let page = 1
   let hasMore = true
   let hasMoreCompany = true
