@@ -22,7 +22,7 @@ export default async (call) => {
   const number = call.direction === 'Inbound'
     ? call.from
     : call.to
-  let res = await match([number])
+  let res = await match([number], 1)
   if (_.isEmpty(res)) {
     showContactFormPanel(number)
   }

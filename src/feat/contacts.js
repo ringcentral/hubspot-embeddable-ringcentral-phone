@@ -390,7 +390,7 @@ export async function showContactInfoPanel (call) {
     return
   }
   phone = formatPhone(phone)
-  let contacts = await match([phone])
+  let contacts = await match([phone], 1)
   let contact = _.get(contacts, `${phone}[0]`)
   if (!contact) {
     return
