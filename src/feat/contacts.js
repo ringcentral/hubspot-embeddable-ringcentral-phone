@@ -28,6 +28,7 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/db'
 import { setCache, getCache } from 'ringcentral-embeddable-extension-common/src/common/cache'
 import { Modal } from 'antd'
+import loadingSvg from 'ringcentral-embeddable-extension-common/src/common/loading.svg'
 
 let {
   serviceName,
@@ -443,7 +444,15 @@ function loadingContacts () {
       class="rc-reloading-contacts"
       id="rc-reloading-contacts"
       title="Reload contacts"
-    />Syncing contacts, please stay in this page until it is done</span>
+    />
+      <img
+        src="${loadingSvg}"
+        class="rc-iblock rc-spinning rc-mg1r"
+        width=16
+        height=16
+      />
+      Syncing contacts, please stay in this page until it is done
+    </span>
     `
   )
   document.body.appendChild(elem)
