@@ -306,12 +306,12 @@ function buildVoiceMailMsgs (body) {
   return arr
 }
 
-function buildKey (id, email) {
-  return `rc-log-${email}-${id}`
+function buildKey (id, cid, email) {
+  return `rc-log-${email}-${cid}-${id}`
 }
 
-async function saveLog (id, email, engageId) {
-  const key = buildKey(id, email)
+async function saveLog (id, cid, email, engageId) {
+  const key = buildKey(id, cid, email)
   await ls.set(key, engageId)
 }
 
@@ -336,7 +336,7 @@ function getCallInfo (contact, toNumber, fromNumber) {
 async function filterLoggered (arr, email) {
   const res = []
   for (const m of arr) {
-    const key = buildKey(m.id, email)
+    const key = buildKey(m.id, m.contactId, email)
     const ig = await ls.get(key)
     if (!ig) {
       res.push(m)
@@ -395,7 +395,8 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (!_.isArray(mainBody)) {
     mainBody = [{
       body: mainBody,
-      id: externalId
+      id: externalId,
+      contactId
     }]
   }
   if (!(isManuallySync && logType === 'Call')) {
@@ -452,7 +453,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     })
     // let res = await fetch.post(url, data, commonFetchOptions())
     if (res && res.engagement) {
-      await saveLog(uit.id, email, res.engagement.id)
+      await saveLog(uit.id, uit.contactId, email, res.engagement.id)
       await updateLog(res.engagement.id, formData.callResult)
       notifySyncSuccess({
         id: contactId,
