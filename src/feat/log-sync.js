@@ -277,8 +277,15 @@ function buildMsgs (body) {
       (fromName ? `(${fromName})` : '')
     const to = toN +
       (toName ? `(${toName})` : '')
+    let attachments = (m.attachments || [])
+      .filter(d => d.type !== 'Text')
+      .map(d => {
+        const url = encodeURIComponent(d.uri)
+        return `<p><a href="https://ringcentral.github.io/ringcentral-media-reader/?media=${url}">attachment: ${d.fileName || d.id}</a><p>`
+      }).join('')
+    attachments = attachments ? `<p>attachments: </p>${attachments}` : ''
     arr.push({
-      body: `<p>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+      body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
       id: m.id
     })
   }
