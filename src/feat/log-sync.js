@@ -261,7 +261,7 @@ export async function doSync (body, formData, isManuallySync) {
   }
 }
 
-function buildMsgs (body) {
+function buildMsgs (body, contactId) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
   for (const m of msgs) {
@@ -286,13 +286,14 @@ function buildMsgs (body) {
     attachments = attachments ? `<p>attachments: </p>${attachments}` : ''
     arr.push({
       body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
-      id: m.id
+      id: m.id,
+      contactId
     })
   }
   return arr
 }
 
-function buildVoiceMailMsgs (body) {
+function buildVoiceMailMsgs (body, contactId) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
   for (const m of msgs) {
@@ -307,7 +308,8 @@ function buildVoiceMailMsgs (body) {
     let links = m.attachments.map(t => t.link).join(', ')
     arr.push({
       body: `<p>Voice mail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
-      id: m.id
+      id: m.id,
+      contactId
     })
   }
   return arr
@@ -393,9 +395,9 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (body.call) {
     mainBody = `${fmtime}: [${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
-    mainBody = buildMsgs(body)
+    mainBody = buildMsgs(body, contactId)
   } else if (isVoiceMail) {
-    mainBody = buildVoiceMailMsgs(body)
+    mainBody = buildVoiceMailMsgs(body, contactId)
   }
   let interactionType = 'CALL' // body.call || isVoiceMail ? 'CALL' : 'NOTE'
   let logType = body.call || isVoiceMail ? 'Call' : ctype
@@ -406,7 +408,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       contactId
     }]
   }
-  if (!(isManuallySync && logType === 'Call')) {
+  if (!isManuallySync) {
     mainBody = await filterLoggered(mainBody, email)
   }
   const descFormatted = (desc || '')
@@ -415,6 +417,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     .join('')
   let bodyAll = mainBody.map(mm => {
     return {
+      ...mm,
       id: mm.id,
       body: `<div>${descFormatted}</div><p>${mm.body}</p>${recording}`
     }
@@ -460,7 +463,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     })
     // let res = await fetch.post(url, data, commonFetchOptions())
     if (res && res.engagement) {
-      await saveLog(uit.id, uit.contactId, email, res.engagement.id)
+      await saveLog(uit.id, contactId, email, res.engagement.id)
       await updateLog(res.engagement.id, formData.callResult)
       notifySyncSuccess({
         id: contactId,
