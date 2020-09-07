@@ -7,8 +7,8 @@ async function addContacts (n, from = 0) {
     console.log(i)
     const r = await addContact({
       ownerId: oid,
-      contactEmail: 'name' + i + '@test.com',
-      firstname: 'name' + i,
+      contactEmail: 'xnxname' + i + '@test.com',
+      firstname: 'xnxname' + i,
       lastname: 'test',
       phone: '6504377934'
     })
@@ -17,5 +17,5 @@ async function addContacts (n, from = 0) {
 }
 
 export default function run () {
-  addContacts(400, 0)
+  addContacts(100000, 0)
 }

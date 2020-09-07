@@ -5,7 +5,7 @@ async function addContacts (n, from = 0) {
   for (let i = from; i < n + from; i++) {
     console.log(i)
     const r = await addCompany({
-      name: 'name-x' + i,
+      name: 'xname-x' + i,
       desc: 'company desc' + i
     })
     console.log(r)
