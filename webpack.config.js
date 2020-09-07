@@ -34,10 +34,6 @@ const f32 = path.resolve(
   __dirname,
   'node_modules/react-dom/umd/react-dom.production.min.js'
 )
-const f3 = path.resolve(
-  __dirname,
-  'node_modules/jsstore/dist/jsstore.worker.min.js'
-)
 const to4 = path.resolve(
   __dirname,
   'dist'
@@ -54,11 +50,11 @@ const patterns = [{
   from: f2,
   to: to4,
   force: true
-}, */ {
+}, {
   from: f3,
   to: to4,
   force: true
-}, /* {
+},  {
   from: f2,
   to: to4f,
   force: true

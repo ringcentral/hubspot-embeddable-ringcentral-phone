@@ -192,10 +192,13 @@ export default () => {
   if (path === '/contacts' && transferringData) {
     return (
       <Tooltip title='Rebuilding data...' overlayClassName='rc-toolt-tip-card'>
-        <SyncOutlined
-          spin
-          className='rc-show-note-form'
-        />
+        <span className='rc-show-note-form rc-rebuild-data rc-iblock rc-pd1'>
+          <SyncOutlined
+            spin
+            className='rc-iblock rc-mg1r'
+          />
+          <span className='rc-iblock'>Rebuilding data, please wait</span>
+        </span>
       </Tooltip>
     )
   }
