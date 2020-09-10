@@ -291,7 +291,8 @@ export const phoneNumberSelectors = [{
  * thirdPartyService config
  * @param {*} serviceName
  */
-export function thirdPartyServiceConfig (serviceName) {
+export async function thirdPartyServiceConfig (serviceName) {
+  const logSMSType = await ls.get('rc-logSMSType') || 'CALL'
   console.log(serviceName)
   const logTitle = `Log to ${serviceName}`
   let services = {
@@ -325,7 +326,14 @@ export function thirdPartyServiceConfig (serviceName) {
     meetingInvitePath: '/meeting/invite',
     meetingInviteTitle: `Schedule meeting`,
     meetingLoggerPath: '/meetingLogger',
-    meetingLoggerTitle: logTitle
+    meetingLoggerTitle: logTitle,
+    settingsPath: '/settings',
+    settings: [
+      {
+        name: 'Log SMS as note',
+        value: logSMSType === 'NOTE'
+      }
+    ]
   }
 
   // handle ringcentral event
@@ -414,6 +422,10 @@ export function thirdPartyServiceConfig (serviceName) {
         responseId: data.requestId,
         response: { data: 'ok' }
       })
+    } else if (data.path === '/settings') {
+      const logSMSASNote = data.body.settings[0].value
+      rc.logSMSType = logSMSASNote ? 'NOTE' : 'CALL'
+      ls.set('rc-logSMSType', rc.logSMSType)
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
       let page = _.get(data, 'body.page') || 1
@@ -554,6 +566,7 @@ export async function initThirdParty () {
   let userId = getUserId()
   rc.currentUserId = userId
   rc.cacheKey = 'contacts' + '_' + userId
+  rc.logSMSType = await ls.get('rc-logSMSType') || 'CALL'
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')

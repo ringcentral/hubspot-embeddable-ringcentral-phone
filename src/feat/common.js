@@ -24,6 +24,7 @@ export function getPortalId () {
   return pid
 }
 window.rc = {
+  logSMSType: 'CALL',
   local: {
     accessToken: null
   },

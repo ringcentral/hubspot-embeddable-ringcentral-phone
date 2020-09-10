@@ -267,7 +267,7 @@ function buildMsgs (body, contactId) {
   for (const m of msgs) {
     const fromN = getFullNumber(_.get(m, 'from')) ||
       getFullNumber(_.get(m, 'from[0]')) || ''
-    const fromName = _.get(m, 'from.name') ||
+    const fromName = _.get(m, 'from.name') || _.get(m, 'from.phoneNumber') ||
       (_.get(m, 'from') || []).map(d => d.name).join(', ') || ''
     const toN = getFullNumber(_.get(m, 'to')) ||
       getFullNumber(_.get(m, 'to[0]')) || ''
@@ -399,7 +399,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   } else if (isVoiceMail) {
     mainBody = buildVoiceMailMsgs(body, contactId)
   }
-  let interactionType = 'CALL' // body.call || isVoiceMail ? 'CALL' : 'NOTE'
+  let interactionType = body.call || isVoiceMail ? 'CALL' : rc.logSMSType
   let logType = body.call || isVoiceMail ? 'Call' : ctype
   if (!_.isArray(mainBody)) {
     mainBody = [{
