@@ -39,7 +39,7 @@ export function openRCMeeting () {
 }
 
 export const onMeetingPanelOpen = async function () {
-  const isInContactPage = /contacts\/\d+\/contact\/\d+/.test(window.location.href)
+  const isInContactPage = /contacts\/\d+\/(contact|company)\/\d+/.test(window.location.href)
   if (!isInContactPage) {
     return false
   }
