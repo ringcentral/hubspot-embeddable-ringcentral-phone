@@ -204,6 +204,10 @@ export const insertClickToCallButton = [
       return /contacts\/\d+\/company\/\d+/.test(href)
     },
     getContactPhoneNumbers: getCompanyPhoneNumbers,
+    onClickMeeting: function () {
+      document.querySelector('[data-icon-name="meetings"]').click()
+      openRCMeeting()
+    },
     parentsToInsertButton: [
       {
         getElem: () => {

@@ -363,7 +363,9 @@ export const getContacts = async (page) => {
     console.debug('use cache')
     return cached
   }
-  fetchAllContacts()
+  if (page === 1) {
+    fetchAllContacts()
+  }
   return final
 }
 
