@@ -107,13 +107,13 @@ function buildPhone (contact) {
   if (phoneNumber) {
     res.push({
       phoneNumber,
-      phoneType: 'directPhone'
+      phoneType: 'direct'
     })
   }
   if (mobile) {
     res.push({
       phoneNumber: mobile,
-      phoneType: 'directPhone'
+      phoneType: 'mobile'
     })
   }
   const r = {

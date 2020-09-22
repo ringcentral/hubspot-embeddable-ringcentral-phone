@@ -74,9 +74,10 @@ let {
 function formatNumbers (res) {
   const r = formatContacts([res])[0]
   return r.phoneNumbers.map(p => {
+    console.log(p)
     return {
       id: p.phoneNumber,
-      title: 'Direct',
+      title: p.phoneType,
       number: formatPhone(p.phoneNumber.replace('*', '#')).replace(' ext. ', '#')
     }
   })
