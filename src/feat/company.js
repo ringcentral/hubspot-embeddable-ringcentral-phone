@@ -17,32 +17,37 @@ export async function getAllCompany (
   limit = 250,
   getRecent = false
 ) {
-  let portalId = getPortalId()
-  const baseUrl = getRecent
-    ? '/companies/v2/companies/recent/modified'
-    : '/companies/v2/companies/paged'
-  let url = `${apiServerHS}${baseUrl}?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
-  let headers = {
-    ...jsonHeader,
-    Accept: 'application/json, text/javascript, */*; q=0.01',
-    'X-HS-Referer': window.location.href,
-    'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
+  return {
+    companies: [],
+    'has-more': false,
+    offset
   }
-  let res = await fetchBg(url, {
-    headers,
-    method: 'get'
-  })
-  if (res && res.companies) {
-    return res
-  } else {
-    console.log('fetch companies error')
-    console.log(res)
-    return {
-      companies: [],
-      'has-more': true,
-      offset
-    }
-  }
+  // let portalId = getPortalId()
+  // const baseUrl = getRecent
+  //   ? '/crm/v3/objects/companies'
+  //   : '/companies/v2/companies/paged'
+  // let url = `${apiServerHS}${baseUrl}?portalId=${portalId}&clienttimeout=60000&limit=${limit}&properties=name&properties=phone&includeMergeAudits=false&propertyMode=value_only&offset=${offset}`
+  // let headers = {
+  //   ...jsonHeader,
+  //   Accept: 'application/json, text/javascript, */*; q=0.01',
+  //   'X-HS-Referer': window.location.href,
+  //   'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
+  // }
+  // let res = await fetchBg(url, {
+  //   headers,
+  //   method: 'get'
+  // })
+  // if (res && res.companies) {
+  //   return res
+  // } else {
+  //   console.log('fetch companies error')
+  //   console.log(res)
+  //   return {
+  //     companies: [],
+  //     'has-more': true,
+  //     offset
+  //   }
+  // }
 }
 
 async function getCompany (

@@ -298,6 +298,7 @@ export const phoneNumberSelectors = [{
  */
 export async function thirdPartyServiceConfig (serviceName) {
   const logSMSType = await ls.get('rc-logSMSType') || 'CALL'
+  const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   console.log(serviceName)
   const logTitle = `Log to ${serviceName}`
   let services = {
@@ -337,6 +338,10 @@ export async function thirdPartyServiceConfig (serviceName) {
       {
         name: 'Log SMS as note',
         value: logSMSType === 'NOTE'
+      },
+      {
+        name: 'Log SMS thread as one log',
+        value: logSMSAsThread
       }
     ]
   }
@@ -428,9 +433,13 @@ export async function thirdPartyServiceConfig (serviceName) {
         response: { data: 'ok' }
       })
     } else if (data.path === '/settings') {
-      const logSMSASNote = data.body.settings[0].value
+      const arr = data.body.settings
+      const logSMSASNote = arr[0].value
       rc.logSMSType = logSMSASNote ? 'NOTE' : 'CALL'
       ls.set('rc-logSMSType', rc.logSMSType)
+      const logSMSAsThread = arr[1].value
+      rc.logSMSAsThread = logSMSAsThread
+      ls.set('rc-logSMSAsThread', rc.logSMSAsThread)
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
       let page = _.get(data, 'body.page') || 1
@@ -572,6 +581,7 @@ export async function initThirdParty () {
   rc.currentUserId = userId
   rc.cacheKey = 'contacts' + '_' + userId
   rc.logSMSType = await ls.get('rc-logSMSType') || 'CALL'
+  rc.logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')

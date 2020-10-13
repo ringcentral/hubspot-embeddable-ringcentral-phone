@@ -261,7 +261,7 @@ export async function doSync (body, formData, isManuallySync) {
   }
 }
 
-function buildMsgs (body, contactId) {
+function buildMsgs (body, contactId, logSMSAsThread) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
   for (const m of msgs) {
@@ -284,11 +284,24 @@ function buildMsgs (body, contactId) {
         return `<p><a href="https://ringcentral.github.io/ringcentral-media-reader/?media=${url}">attachment: ${d.fileName || d.id}</a><p>`
       }).join('')
     attachments = attachments ? `<p>attachments: </p>${attachments}` : ''
-    arr.push({
-      body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
-      id: m.id,
+    if (logSMSAsThread) {
+      arr.push(
+        `<div><b>${m.subject}</b> ${attachments} - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`
+      )
+    } else {
+      arr.push({
+        body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
+        id: m.id,
+        contactId
+      })
+    }
+  }
+  if (logSMSAsThread) {
+    return [{
+      body: arr.join(''),
+      id: msgs.map(s => s.id).join(','),
       contactId
-    })
+    }]
   }
   return arr
 }
@@ -392,10 +405,11 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
+  const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   if (body.call) {
     mainBody = `${fmtime}: [${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
-    mainBody = buildMsgs(body, contactId)
+    mainBody = buildMsgs(body, contactId, logSMSAsThread)
   } else if (isVoiceMail) {
     mainBody = buildVoiceMailMsgs(body, contactId)
   }
