@@ -585,10 +585,7 @@ export async function initThirdParty () {
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')
-  if (!syncTimeStamp) {
-    rc.syncTimeStamp = Date.now()
-    await ls.set('rc-sync-timestamp', rc.syncTimeStamp)
-  } else {
+  if (syncTimeStamp) {
     rc.syncTimeStamp = syncTimeStamp
   }
   console.log('rc.countryCode:', rc.countryCode)

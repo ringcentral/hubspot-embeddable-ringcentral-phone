@@ -3,7 +3,7 @@
  */
 
 import { useEffect } from 'react'
-import { Modal, Button } from 'antd'
+import { Modal, Button, notification } from 'antd'
 import { SyncOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { fetchAllContacts, notifyReSyncContacts } from '../feat/contacts'
 import { doAuth } from '../feat/auth'
@@ -13,6 +13,9 @@ import './antd.less'
 import 'antd/dist/antd.less'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { callResultListKey } from '../feat/common'
+import {
+  remove
+} from 'ringcentral-embeddable-extension-common/src/common/db'
 
 function showSyncMenu () {
   let mod = null
@@ -23,6 +26,13 @@ function showSyncMenu () {
   function syncAll () {
     fetchAllContacts()
     destroyMod()
+  }
+  async function delAll () {
+    await remove()
+    notification.success({
+      message: 'All contacts removed from extension database',
+      zIndex: 6697
+    })
   }
   function onCancel () {
     notifyReSyncContacts()
@@ -48,6 +58,13 @@ function showSyncMenu () {
           onClick={syncAll}
         >
           Sync all contacts
+        </Button>
+        <Button
+          type='primary'
+          className='rc-mg1r rc-mg1b'
+          onClick={delAll}
+        >
+          Remove all contacts data from extension database
         </Button>
         <Button
           type='ghost'

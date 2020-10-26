@@ -21,7 +21,6 @@ import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/c
 import { jsonHeader } from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import {
-  remove,
   insert,
   getByPage,
   match
@@ -288,10 +287,6 @@ export async function fetchAllContacts (_getRecent, showModal = true) {
   if (!dbTest || !dbTest.count || offset || offsetCompany) {
     getRecent = false
   }
-  console.debug('getRecent2', getRecent)
-  if (!getRecent && !offset && !offsetCompany) {
-    await remove()
-  }
   let countRecentMax = 3
   let countRecent = 0
   let countRecentCompanyMax = 3
@@ -363,7 +358,7 @@ export const getContacts = async (page) => {
     console.debug('use cache')
     return cached
   }
-  if (page === 1) {
+  if (page === 1 && !rc.syncTimestamp) {
     fetchAllContacts()
   }
   return final
