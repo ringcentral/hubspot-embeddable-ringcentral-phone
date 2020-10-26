@@ -286,7 +286,7 @@ function buildMsgs (body, contactId, logSMSAsThread) {
     attachments = attachments ? `<p>attachments: </p>${attachments}` : ''
     if (logSMSAsThread) {
       arr.push(
-        `<div><b>${m.subject}</b> ${attachments} - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`
+        `<div><b>${m.subject}</b> ${attachments} - from <b>${from}</b> to <b>${to}</b>  - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`
       )
     } else {
       arr.push({

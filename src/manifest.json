@@ -1,7 +1,7 @@
 {
   "name": "RingCentral Embeddable Voice for HubSpot",
   "description": "RingCentral Embeddable Voice for HubSpot",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArrMAkcBow9EOct8y5xh1Ddyp+2KcWaLK4VtVzRZZlXQYDCE/gnCkiiZWrgkbWuLYdwAS9nfkrzbvxKXDXbqESMbo1JHNF4QFw2I6yv8AIpcpx7h4he4JmUc9hTErCd3I3WnsWluEoPC21kJx2HgVRHUR/9zR677t+42B70rcR2P0s9/+KsRN4vwau377xYCT2szjzfeluxrriG0v4nuggxWoZ8sFgIizJEv8jMOX9Xak3Y/4JK+1f9bffdN5wTQwvMDZKhsHJs/qgpis0GF6B9QW1CC80uj2UxjvcHMUabh83ozaawO+66d4f/opB20FltkY7ufD7jxcw4ebQpSD2wIDAQAB",
   "permissions": [
     "http://*/",
