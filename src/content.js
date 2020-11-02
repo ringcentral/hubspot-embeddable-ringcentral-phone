@@ -12,13 +12,14 @@ import './custom.styl'
 let {
   clientID,
   appServer,
-  clientSecret
+  clientSecret,
+  authUrl
 } = ringCentralConfigs
 
 let appConfigQuery = ''
 let { serviceName } = thirdPartyConfigs
 if (clientID || appServer) {
-  appConfigQuery = `?appVersion=${appVersion}&zIndex=2222&prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}&disableConferenceCall=false`
+  appConfigQuery = `?appVersion=${appVersion}&zIndex=2222&prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}&disableConferenceCall=false&redirectUri=${authUrl}`
 }
 
 /* eslint-disable-next-line */

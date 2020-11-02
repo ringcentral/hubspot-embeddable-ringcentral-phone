@@ -2,7 +2,7 @@
  * call/message log sync feature
  */
 
-import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { thirdPartyConfigs, ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import { getContactInfo } from './log-sync-form'
 import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
 import {
@@ -401,6 +401,9 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let recording = _.get(body, 'call.recording')
     ? `<p>Recording link: ${body.call.recording.link}</p>`
     : ''
+  let recordingUrl = _.get(body, 'call.recording')
+    ? ringCentralConfigs.mediaPlayUrl + encodeURIComponent(body.call.recording.contentUri)
+    : undefined
   let dealIds = await getDeals(contactId)
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
@@ -461,6 +464,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
         fromNumber,
         status,
         durationMilliseconds,
+        recordingUrl,
         ...getCallInfo(contact, toNumber, fromNumber)
       }
     }
