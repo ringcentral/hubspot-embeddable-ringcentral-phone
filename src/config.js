@@ -390,7 +390,7 @@ export async function thirdPartyServiceConfig (serviceName) {
         sessionIds
       })
     } else if (
-      type === 'rc-call-ring-notify'
+      type === 'rc-active-call-notify'
     ) {
       showContactInfoPanel(call)
     } else if (type === 'rc-region-settings-notify') {
