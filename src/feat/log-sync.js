@@ -398,9 +398,9 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     ? durationMilliseconds * 1000
     : undefined
   let externalId = buildId(body)
-  // let recording = _.get(body, 'call.recording')
-  //   ? `<p>Recording link: ${body.call.recording.link}</p>`
-  //   : ''
+  let recording = _.get(body, 'call.recording')
+    ? `<p>Recording link: ${body.call.recording.link}</p>`
+    : ''
   let recordingUrl = _.get(body, 'call.recording')
     ? ringCentralConfigs.mediaPlayUrl + encodeURIComponent(body.call.recording.contentUri)
     : undefined
@@ -436,7 +436,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     return {
       ...mm,
       id: mm.id,
-      body: `<div>${descFormatted}</div><p>${mm.body}</p>`
+      body: `<div>${descFormatted}</div><p>${mm.body}</p>${recording}`
     }
   })
   for (const uit of bodyAll) {
