@@ -13,7 +13,7 @@ export function getCSRFToken () {
 
 export function getPortalId () {
   let pid = _.get(
-    document.cookie.match(/hubspgot\.hub\.id=([^=;]+);/),
+    document.cookie.match(/hubspot\.hub\.id=([^=;]+);/),
     '[1]'
   )
   if (!pid) {

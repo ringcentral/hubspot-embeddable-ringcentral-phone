@@ -1,5 +1,5 @@
 import initBackground from 'ringcentral-embeddable-extension-common/src/spa/background'
-import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { thirdPartyConfigs, ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import _ from 'lodash'
 
 /**
@@ -16,13 +16,22 @@ function checkTab (tab) {
 }
 
 let list = [
-  /^https:\/\/api\.hubspot\.com.+/
+  /^https:\/\/api\.hubspot\.com.+/,
+  /^https:\/\/api\.hubspot\.com.+/,
 ]
 if (thirdPartyConfigs.upgradeServer) {
   list.push(
     new RegExp(
       '^' +
       _.escapeRegExp(thirdPartyConfigs.upgradeServer)
+    )
+  )
+}
+if (ringCentralConfigs.authServer) {
+  list.push(
+    new RegExp(
+      '^' +
+      _.escapeRegExp(ringCentralConfigs.authServer)
     )
   )
 }

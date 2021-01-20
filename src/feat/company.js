@@ -140,7 +140,6 @@ export function formatCompanyContact (companyInfo) {
 }
 
 export async function getCompanyById (id) {
-  console.log('getCompanyById')
   let comps = await getCompany(1, id)
   if (comps && comps.companies && comps.companies.length) {
     return formatCompanyContact(comps.companies[0])

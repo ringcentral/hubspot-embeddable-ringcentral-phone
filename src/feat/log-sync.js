@@ -25,12 +25,29 @@ import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import updateLog from './update-call-log'
+import { createSMS } from './create-custom-sms-event'
 
-let {
+const {
   showCallLogSyncForm,
   serviceName,
   apiServerHS
 } = thirdPartyConfigs
+
+const filterTime = 5 * 60 * 1000
+
+function filterSMS (arr) {
+  // console.log('old---====', arr)
+  if (!rc.filterSMSThread) {
+    return arr
+  }
+  const now = Date.now()
+  const base = arr[0].stamp || now
+  const res = arr.filter(d => {
+    return base - (d.stamp || now) < filterTime
+  })
+  // console.log('new---====', res)
+  return res
+}
 
 // function getPortalId() {
 //   let dom = document.querySelector('.navAccount-portalId')
@@ -264,6 +281,7 @@ export async function doSync (body, formData, isManuallySync) {
 function buildMsgs (body, contactId, logSMSAsThread) {
   let msgs = _.get(body, 'conversation.messages')
   const arr = []
+  const arrMd = []
   for (const m of msgs) {
     const fromN = getFullNumber(_.get(m, 'from')) ||
       getFullNumber(_.get(m, 'from[0]')) || ''
@@ -277,6 +295,7 @@ function buildMsgs (body, contactId, logSMSAsThread) {
       (fromName ? `(${fromName})` : '')
     const to = toN +
       (toName ? `(${toName})` : '')
+    const stamp = dayjs(m.creationTime).valueOf()
     let attachments = (m.attachments || [])
       .filter(d => d.type !== 'Text')
       .map(d => {
@@ -284,26 +303,50 @@ function buildMsgs (body, contactId, logSMSAsThread) {
         return `<p><a href="https://ringcentral.github.io/ringcentral-media-reader/?media=${url}">attachment: ${d.fileName || d.id}</a><p>`
       }).join('')
     attachments = attachments ? `<p>attachments: </p>${attachments}` : ''
+    let attachmentsMd = (m.attachments || [])
+      .filter(d => d.type !== 'Text')
+      .map(d => {
+        const url = encodeURIComponent(d.uri)
+        return `[attachment: ${d.fileName || d.id}](https://ringcentral.github.io/ringcentral-media-reader/?media=${url})`
+      }).join(' ')
+    arrMd.push({
+      id: m.id,
+      stamp,
+      time: dayjs(m.creationTime).format('MMM DD, YYYY HH:mm'),
+      content: `**${m.subject}** ${attachmentsMd} - from **${from}** to **${to}**`
+    })
     if (logSMSAsThread) {
-      arr.push(
-        `<div><b>${m.subject}</b> ${attachments} - from <b>${from}</b> to <b>${to}</b>  - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`
-      )
+      arr.push({
+        text: `<div><b>${m.subject}</b> ${attachments} - from <b>${from}</b> to <b>${to}</b>  - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`,
+        stamp
+      })
     } else {
       arr.push({
         body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
         id: m.id,
+        stamp,
+        isSMS: true,
         contactId
       })
     }
   }
   if (logSMSAsThread) {
+    const bd = filterSMS(arr).map(d => d.text).join(' ')
+    const ms = filterSMS(arrMd)
     return [{
-      body: arr.join(''),
-      id: msgs.map(s => s.id).join(','),
+      body: bd,
+      mds: filterSMS(arrMd),
+      isSMS: true,
+      id: ms.map(s => s.id).join(','),
       contactId
     }]
   }
-  return arr
+  return arr.map((obj, i) => {
+    return {
+      ...obj,
+      mds: [arrMd[i]]
+    }
+  })
 }
 
 function buildVoiceMailMsgs (body, contactId) {
@@ -440,45 +483,56 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     }
   })
   for (const uit of bodyAll) {
-    let companyId = isCompany
-      ? contactId
-      : await getCompanyId(contactId)
-    let data = {
-      engagement: {
-        active: true,
-        ownerId,
-        type: interactionType,
-        timestamp: now
-      },
-      associations: {
-        contactIds,
-        companyIds: companyId ? [Number(companyId)] : [],
-        dealIds,
-        ownerIds: []
-      },
-      attachments: [],
-      metadata: {
-        externalId: uit.id,
-        body: uit.body,
-        toNumber,
-        fromNumber,
-        status,
-        durationMilliseconds,
-        recordingUrl,
-        ...getCallInfo(contact, toNumber, fromNumber)
+    let res = null
+    let portalId = getPortalId()
+    if (uit.isSMS) {
+      res = await createSMS(uit, contact.emails[0])
+    }
+    if (!res) {
+      let companyId = isCompany
+        ? contactId
+        : await getCompanyId(contactId)
+      let data = {
+        engagement: {
+          active: true,
+          ownerId,
+          type: interactionType,
+          timestamp: now
+        },
+        associations: {
+          contactIds,
+          companyIds: companyId ? [Number(companyId)] : [],
+          dealIds,
+          ownerIds: []
+        },
+        attachments: [],
+        metadata: {
+          externalId: uit.id,
+          body: uit.body,
+          toNumber,
+          fromNumber,
+          status,
+          durationMilliseconds,
+          recordingUrl,
+          ...getCallInfo(contact, toNumber, fromNumber)
+        }
+      }
+
+      let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
+      res = await fetchBg(url, {
+        method: 'post',
+        body: data,
+        headers: {
+          ...commonFetchOptions().headers,
+          'X-Source': 'CRM_UI',
+          'X-SourceId': email
+        }
+      })
+    } else {
+      res = {
+        engagement: copy(res)
       }
     }
-    let portalId = getPortalId()
-    let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
-    let res = await fetchBg(url, {
-      method: 'post',
-      body: data,
-      headers: {
-        ...commonFetchOptions().headers,
-        'X-Source': 'CRM_UI',
-        'X-SourceId': email
-      }
-    })
     // let res = await fetch.post(url, data, commonFetchOptions())
     if (res && res.engagement) {
       await saveLog(uit.id, contactId, email, res.engagement.id)

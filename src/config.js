@@ -56,6 +56,8 @@ import initReact from './lib/react-entry'
 import initInner from './lib/inner-entry'
 import initInnerCallLog from './lib/call-log-entry.js'
 import { resyncCheck } from './lib/auto-resync'
+import { onTriggerLogin, onLoginCallback } from './feat/handle-login'
+import { onSMSlogEnabled } from './feat/create-custom-sms-event'
 // import run from './feat/add-contacts'
 // import run1 from './feat/add-companies'
 // run()
@@ -74,7 +76,6 @@ let {
 function formatNumbers (res) {
   const r = formatContacts([res])[0]
   return r.phoneNumbers.map(p => {
-    console.log(p)
     return {
       id: p.phoneNumber,
       title: p.phoneType,
@@ -299,6 +300,8 @@ export const phoneNumberSelectors = [{
 export async function thirdPartyServiceConfig (serviceName) {
   const logSMSType = await ls.get('rc-logSMSType') || 'CALL'
   const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
+  const logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
+  const filterSMSThread = await ls.get('rc-filterSMSThread') || false
   console.log(serviceName)
   const logTitle = `Log to ${serviceName}`
   let services = {
@@ -342,6 +345,14 @@ export async function thirdPartyServiceConfig (serviceName) {
       {
         name: 'Log SMS thread as one log',
         value: logSMSAsThread
+      },
+      {
+        name: 'Log SMS as RingCentral SMS event',
+        value: logSMSAsCustomEvent
+      },
+      {
+        name: 'For SMS thread Only show SMS in 5 minutes',
+        value: filterSMSThread
       }
     ]
   }
@@ -356,10 +367,15 @@ export async function thirdPartyServiceConfig (serviceName) {
       return
     }
     console.debug(data)
-    let { type, loggedIn, path, call, requestId, sessionIds } = data
+    let { type, loggedIn, path, call, requestId, sessionIds, callbackUri } = data
+    if (callbackUri) {
+      return onLoginCallback(callbackUri)
+    }
     if (type === 'rc-login-status-notify') {
       console.debug('rc logined', loggedIn)
       rc.rcLogined = loggedIn
+    } else if (type === 'rc-login-popup-notify') {
+      onTriggerLogin(data)
     }
     if (type === 'rc-sync-log-success') {
       // response to widget
@@ -440,6 +456,16 @@ export async function thirdPartyServiceConfig (serviceName) {
       const logSMSAsThread = arr[1].value
       rc.logSMSAsThread = logSMSAsThread
       ls.set('rc-logSMSAsThread', rc.logSMSAsThread)
+      const logSMSAsCustomEvent = arr[2].value
+      const prevLogSMSAsCustomEvent = rc.logSMSAsCustomEvent
+      rc.logSMSAsCustomEvent = logSMSAsCustomEvent
+      ls.set('rc-logSMSAsCustomEvent', rc.logSMSAsCustomEvent)
+      if (!prevLogSMSAsCustomEvent && rc.logSMSAsCustomEvent) {
+        onSMSlogEnabled()
+      }
+      const filterSMSThread = arr[3].value
+      rc.filterSMSThread = filterSMSThread
+      ls.set('rc-filterSMSThread', rc.filterSMSThread)
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
       let page = _.get(data, 'body.page') || 1
@@ -582,6 +608,8 @@ export async function initThirdParty () {
   rc.cacheKey = 'contacts' + '_' + userId
   rc.logSMSType = await ls.get('rc-logSMSType') || 'CALL'
   rc.logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
+  rc.logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
+  rc.filterSMSThread = await ls.get('rc-filterSMSThread') || false
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')

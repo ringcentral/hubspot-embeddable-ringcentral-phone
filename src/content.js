@@ -13,13 +13,13 @@ let {
   clientID,
   appServer,
   clientSecret,
-  authUrl
+  authServer
 } = ringCentralConfigs
-
+const authUrl = authServer + '/rc-ext-oauth'
 let appConfigQuery = ''
 let { serviceName } = thirdPartyConfigs
 if (clientID || appServer) {
-  appConfigQuery = `?appVersion=${appVersion}&zIndex=2222&prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}&disableConferenceCall=false&redirectUri=${authUrl}`
+  appConfigQuery = `?appVersion=${appVersion}&zIndex=2222&prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}&disableConferenceCall=false&redirectUri=${authUrl}&disableLoginPopup=1`
 }
 
 /* eslint-disable-next-line */
