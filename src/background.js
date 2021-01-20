@@ -16,8 +16,7 @@ function checkTab (tab) {
 }
 
 let list = [
-  /^https:\/\/api\.hubspot\.com.+/,
-  /^https:\/\/api\.hubspot\.com.+/,
+  /^https:\/\/api\.hubspot\.com.+/
 ]
 if (thirdPartyConfigs.upgradeServer) {
   list.push(
