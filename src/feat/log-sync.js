@@ -283,12 +283,16 @@ function buildMsgs (body, contactId, logSMSAsThread) {
   const arr = []
   const arrMd = []
   for (const m of msgs) {
-    const fromN = getFullNumber(_.get(m, 'from')) ||
+    const fromN = formatPhoneLocal(
+      getFullNumber(_.get(m, 'from')) ||
       getFullNumber(_.get(m, 'from[0]')) || ''
+    )
     const fromName = _.get(m, 'from.name') || _.get(m, 'from.phoneNumber') ||
       (_.get(m, 'from') || []).map(d => d.name).join(', ') || ''
-    const toN = getFullNumber(_.get(m, 'to')) ||
+    const toN = formatPhoneLocal(
+      getFullNumber(_.get(m, 'to')) ||
       getFullNumber(_.get(m, 'to[0]')) || ''
+    )
     const toName = _.get(m, 'to.name') ||
       (_.get(m, 'to') || []).map(d => d.name).join(', ') || ''
     const from = fromN +
