@@ -253,7 +253,7 @@ export async function getCompanyId (contactId) {
   // let res = await fetch.get(url, commonFetchOptions())
   let companyId = ''
   if (res && res.data) {
-    companyId = _.get(res, 'data.CONTACT.properties.associatedcompanyid.value') + ''
+    companyId = _.get(res, 'data.CONTACT.properties.associatedcompanyid.value')
   } else {
     console.log('fetch company error')
     console.log(res)
