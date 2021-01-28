@@ -87,11 +87,6 @@ footer {
     color: #797979;
     padding-bottom: 30px;
 }
-footer .brand {
-    background: url('./img/footer_rclogo.png') no-repeat 0px 20px;
-    padding: 40px 0 10px 0;
-    font-size: 12px;
-}
 footer .row-1 {
     border-bottom: 1px solid #414141;
     margin-bottom: 10px
@@ -120,10 +115,25 @@ footer .footer-image-link i {
 }
 /* Left Sidebar Nav BEGIN */
 #sidebar-nav {
-    padding-top: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     background-color: #333;
     color: white;
 }
+#sidebar-nav .navbar-toggler {
+    margin-right: -15px;
+}
+#sidebar-nav .navbar-brand {
+    margin-left: -15px;
+}
+#sidebar-navbar-collapse {
+    padding-top: 20px;
+}
+#sidebar-nav hr {
+    border-color: white;
+    height: 1px;
+}
+
 #sidebar-nav a {
     color: white;
 }
@@ -139,6 +149,9 @@ footer .footer-image-link i {
 #sidebar-nav .toplevel .section-title {
     font-weight: 400;
     text-transform: uppercase;
+}
+#sidebar-nav .nav-item > a.nav-link {
+    padding-left: 0;
 }
 /* Left Sidebar Nav END */
 
@@ -216,8 +229,7 @@ a.toctree-l3 {
 }
 
 nav.navbar {
-    border-bottom: 1px solid #cdcdcd;
-    background-color: white;
+    background-color: transparent;
     font-size: 15px;
     padding: 0 15px 0 15px;
 }
@@ -227,6 +239,13 @@ nav.navbar {
 a.dropdown-toggle::after{
     content:none;
 }
+
+#mainnav.navbar {
+    border-bottom: 1px solid #cdcdcd;
+    background-color: white;
+}
+
+
 @media (min-width: 768px) {
     .navbar-nav .main-item a.dropdown-toggle {
 	padding-left: 15px;
@@ -339,6 +358,15 @@ ul.nav li.main {
     .dropdown-menu .dropdown-submenu{
         width: auto;
     }
+}
+
+@media (min-width: 770px) {
+     .container-fluid #sidebar-nav {
+          max-width: 285px;
+     }
+     .container-fluid #sidebar-toc {
+          max-width: 190px;
+     }
 }
 
 .btn:visited {

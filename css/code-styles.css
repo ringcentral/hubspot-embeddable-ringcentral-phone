@@ -192,7 +192,7 @@
 
 .codehilite, .highlight {
   position: relative;
-  margin: 1em 0;
+/*  margin: 1em 0;*/
   padding: 0;
   border-radius: 0.2rem;
   background-color: rgba(236, 236, 236, 0.5);
@@ -203,7 +203,7 @@
   .codehilite code, .highlight code {
     display: block;
     margin: 0;
-    padding: 1.05rem 1.2rem;
+    padding: 1.05rem 0.5rem;
     background-color: transparent;
     overflow: auto;
     vertical-align: top; }
@@ -227,7 +227,7 @@ pre.codehilite, pre.highlight {
 
 .codehilitetable, .highlighttable {
   display: block;
-  margin: 1em 0;
+/*  margin: 1em 0;*/
   border-radius: 0.2em;
   font-size: 0.9rem;
   line-height: 1.4;

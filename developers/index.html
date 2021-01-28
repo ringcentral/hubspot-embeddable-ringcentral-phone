@@ -14,6 +14,7 @@
     
     <link rel="canonical" href="https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/developers/">
     <link rel="shortcut icon" href="../img/favicon.ico">
+    
     <title>Customization - RingCentral Embeddable Phone for HubSpot</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -24,14 +25,13 @@
     <link href="../css/code-tabs.css" rel="stylesheet">
     <link href="../css/admonition.css" rel="stylesheet">
     <link href="../css/base.css" rel="stylesheet">
-    <link href="../css/extra.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="fonts.js"></script> 
+    <script src="../fonts.js"></script> 
   </head>
   
   <body class="" data-spy="scroll" data-target="#toc">
@@ -211,15 +211,22 @@
     </div>
   </div>
 </nav>
-    <div id="content" class="container">
+    <div id="content"class="container">
       
     <div class="row">
-      <div id="sidebar-nav" class="sidebar col-md-3"><nav id="sidenav" class="nav-collapse" data-toggle="collapse" data-target=".nav-collapse.show">
-  <div class="container">
+      <div id="sidebar-nav" class="sidebar col-md-3"><nav id="sidenav" class="navbar navbar-default navbar-expand-md navbar-dark" role="navigation">
+  <a class="navbar-brand d-block d-md-none d-xl-none" href="#"><i class="fa fa-home fa-fw"></i> Table of Contents</a>
+  <button class="navbar-toggler ml-auto hidden-sm-up float-xs-right" type="button" data-toggle="collapse" data-target="#sidebar-navbar-collapse" aria-controls="sidebar-navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="sidebar-navbar-collapse">
     <!-- Main navigation -->
-    <ul class="nav navbar-nav">
+    <ul class="nav navbar-nav flex-column">
       <li >
         <a class="nav-link" href="..">Home</a>
+      </li>
+      <li >
+        <a class="nav-link" href="../screenshots/">Screenshots</a>
       </li>
       <li >
         <a class="nav-link" href="../install/">Installation</a>
@@ -240,11 +247,10 @@
 
 <h1 id="customizing-ringcentral-embeddable-voice-for-hubspot">Customizing RingCentral Embeddable Voice for HubSpot</h1>
 <p>Developers are free to customize their RingCentral integration with Hubspot by forking the project on github:</p>
-<div class="codehilite"><pre><span></span>$ git clone https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone.git
+<div class="highlight"><pre><span></span><code>$ git clone https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone.git
 $ <span class="nb">cd</span> hubspot-embeddable-ringcentral-phone
 $ npm i
-</pre></div>
-
+</code></pre></div>
 <h2 id="create-your-apps">Create Your Apps</h2>
 <h3 id="ringcentral">RingCentral</h3>
 <p>On RingCentral you will need to create an application with your developer console. To create the app quickly, click the button below:</p>
@@ -280,11 +286,10 @@ $ npm i
 </ol>
 <h2 id="edit-configjs">Edit config.js</h2>
 <p>You will need to create your config file using the template provided:</p>
-<div class="codehilite"><pre><span></span>$ cp config.sample.js config.js
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ cp config.sample.js config.js
+</code></pre></div>
 <p>Look for the following section, and enter in your RingCentral Client ID, and set the server to the proper environment:</p>
-<div class="codehilite"><pre><span></span><span class="err">////</span> <span class="err">ringcentral</span> <span class="err">config</span>
+<div class="highlight"><pre><span></span><code><span class="err">////</span> <span class="err">ringcentral</span> <span class="err">config</span>
 <span class="err">ringCentralConfigs:</span> <span class="p">{</span>
   <span class="err">//</span> <span class="err">your</span> <span class="err">ringCentral</span> <span class="err">app&#39;s</span> <span class="err">Client</span> <span class="err">ID</span>
   <span class="err">//</span> <span class="err">clientID:</span> <span class="err">&#39;aaaaaaaseWivhrrGgggVeCrw&#39;,</span>
@@ -292,10 +297,9 @@ $ npm i
   <span class="err">//</span> <span class="err">your</span> <span class="err">ringCentral</span> <span class="err">app&#39;s</span> <span class="err">Auth</span> <span class="err">Server</span> <span class="err">URL</span>
   <span class="err">//</span> <span class="err">appServer:</span> <span class="err">&#39;https://platform.devtest.ringcentral.com&#39;</span>
 <span class="p">}</span><span class="err">,</span>
-</pre></div>
-
+</code></pre></div>
 <p>Finally, fill out the configuration information for your HubSpot application. Look for the following section and fill out accordingly (you should only need to provide your Client ID and Secret):</p>
-<div class="codehilite"><pre><span></span><span class="err">thirdPartyConfigs:</span> <span class="p">{</span>
+<div class="highlight"><pre><span></span><code><span class="err">thirdPartyConfigs:</span> <span class="p">{</span>
   <span class="err">//</span> <span class="err">hubspot</span> <span class="err">app</span> <span class="err">client</span> <span class="err">ID,</span> <span class="err">required</span>
   <span class="err">//</span> <span class="err">get</span> <span class="err">it</span> <span class="err">from</span> <span class="err">your</span> <span class="err">hubspot</span> <span class="err">app,</span> <span class="err">https://app.hubspot.com/developer</span>
   <span class="err">clientIDHS:</span> <span class="err">,</span>
@@ -310,13 +314,11 @@ $ npm i
   <span class="err">//</span> <span class="err">show</span> <span class="err">call</span> <span class="err">log</span> <span class="err">sync</span> <span class="err">desc</span> <span class="err">form</span> <span class="err">or</span> <span class="err">not</span>
   <span class="err">//</span> <span class="err">showCallLogSyncForm:</span> <span class="err">true</span>
 <span class="p">}</span><span class="err">,</span>
-</pre></div>
-
+</code></pre></div>
 <h2 id="start-up">Start Up</h2>
 <p>You are ready to start up your app. </p>
-<div class="codehilite"><pre><span></span>$ npm start
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$ npm start
+</code></pre></div>
 <h2 id="customize-your-integration">Customize Your Integration</h2>
 <p>To customize your integration, edit the many <code>.js</code> files in the <code>src</code> directory. As you edit, webpack will rebuild automatically.</p>
 <h2 id="install-your-extension">Install Your Extension</h2>
@@ -424,7 +426,7 @@ $ npm i
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Keyboard Shortcuts</h4>
+                <p class="h4 modal-title">Keyboard Shortcuts</p>
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             </div>
             <div class="modal-body">
