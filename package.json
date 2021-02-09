@@ -89,6 +89,9 @@
     "parser": "babel-eslint",
     "globals": [
       "chrome"
+    ],
+    "ignore": [
+      "docs"
     ]
   }
 }
