@@ -23,12 +23,13 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Screenshots: screenshots.md
   - Installation: install.md
   - Customization: developers.md
   - About: about.md
 
-extra_css:
-    - css/extra.css
+#extra_css:
+#    - css/extra.css
 
 copyright: Copyright 2019 RingCentral Inc. 
 google_analytics: 
