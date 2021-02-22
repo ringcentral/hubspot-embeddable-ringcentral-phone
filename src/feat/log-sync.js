@@ -442,7 +442,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     return
   }
   let email = getEmail()
-  let now = +new Date()
+  // let now = +new Date()
   let contactIds = isCompany ? [] : [Number(contactId)]
   let toNumber = getFullNumber(_.get(body, 'call.to'))
   let fromNumber = getFullNumber(_.get(body, 'call.from'))
