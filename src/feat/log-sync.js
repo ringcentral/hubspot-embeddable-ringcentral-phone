@@ -26,6 +26,7 @@ import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import updateLog from './update-call-log'
 import { createSMS } from './create-custom-sms-event'
+import { nanoid } from 'nanoid/non-secure'
 
 const {
   showCallLogSyncForm,
@@ -268,10 +269,21 @@ export async function getCompanyId (contactId) {
  * @param {*} body
  * @param {*} formData
  */
-export async function doSync (body, formData, isManuallySync) {
-  let contacts = await getSyncContacts(body)
+export async function doSync (body, formData, isManuallySync, contactList) {
+  let contacts = contactList || await getSyncContacts(body)
   if (!contacts.length) {
     return notify('No related contacts')
+  } else if (contacts.length > 1 && !contactList) {
+    return window.postMessage({
+      inst: {
+        id: nanoid(),
+        formData,
+        body,
+        contacts,
+        isManuallySync
+      },
+      type: 'rc-select-sync-contacts'
+    }, '*')
   }
   for (let contact of contacts) {
     await doSyncOne(contact, body, formData, isManuallySync)

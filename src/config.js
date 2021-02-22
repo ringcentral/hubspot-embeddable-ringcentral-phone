@@ -55,6 +55,7 @@ import { initMeetingSelect } from './feat/meeting-sync'
 import initReact from './lib/react-entry'
 import initInner from './lib/inner-entry'
 import initInnerCallLog from './lib/call-log-entry.js'
+import initSyncContactsSelect from './lib/sync-contacts-select-entry.js'
 import { resyncCheck } from './lib/auto-resync'
 import { onTriggerLogin, onLoginCallback } from './feat/handle-login'
 import { onSMSlogEnabled } from './feat/create-custom-sms-event'
@@ -633,6 +634,7 @@ export async function initThirdParty () {
   initReact()
   initInner()
   initInnerCallLog()
+  initSyncContactsSelect()
   const db = await getByPage(1, 1)
   resyncCheck(db && db.count)
 }
