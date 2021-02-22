@@ -414,6 +414,14 @@ async function filterLoggered (arr, email) {
   return res
 }
 
+function getStamp (body) {
+  const t = _.get(body, 'call.startTime') || _.get(body, 'conversation.messages[0].creationTime') || Date.now()
+  // console.log('call.startTime', _.get(body, 'call.startTime'))
+  // console.log('conversation.messages[0].creationTime', _.get(body, 'conversation.messages[0].creationTime'))
+  // console.log('Date.now', Date.now())
+  return dayjs(t).valueOf()
+}
+
 async function doSyncOne (contact, body, formData, isManuallySync) {
   let { id: contactId, isCompany } = contact
   if (isCompany) {
@@ -439,6 +447,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let toNumber = getFullNumber(_.get(body, 'call.to'))
   let fromNumber = getFullNumber(_.get(body, 'call.from'))
   let fmtime = dayjs(_.get(body, 'call.startTime')).format('MMM DD, YYYY h:mm A')
+  const stamp = getStamp(body)
   let status = 'COMPLETED'
   let durationMilliseconds = _.get(body, 'call.duration')
   durationMilliseconds = durationMilliseconds
@@ -501,7 +510,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
           active: true,
           ownerId,
           type: interactionType,
-          timestamp: now
+          timestamp: stamp
         },
         associations: {
           contactIds,
