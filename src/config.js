@@ -303,6 +303,7 @@ export async function thirdPartyServiceConfig (serviceName) {
   const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   const logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
   const filterSMSThread = await ls.get('rc-filterSMSThread') || false
+  const autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
   console.log(serviceName)
   const logTitle = `Log to ${serviceName}`
   let services = {
@@ -354,6 +355,10 @@ export async function thirdPartyServiceConfig (serviceName) {
       {
         name: 'For SMS thread Only show SMS in 5 minutes',
         value: filterSMSThread
+      },
+      {
+        name: 'Auto sync call/message log to all matched contact(do not show selection)',
+        value: autoSyncToAll
       }
     ]
   }
@@ -467,6 +472,9 @@ export async function thirdPartyServiceConfig (serviceName) {
       const filterSMSThread = arr[3].value
       rc.filterSMSThread = filterSMSThread
       ls.set('rc-filterSMSThread', rc.filterSMSThread)
+      const autoSyncToAll = arr[4].value
+      rc.autoSyncToAll = autoSyncToAll
+      ls.set('rc-autoSyncToAll', rc.autoSyncToAll)
     } else if (path === '/contacts') {
       let isMannulSync = _.get(data, 'body.type') === 'manual'
       let page = _.get(data, 'body.page') || 1
@@ -611,6 +619,7 @@ export async function initThirdParty () {
   rc.logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   rc.logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
   rc.filterSMSThread = await ls.get('rc-filterSMSThread') || false
+  rc.autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
   let accessToken = await ls.get('accessToken') || null
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')

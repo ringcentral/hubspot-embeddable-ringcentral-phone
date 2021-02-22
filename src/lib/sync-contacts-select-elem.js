@@ -2,10 +2,6 @@
  * select sync call log to which contacts
  */
 
- /**
- * react element in widget wrapper
- */
-
 import { useState, useEffect } from 'react'
 import _ from 'lodash'
 import SyncContactsSelectForm from './sync-contacts-select-form'

@@ -273,7 +273,7 @@ export async function doSync (body, formData, isManuallySync, contactList) {
   let contacts = contactList || await getSyncContacts(body)
   if (!contacts.length) {
     return notify('No related contacts')
-  } else if (contacts.length > 1 && !contactList) {
+  } else if (contacts.length > 1 && !contactList && !window.rc.autoSyncToAll) {
     return window.postMessage({
       inst: {
         id: nanoid(),
