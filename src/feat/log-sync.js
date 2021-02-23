@@ -16,7 +16,7 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import { getFullNumber, commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
-import { getDeals } from './deal'
+// import { getDeals } from './deal'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
@@ -434,6 +434,17 @@ function getStamp (body) {
   return dayjs(t).valueOf()
 }
 
+/**
+ * for current contact, only one contact name is enough,
+ * need search for matched number to confirm if the contact is caller or callee
+ * @param {array} list from or to list
+ * @param {*} contact current hubspot contact to sync to
+ */
+function parseLogName (list, contact) {
+  const inList = list.map(d => d.id).includes(contact.id)
+  return inList ? contact.name : list.map(d => d.name).join(', ')
+}
+
 async function doSyncOne (contact, body, formData, isManuallySync) {
   let { id: contactId, isCompany } = contact
   if (isCompany) {
@@ -472,13 +483,14 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let recordingUrl = _.get(body, 'call.recording')
     ? ringCentralConfigs.mediaPlayUrl + encodeURIComponent(body.call.recording.contentUri)
     : undefined
-  let dealIds = await getDeals(contactId)
+  let dealIds = [] // await getDeals(contactId)
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
   const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   if (body.call) {
-    mainBody = `${fmtime}: [${_.get(body, 'call.direction')} ${_.get(body, 'call.result')}] CALL from <b>${body.call.fromMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${body.call.toMatches.map(d => d.name).join(', ')}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
+    const direction = _.get(body, 'call.direction')
+    mainBody = `${fmtime}: [${direction} ${_.get(body, 'call.result')}] CALL from <b>${parseLogName(body.call.fromMatches, contact)}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${parseLogName(body.call.toMatches, contact)}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
     mainBody = buildMsgs(body, contactId, logSMSAsThread)
   } else if (isVoiceMail) {
