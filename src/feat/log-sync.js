@@ -16,7 +16,7 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import { getFullNumber, commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
-// import { getDeals } from './deal'
+import { getDeals } from './deal'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
@@ -483,7 +483,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   let recordingUrl = _.get(body, 'call.recording')
     ? ringCentralConfigs.mediaPlayUrl + encodeURIComponent(body.call.recording.contentUri)
     : undefined
-  let dealIds = [] // await getDeals(contactId)
+  let dealIds = await getDeals(contactId)
   let mainBody = ''
   let ctype = _.get(body, 'conversation.type')
   let isVoiceMail = ctype === 'VoiceMail'
