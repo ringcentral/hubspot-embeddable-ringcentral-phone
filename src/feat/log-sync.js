@@ -107,6 +107,7 @@ function checkMerge (body) {
     return body
   }
   if (prev.sessionId === sid && prev.time - now < maxDiff) {
+    console.log('trigger merger')
     let msgs = [
       ...body.conversation.messages,
       ...prev.body.conversation.messages
@@ -116,6 +117,7 @@ function checkMerge (body) {
     prev.body = copy(body)
     return body
   } else {
+    console.log('not trigger merger')
     prev.time = now
     prev.sessionId = sid
     prev.body = copy(body)
@@ -149,6 +151,7 @@ export async function syncCallLogToThirdParty (body) {
   const id = buildId(body)
   if (showCallLogSyncForm && isManuallySync) {
     body = checkMerge(body)
+    console.log('bbbb', body)
     let contactRelated = await getContactInfo(body, serviceName)
     if (
       !contactRelated ||
@@ -522,7 +525,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   for (const uit of bodyAll) {
     let res = null
     let portalId = getPortalId()
-    if (uit.isSMS) {
+    if (uit.isSMS && rc.logSMSAsCustomEvent) {
       res = await createSMS(uit, contact.emails[0])
     }
     if (!res) {

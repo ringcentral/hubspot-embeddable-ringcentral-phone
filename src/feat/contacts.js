@@ -346,9 +346,6 @@ export const getContacts = async (page) => {
     result: [],
     hasMore: false
   }
-  if (!rc.rcLogined) {
-    return final
-  }
   if (!rc.local.accessToken) {
     showAuthBtn()
     return final
