@@ -356,6 +356,7 @@ function buildMsgs (body, contactId, logSMSAsThread) {
       body: bd,
       mds: filterSMS(arrMd),
       isSMS: true,
+      stamp: arr[0].stamp,
       id: ms.map(s => s.id).join(','),
       contactId
     }]
@@ -384,6 +385,7 @@ function buildVoiceMailMsgs (body, contactId) {
     arr.push({
       body: `<p>Voice mail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
       id: m.id,
+      stamp: dayjs(m.creationTime).valueOf(),
       contactId
     })
   }
@@ -537,7 +539,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
           active: true,
           ownerId,
           type: interactionType,
-          timestamp: stamp
+          timestamp: uit.stamp || stamp
         },
         associations: {
           contactIds,
