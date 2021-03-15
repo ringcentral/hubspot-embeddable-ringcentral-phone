@@ -28,7 +28,7 @@ curl -X POST -H 'Content-Type: application/json' \
 'https://api.hubapi.com/crm/v3/timeline/events'
  */
 
-export async function createSMS (opts, email) {
+export async function createSMS (opts, objectId) {
   const data = {
     eventTemplateId: smsTemplateId,
     timestamp: dayjs(opts.mds[0].stamp).toISOString(),
@@ -38,7 +38,7 @@ export async function createSMS (opts, email) {
     extraData: {
       smsList: opts.mds
     },
-    email
+    objectId
   }
   const url = `${authServer}/hs/create-sms-event`
   let res = await fetch.post(url, data, {
