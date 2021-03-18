@@ -29,43 +29,31 @@ import {
   getActivities
 } from './feat/activities'
 import {
-  showAuthBtn,
-  doAuth,
-  notifyRCAuthed,
-  unAuth
-} from './feat/auth'
-import {
   syncCallLogToThirdParty,
-  findMatchCallLog
+  findMatchCallLog,
+  onTurnOnAlwaysDedup
 } from './feat/log-sync.js'
 import {
-  fetchAllContacts,
-  getContacts,
+  // getContacts,
   formatContacts,
   showContactInfoPanel
 } from './feat/contacts.js'
-import {
-  search,
-  match,
-  getByPage
-} from 'ringcentral-embeddable-extension-common/src/common/db'
 import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen, openRCMeeting } from './feat/meeting'
 import { initMeetingSelect } from './feat/meeting-sync'
-import initReact from './lib/react-entry'
+// import initReact from './lib/react-entry'
 import initInner from './lib/inner-entry'
 import initInnerCallLog from './lib/call-log-entry.js'
-import initSyncContactsSelect from './lib/sync-contacts-select-entry.js'
-import { resyncCheck } from './lib/auto-resync'
 import { onTriggerLogin, onLoginCallback } from './feat/handle-login'
 import { onSMSlogEnabled } from './feat/create-custom-sms-event'
+import { searchContactByNumbers, debounceSearchContact } from './feat/search-contacts'
+
 // import run from './feat/add-contacts'
 // import run1 from './feat/add-companies'
 // run()
 // run1()
 let {
-  apiServerHS,
-  pageSize
+  apiServerHS
 } = thirdPartyConfigs
 
 // let phoneTypeDict = {
@@ -304,21 +292,22 @@ export async function thirdPartyServiceConfig (serviceName) {
   const logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
   const filterSMSThread = await ls.get('rc-filterSMSThread') || false
   const autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
+  const alwaysDedupe = await ls.get('rc-alwaysDedupe') || false
   console.log(serviceName)
   const logTitle = `Log to ${serviceName}`
   let services = {
     name: serviceName,
     // show contacts in ringcentral widgets
-    contactsPath: '/contacts',
-    contactIcon: 'https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/blob/master/src/hubspot.png?raw=true',
+    // contactsPath: '/contacts',
+    // contactIcon: 'https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/blob/master/src/hubspot.png?raw=true',
     contactSearchPath: '/contacts/search',
     contactMatchPath: '/contacts/match',
 
     // show auth/auauth button in ringcentral widgets
-    authorizationPath: '/authorize',
-    authorizedTitle: 'Unauthorize',
-    unauthorizedTitle: 'Authorize',
-    authorized: false,
+    // authorizationPath: '/authorize',
+    // authorizedTitle: 'Unauthorize',
+    // unauthorizedTitle: 'Authorize',
+    // authorized: true,
 
     // Enable call log sync feature
     callLoggerPath: '/callLogger',
@@ -328,8 +317,8 @@ export async function thirdPartyServiceConfig (serviceName) {
     messageLoggerTitle: logTitle,
 
     // show contact activities in ringcentral widgets
-    activitiesPath: '/activities',
-    activityPath: '/activity',
+    // activitiesPath: '/activities',
+    // activityPath: '/activity',
     callLogEntityMatcherPath: '/callLogger/match',
     messageLogEntityMatcherPath: '/messageLogger/match',
 
@@ -359,6 +348,10 @@ export async function thirdPartyServiceConfig (serviceName) {
       {
         name: 'Auto sync call/message log to all matched contact(do not show selection)',
         value: autoSyncToAll
+      },
+      {
+        name: 'Always avoid duplicate log even when manually log',
+        value: alwaysDedupe
       }
     ]
   }
@@ -399,12 +392,6 @@ export async function thirdPartyServiceConfig (serviceName) {
     }
     if (
       type === 'rc-route-changed-notify' &&
-      path === '/contacts' &&
-      !rc.local.accessToken
-    ) {
-      showAuthBtn()
-    } else if (
-      type === 'rc-route-changed-notify' &&
       path === '/history'
     ) {
       rc.postMessage({
@@ -420,9 +407,9 @@ export async function thirdPartyServiceConfig (serviceName) {
       console.debug('prev country code:', prevCountryCode)
       const newCountryCode = data.countryCode
       console.debug('new country code:', newCountryCode)
-      if (prevCountryCode !== newCountryCode) {
-        fetchAllContacts()
-      }
+      // if (prevCountryCode !== newCountryCode) {
+      //   fetchAllContacts()
+      // }
       rc.countryCode = newCountryCode
       ls.set('rc-country-code', newCountryCode)
     } else if (type === 'rc-call-end-notify') {
@@ -443,18 +430,7 @@ export async function thirdPartyServiceConfig (serviceName) {
     if (type !== 'rc-post-message-request') {
       return
     }
-    if (data.path === '/authorize') {
-      if (rc.local.accessToken) {
-        unAuth()
-      } else {
-        doAuth()
-      }
-      rc.postMessage({
-        type: 'rc-post-message-response',
-        responseId: data.requestId,
-        response: { data: 'ok' }
-      })
-    } else if (data.path === '/settings') {
+    if (data.path === '/settings') {
       const arr = data.body.settings
       const logSMSASNote = arr[0].value
       rc.logSMSType = logSMSASNote ? 'NOTE' : 'CALL'
@@ -475,53 +451,20 @@ export async function thirdPartyServiceConfig (serviceName) {
       const autoSyncToAll = arr[4].value
       rc.autoSyncToAll = autoSyncToAll
       ls.set('rc-autoSyncToAll', rc.autoSyncToAll)
-    } else if (path === '/contacts') {
-      let isMannulSync = _.get(data, 'body.type') === 'manual'
-      let page = _.get(data, 'body.page') || 1
-      if (isMannulSync && page === 1) {
-        window.postMessage({
-          type: 'rc-show-sync-menu'
-        }, '*')
-        return rc.postMessage({
-          type: 'rc-post-message-response',
-          responseId: data.requestId,
-          response: {
-            data: []
-          }
-        })
+      const prevAlwaysDedupe = rc.alwaysDedupe
+      const alwaysDedupe = arr[5].value
+      rc.alwaysDedupe = alwaysDedupe
+      if (!prevAlwaysDedupe && rc.alwaysDedupe) {
+        onTurnOnAlwaysDedup()
       }
-      const now = Date.now()
-      window.postMessage({
-        type: 'rc-transferring-data',
-        transferringData: true
-      }, '*')
-      let contacts = await getContacts(page)
-      let nextPage = ((contacts.count || 0) - page * pageSize > 0) || contacts.hasMore
-        ? page + 1
-        : null
-      const no2 = Date.now()
-      console.debug(no2 - now)
-      window.postMessage({
-        type: 'rc-transferring-data',
-        transferringData: false
-      }, '*')
-      rc.postMessage({
-        type: 'rc-post-message-response',
-        responseId: data.requestId,
-        response: {
-          data: contacts.result,
-          nextPage,
-          syncTimeStamp: rc.syncTimeStamp
-        }
-      })
+      ls.set('rc-alwaysDedupe', rc.alwaysDedupe)
     } else if (path === '/contacts/search') {
-      if (!rc.local.accessToken) {
-        return showAuthBtn()
-      }
       let contacts = []
       let keyword = _.get(data, 'body.searchString')
-      if (keyword) {
-        contacts = await search(keyword)
+      if (keyword && keyword.length < 2) {
+        contacts = []
+      } else if (keyword) {
+        contacts = await debounceSearchContact(keyword)
       }
       rc.postMessage({
         type: 'rc-post-message-response',
@@ -531,11 +474,9 @@ export async function thirdPartyServiceConfig (serviceName) {
         }
       })
     } else if (path === '/contacts/match') {
-      if (!rc.local.accessToken) {
-        return showAuthBtn()
-      }
       let phoneNumbers = _.get(data, 'body.phoneNumbers') || []
-      let res = await match(phoneNumbers)
+      console.log('match search', phoneNumbers)
+      let res = await searchContactByNumbers(phoneNumbers)
       rc.postMessage({
         type: 'rc-post-message-response',
         responseId: data.requestId,
@@ -620,30 +561,18 @@ export async function initThirdParty () {
   rc.logSMSAsCustomEvent = await ls.get('rc-logSMSAsCustomEvent') || false
   rc.filterSMSThread = await ls.get('rc-filterSMSThread') || false
   rc.autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
-  let accessToken = await ls.get('accessToken') || null
+  rc.alwaysDedupe = await ls.get('rc-alwaysDedupe') || false
   rc.countryCode = await ls.get('rc-country-code') || undefined
   const syncTimeStamp = await ls.get('rc-sync-timestamp')
   if (syncTimeStamp) {
     rc.syncTimeStamp = syncTimeStamp
   }
   console.log('rc.countryCode:', rc.countryCode)
-  if (accessToken) {
-    rc.local = {
-      accessToken
-    }
-  }
-
-  if (rc.local.accessToken) {
-    notifyRCAuthed()
-  }
-
   upgrade()
   onMeetingPanelOpen()
   initMeetingSelect()
-  initReact()
+  // initReact()
   initInner()
   initInnerCallLog()
-  initSyncContactsSelect()
-  const db = await getByPage(1, 1)
-  resyncCheck(db && db.count)
+  // initSyncContactsSelect()
 }

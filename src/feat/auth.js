@@ -17,14 +17,6 @@ export function showAuthBtn () {
   }, '*')
 }
 
-export function doAuth () {
-  if (rc.local.accessToken) {
-    return
-  }
-  notifyRCAuthed()
-  rc.updateToken('authed')
-}
-
 export function notifyRCAuthed (authorized = true) {
   rc.postMessage({
     type: 'rc-adapter-update-authorization-status',

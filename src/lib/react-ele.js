@@ -7,7 +7,7 @@ import { Modal, Button, notification } from 'antd'
 import { SyncOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { fetchAllContacts, notifyReSyncContacts } from '../feat/contacts'
 import { doAuth } from '../feat/auth'
-import AutoSync from './auto-resync'
+// import AutoSync from './auto-resync'
 import getCallResultList from '../feat/get-call-result-list.js'
 import './antd.less'
 import 'antd/dist/antd.less'
@@ -73,7 +73,6 @@ function showSyncMenu () {
         >
           Cancel
         </Button>
-        <AutoSync />
       </div>
     </div>
   )

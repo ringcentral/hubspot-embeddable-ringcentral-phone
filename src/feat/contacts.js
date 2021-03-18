@@ -7,9 +7,6 @@ import {
   getAllCompany, formatCompanyContact
 } from './company'
 import {
-  showAuthBtn
-} from './auth'
-import {
   popup,
   createElementFromHTML,
   formatPhone,
@@ -254,10 +251,6 @@ export async function getContact (
 }
 
 export async function fetchAllContacts (_getRecent, showModal = true) {
-  if (!rc.local.accessToken) {
-    showAuthBtn()
-    return
-  }
   if (rc.isFetchingContacts) {
     return
   }
@@ -345,10 +338,6 @@ export const getContacts = async (page) => {
   let final = {
     result: [],
     hasMore: false
-  }
-  if (!rc.local.accessToken) {
-    showAuthBtn()
-    return final
   }
   let cached = await getByPage(page).catch(e => console.log(e.stack))
   if (cached && cached.result && cached.result.length) {

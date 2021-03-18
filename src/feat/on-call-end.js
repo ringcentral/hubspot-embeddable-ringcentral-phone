@@ -3,26 +3,19 @@
  */
 
 import _ from 'lodash'
-import { rc } from './common'
-import {
-  match, insert
-} from 'ringcentral-embeddable-extension-common/src/common/db'
 import {
   createElementFromHTML, checkPhoneNumber, notify
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { addContact } from './add-contact'
-import { showAuthBtn, formatContacts, notifyReSyncContacts, getOwnerId as getVid } from './contacts'
+import { getOwnerId as getVid } from './contacts'
 import getOwnerId from './get-owner-id'
+import { searchContact } from './search-contacts'
 
 export default async (call) => {
-  if (!rc.local.accessToken) {
-    showAuthBtn()
-    return
-  }
   const number = call.direction === 'Inbound'
     ? call.from
     : call.to
-  let res = await match([number], 1)
+  let res = await searchContact(number)
   if (_.isEmpty(res)) {
     showContactFormPanel(number)
   }
@@ -76,12 +69,6 @@ async function onSubmit (res) {
   if (!r || !r.vid) {
     notify('Create contact failed')
   } else {
-    if (r && r.vid) {
-      await insert(
-        formatContacts([r])
-      )
-      notifyReSyncContacts()
-    }
     notify('Contact created')
   }
 }

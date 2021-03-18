@@ -47,17 +47,17 @@ export async function createSMS (opts, objectId) {
   return res
 }
 
-window.aa = (tar) => {
-  const defaul = {
-    mds: [
-      {
-        content: '**jkl** [attachment: rc-30-30.png](https://ringcentral.github.io/ringcentral-media-reader/?media=https%3A%2F%2Fmedia.ringcentral.com%2Frestapi%2Fv1.0%2Faccount%2F37439510%2Fextension%2F1903785020%2Fmessage-store%2F1450446757020%2Fcontent%2F37051121020) - from **+16504377931(Drake Zhao)** to **+17206770897**',
-        time: 'Jan 20, 2021 09:54'
-      }
-    ]
-  }
-  createSMS(tar || defaul, 'test@test25.com')
-}
+// window.aa = (tar) => {
+//   const defaul = {
+//     mds: [
+//       {
+//         content: '**jkl** [attachment: rc-30-30.png](https://ringcentral.github.io/ringcentral-media-reader/?media=https%3A%2F%2Fmedia.ringcentral.com%2Frestapi%2Fv1.0%2Faccount%2F37439510%2Fextension%2F1903785020%2Fmessage-store%2F1450446757020%2Fcontent%2F37051121020) - from **+16504377931(Drake Zhao)** to **+17206770897**',
+//         time: 'Jan 20, 2021 09:54'
+//       }
+//     ]
+//   }
+//   createSMS(tar || defaul, 'test@test25.com')
+// }
 
 export function onSMSlogEnabled () {
   const hsAppUrl = 'https://ecosystem.hubspot.com/marketplace/apps/sales/calling/ringcentral-202602'

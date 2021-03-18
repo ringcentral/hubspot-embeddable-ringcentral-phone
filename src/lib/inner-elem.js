@@ -7,15 +7,12 @@ import { Tooltip, Input, notification } from 'antd'
 import { EditOutlined, LeftCircleOutlined, SyncOutlined } from '@ant-design/icons'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 // prefix telephonySessionId
-import { autoLogPrefix, rc, getFullNumber } from '../feat/common'
+import { autoLogPrefix, getFullNumber } from '../feat/common'
 import ContactForm from './add-contact-form'
-import { getOwnerId as getVid, formatContacts, notifyReSyncContacts } from '../feat/contacts'
+import { getOwnerId as getVid } from '../feat/contacts'
 import getOwnerId from '../feat/get-owner-id'
 import { addContact } from '../feat/add-contact'
-import { showAuthBtn } from '../feat/auth'
-import {
-  insert, match
-} from 'ringcentral-embeddable-extension-common/src/common/db'
+import { searchContact } from '../feat/search-contacts'
 import _ from 'lodash'
 import './inner.styl'
 
@@ -83,12 +80,6 @@ export default () => {
         message: 'Create contact failed'
       })
     } else {
-      if (r && r.vid) {
-        await insert(
-          formatContacts([r])
-        )
-        notifyReSyncContacts()
-      }
       notification.info({
         message: 'Contact created'
       })
@@ -135,10 +126,6 @@ export default () => {
       saveNote(id)
       autoHide(10)
     } else if (type === 'rc-show-add-contact-panel') {
-      if (!rc.local.accessToken) {
-        showAuthBtn()
-        return
-      }
       const { call = {} } = e.data
       let phone = getFullNumber(_.get(
         e.data,
@@ -153,7 +140,7 @@ export default () => {
         ? _.get(call, 'from.name')
         : _.get(call, 'to.name')
       const [firstname, lastname] = (name || '').replace(/\s+/, '\x01').split('\x01')
-      let res = await match([phone])
+      let res = await searchContact(phone)
       if (_.isEmpty(res)) {
         setData({
           phone,

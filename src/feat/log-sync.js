@@ -1,13 +1,9 @@
 /**
  * call/message log sync feature
  */
-
+import { Modal } from 'antd'
 import { thirdPartyConfigs, ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-import { getContactInfo } from './log-sync-form'
 import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
-import {
-  showAuthBtn
-} from './auth'
 import _ from 'lodash'
 import {
   notify,
@@ -17,9 +13,6 @@ import {
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
 import { getFullNumber, commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from './common'
 import { getDeals } from './deal'
-import {
-  match
-} from 'ringcentral-embeddable-extension-common/src/common/db'
 import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
@@ -27,10 +20,10 @@ import dayjs from 'dayjs'
 import updateLog from './update-call-log'
 import { createSMS } from './create-custom-sms-event'
 import { nanoid } from 'nanoid/non-secure'
+import { searchContactByNumbers } from './search-contacts'
 
 const {
   showCallLogSyncForm,
-  serviceName,
   apiServerHS
 } = thirdPartyConfigs
 
@@ -145,17 +138,13 @@ export async function syncCallLogToThirdParty (body) {
     // todo: support voicemail
     return
   }
-  if (!rc.local.accessToken) {
-    return isManuallySync ? showAuthBtn() : null
-  }
   const id = buildId(body)
   if (showCallLogSyncForm && isManuallySync) {
     body = checkMerge(body)
     console.log('bbbb', body)
-    let contactRelated = await getContactInfo(body, serviceName)
+    let contactRelated = await getSyncContacts(body)
     if (
-      !contactRelated ||
-      (!contactRelated.froms && !contactRelated.tos)
+      !contactRelated.length
     ) {
       const b = copy(body)
       b.type = 'rc-show-add-contact-panel'
@@ -183,7 +172,7 @@ export async function syncCallLogToThirdParty (body) {
   }
 }
 
-async function getSyncContacts (body) {
+export async function getSyncContacts (body) {
   // let objs = _.filter(
   //   [
   //     ..._.get(body, 'call.toMatches') || [],
@@ -197,19 +186,20 @@ async function getSyncContacts (body) {
   // }
   let all = []
   if (body.call) {
-    let nf = getFullNumber(_.get(body, 'to')) ||
+    const direction = _.get(body, 'call.direction')
+    let nf = direction === 'Outbound'
+      ? getFullNumber(_.get(body, 'to')) ||
       getFullNumber(_.get(body, 'call.to'))
-    let nt = getFullNumber(_.get(body, 'from')) ||
+      : getFullNumber(_.get(body, 'from')) ||
       getFullNumber(_.get(body.call, 'from'))
-    all = [nt, nf]
+    all = [nf]
   } else {
     all = [
-      getFullNumber(_.get(body, 'conversation.self')),
       ...body.conversation.correspondents.map(d => getFullNumber(d))
     ]
   }
   all = all.map(s => formatPhone(s))
-  let contacts = await match(all)
+  let contacts = await searchContactByNumbers(all)
   let arr = Object.keys(contacts).reduce((p, k) => {
     return [
       ...p,
@@ -267,8 +257,6 @@ export async function getCompanyId (contactId) {
 
 /**
  * sync call log action
- * todo: need you find out how to do the sync
- * you may check the CRM site to find the right api to do it
  * @param {*} body
  * @param {*} formData
  */
@@ -510,7 +498,8 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       contactId
     }]
   }
-  if (!isManuallySync) {
+  if (!isManuallySync || window.rc.alwaysDedupe) {
+    console.debug('dedup')
     mainBody = await filterLoggered(mainBody, email)
   }
   const descFormatted = (desc || '')
@@ -651,16 +640,15 @@ export async function findMatchCallLog (data) {
   return x
 }
 
-/**
-Contact to engagement 9
-get
-/crm-associations/v1/associations/:objectId/HUBSPOT_DEFINED/:definitionId?limit=100&offset=0
-{
-  "results": [
-    259674,
-    259727
-  ],
-  "hasMore": false,
-  "offset": 259727
+export function onTurnOnAlwaysDedup () {
+  const content = (
+    <div>
+      <p>When turn on "Always avoid duplicate log even when manually log", even when sync call/sms log manually, app would check local storage if this call/sms already logged, if already logged, will skip.</p>
+      <p>If a call/sms logged only stores in your current browser and will not be updated even you delete the call log.</p>
+    </div>
+  )
+  Modal.info({
+    title: 'About "Always avoid duplicate log even when manually log"',
+    content
+  })
 }
- */

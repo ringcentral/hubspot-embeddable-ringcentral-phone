@@ -5,9 +5,6 @@
 import { useEffect, useState } from 'react'
 import { Input, Form, Button, Spin, Select } from 'antd'
 import { doSync } from '../feat/log-sync'
-import {
-  match
-} from 'ringcentral-embeddable-extension-common/src/common/db'
 import _ from 'lodash'
 import dayjs from 'dayjs'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
@@ -82,6 +79,9 @@ export default function AddContactForm (props) {
       fromNames = _.get(body, 'call.fromMatches') || []
       toNames = _.get(body, 'call.toMatches') || []
       time = dayjs(body.call.startTime).format()
+      fromNames = fromNames
+        .filter(d => d.type === serviceName)
+        .map(d => d.name)
     } else if (
       _.get(body, 'conversation.type') === 'SMS' ||
       _.get(body, 'conversation.type') === 'VoiceMail'
@@ -92,8 +92,8 @@ export default function AddContactForm (props) {
       toNames = _.get(body, 'correspondentEntity')
       toNames = toNames ? [toNames] : []
       let selfNumber = getFullNumber(_.get(body, 'conversation.self'))
-      fromNames = await match([selfNumber])
-      fromNames = fromNames[selfNumber] || []
+      fromNames = _.get(body, 'conversation.self.name') || selfNumber
+      fromNames = fromNames ? [fromNames] : []
       time = _.get(body, 'conversation.date')
       if (!toNames.length && !fromNames.length) {
         return
@@ -103,9 +103,6 @@ export default function AddContactForm (props) {
       notify(`Do not support ${_.get(body, 'conversation.type')} yet`)
       return
     }
-    fromNames = fromNames
-      .filter(d => d.type === serviceName)
-      .map(d => d.name)
     fromNumber = formatPhone(
       getFullNumber(
         _.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self')

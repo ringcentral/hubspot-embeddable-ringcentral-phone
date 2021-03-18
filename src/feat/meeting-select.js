@@ -4,11 +4,10 @@
 
 import { Component } from 'react'
 import { AutoComplete, Select, Spin, Button } from 'antd'
-import {
-  search
-} from 'ringcentral-embeddable-extension-common/src/common/db'
 import dayjs from 'dayjs'
 import _ from 'lodash'
+import { searchContact } from './search-contacts'
+
 /**
  * sync meeting from rc to hs
  */
@@ -17,11 +16,8 @@ import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-wi
 
 import getOwnerId from './get-owner-id'
 import { getCompanyId, notifySyncSuccess } from './log-sync'
-import { commonFetchOptions, getPortalId, getEmail, rc } from './common'
+import { commonFetchOptions, getPortalId, getEmail } from './common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-import {
-  showAuthBtn
-} from './auth'
 
 let {
   apiServerHS
@@ -105,10 +101,6 @@ export default class App extends Component {
   componentDidMount () {
     window.addEventListener('message', e => {
       if (e && e.data && e.data.path === '/meetingLoggerForward') {
-        if (!rc.local.accessToken) {
-          showAuthBtn()
-          return
-        }
         this.setState({
           data: e.data,
           show: true
@@ -178,7 +170,7 @@ export default class App extends Component {
   }
 
   fetch = _.debounce(async (v) => {
-    const res = await search(v)
+    const res = await searchContact(v)
     this.setState({
       options: res
     })

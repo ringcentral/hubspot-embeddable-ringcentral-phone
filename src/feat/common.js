@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { jsonHeader, handleErr } from 'ringcentral-embeddable-extension-common/src/common/fetch'
-import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { sendMsgToRCIframe, formatPhone } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 
 export const callResultListKey = 'rc-call-result-list'
@@ -26,23 +25,12 @@ export function getPortalId () {
 window.rc = {
   logSMSType: 'CALL',
   local: {
-    accessToken: null
+    accessToken: true
   },
   postMessage: sendMsgToRCIframe,
   currentUserId: '',
   rcLogined: false,
-  cacheKey: 'contacts' + '_' + '',
-  updateToken: async (newToken, type = 'accessToken') => {
-    if (!newToken) {
-      await ls.remove(type)
-      rc.local = {
-        accessToken: null
-      }
-    } else {
-      rc.local[type] = newToken
-      await ls.set(type, newToken)
-    }
-  }
+  cacheKey: 'contacts' + '_' + ''
 }
 export const rc = window.rc
 export const commonFetchOptions = (headers) => ({
