@@ -47,6 +47,7 @@ import initInnerCallLog from './lib/call-log-entry.js'
 import { onTriggerLogin, onLoginCallback } from './feat/handle-login'
 import { onSMSlogEnabled } from './feat/create-custom-sms-event'
 import { searchContactByNumbers, debounceSearchContact } from './feat/search-contacts'
+import initSyncContactsSelect from './lib/sync-contacts-select-entry.js'
 
 // import run from './feat/add-contacts'
 // import run1 from './feat/add-companies'
@@ -396,7 +397,7 @@ export async function thirdPartyServiceConfig (serviceName) {
     ) {
       rc.postMessage({
         type: 'rc-adapter-trigger-call-logger-match',
-        sessionIds
+        sessionIds: []
       })
     } else if (
       type === 'rc-active-call-notify'
@@ -574,5 +575,5 @@ export async function initThirdParty () {
   // initReact()
   initInner()
   initInnerCallLog()
-  // initSyncContactsSelect()
+  initSyncContactsSelect()
 }

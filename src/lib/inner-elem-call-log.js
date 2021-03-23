@@ -8,6 +8,7 @@ import CallLogForm from './call-log-form'
 import copy from 'json-deep-copy'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { callResultListKey } from '../feat/common'
+import getCallResultList from '../feat/get-call-result-list.js'
 
 export default () => {
   const [forms, setStateOri] = useState([])
@@ -42,12 +43,14 @@ export default () => {
       add(callLogProps)
     }
   }
-  async function initCallResultList () {
-    const arr = await ls.get(callResultListKey)
-    setCallResultList(arr)
+  async function init () {
+    const callResultList = await getCallResultList()
+    console.log('callResultList', callResultList)
+    await ls.set(callResultListKey, callResultList)
+    setCallResultList(callResultList)
   }
   useEffect(() => {
-    initCallResultList()
+    init()
     window.addEventListener('message', onEvent)
     return () => {
       window.removeEventListener('message', onEvent)
