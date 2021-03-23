@@ -18,7 +18,7 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 
 ## Youtube video
 
-[https://youtu.be/ajbipkPd_4Q](https://youtu.be/ajbipkPd_4Q)
+[https://youtu.be/OpXYHIGISaI](https://youtu.be/OpXYHIGISaI)
 
 ## Screenshots
 

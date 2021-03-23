@@ -16,7 +16,7 @@ The RingCentral Hubspot integration is built on top of [RingCentral Embeddable](
 
 ## Demonstration
 
-<iframe src="https://www.youtube.com/embed/ajbipkPd_4Q?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/OpXYHIGISaI?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <a class="btn btn-primary" href="install/">Install Now &raquo;</a>
 
