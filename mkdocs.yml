@@ -6,20 +6,20 @@ repo_url: https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone
 
 plugins:
   - search
-  - bootstrap-tables
+#   - bootstrap-tables
 
 theme:
-  name: moonstone
-  custom_dir: 'theme/'
-  fluid_layout: False
+  name: readthedocs
+#   custom_dir: 'theme/'
+#   fluid_layout: False
 
-markdown_extensions:
-  - markdown.extensions.admonition
-  - pymdownx.details
-  - pymdownx.keys
-  - pymdownx.superfences
-  - codehilite:
-      linenums: "None"
+# markdown_extensions:
+#   - markdown.extensions.admonition
+#   - pymdownx.details
+#   - pymdownx.keys
+#   - pymdownx.superfences
+#   - codehilite:
+#       linenums: "None"
 
 nav:
   - Home: index.md
