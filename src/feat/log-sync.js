@@ -528,7 +528,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     let res = null
     let portalId = getPortalId()
     if (uit.isSMS && rc.logSMSAsCustomEvent) {
-      res = await createSMS(uit, contact.emails[0])
+      res = await createSMS(uit, contact.id)
     }
     if (!res) {
       let companyId = isCompany
