@@ -21,6 +21,7 @@ import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-wi
 import { jsonHeader } from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import { getCSRFToken, getIds, rc } from './feat/common'
 import { getDeals } from './feat/deal'
+import './feat/on-unload'
 import {
   getCompanyById
 } from './feat/company'
@@ -373,7 +374,7 @@ export async function thirdPartyServiceConfig (serviceName) {
       return
     }
     console.debug(data)
-    let { type, loggedIn, path, call, requestId, sessionIds, callbackUri } = data
+    let { type, loggedIn, path, call, requestId, sessionIds, callbackUri, telephonyStatus } = data
     if (callbackUri) {
       return onLoginCallback(callbackUri)
     }
@@ -431,10 +432,13 @@ export async function thirdPartyServiceConfig (serviceName) {
       window.postMessage(dd, '*')
     } else if (type === 'UI_ADDON_INTEGRATIONS_DIRECTORY_APP_LOADED') {
       onMeetingPanelOpen()
+    } else if (type === 'rc-adapter-syncPresence') {
+      if (telephonyStatus === 'Ringing') {
+        window.rc.calling = true
+      } else if (telephonyStatus === 'NoCall') {
+        window.rc.calling = false
+      }
     }
-    // else if (type === 'rc-call-end-notify') {
-    //   hideContactInfoPanel()
-    // }
     // if (type === 'rc-inbound-message-notify') {
     //   return console.log('rc-inbound-message-notify:', data.message, data)
     // } else if (type === 'rc-message-updated-notify') {
