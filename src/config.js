@@ -166,7 +166,7 @@ export const insertClickToCallButton = [
     parentsToInsertButton: [
       {
         getElem: () => {
-          let p = document.querySelector('[data-unit-test="highlightSubtitle"]')
+          let p = document.querySelector('[data-unit-test="highlightSubtitle"]') || document.querySelector('[data-selenium-test="contact-highlight-details"]')
           return p
             ? p.parentNode.parentNode : null
         },
@@ -215,7 +215,7 @@ export const insertClickToCallButton = [
     parentsToInsertButton: [
       {
         getElem: () => {
-          let p = document.querySelector('[class*="CompanyContactEditableTitle"]')
+          let p = document.querySelector('[data-selenium-test="company-highlight-details"] div') || document.querySelector('[class*="CompanyContactEditableTitle"]')
           return p
             ? p.parentNode.parentNode.parentNode : null
         },
