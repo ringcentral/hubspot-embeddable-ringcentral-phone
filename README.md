@@ -7,5 +7,5 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 
 ## About the Chrome extension take down
 
-This Chrome Extension for HubSpot has been pulled as we work together with HubSpot to resolve issues with the Chrome Extension. We hope to resolve these issues by the end of the month, where the Chrome Extension will once again be available on GitHub. You can still install and use the [RingCentral integration from the HubSpot Marketplace](https://ecosystem.hubspot.com/marketplace/apps/sales/calling/ringcentral-202602).
+This Chrome Extension for HubSpot has been pulled as we work together with HubSpot to resolve issues with the Chrome Extension. We hope to resolve these issues before 15 May, where the Chrome Extension will once again be available on GitHub. You can still install and use the [RingCentral integration from the HubSpot Marketplace](https://ecosystem.hubspot.com/marketplace/apps/sales/calling/ringcentral-202602).
 
