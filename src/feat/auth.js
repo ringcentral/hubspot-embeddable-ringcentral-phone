@@ -2,12 +2,12 @@
  * auth related feature
  */
 
-import { rc } from './common'
+import { rc } from '../common/common'
 
 let tokenHandler
 
 export function hideAuthBtn () {
-  let dom = document.querySelector('.rc-auth-button-wrap')
+  const dom = document.querySelector('.rc-auth-button-wrap')
   dom && dom.classList.add('rc-hide-to-side')
 }
 

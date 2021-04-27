@@ -1,13 +1,13 @@
 import { jsonHeader } from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { getPortalId, getCSRFToken } from './common'
+import { getPortalId, getCSRFToken } from '../common/common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import _ from 'lodash'
 import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 
-let {
+const {
   serviceName,
   apiServerHS
 } = thirdPartyConfigs
@@ -55,22 +55,22 @@ async function getCompany (
   id = '',
   offset
 ) {
-  let count = 100
-  let vidOffset = offset || (page - 1) * count
-  let portalId = getPortalId()
-  let url = `${apiServerHS}/contacts/search/v1/search/companies/v2?portalId=${portalId}&clienttimeout=60000`
-  let filterGroups = id
+  const count = 100
+  const vidOffset = offset || (page - 1) * count
+  const portalId = getPortalId()
+  const url = `${apiServerHS}/contacts/search/v1/search/companies/v2?portalId=${portalId}&clienttimeout=60000`
+  const filterGroups = id
     ? [
-      {
-        filters: [{
-          operator: 'EQ',
-          property: 'companyId',
-          value: id.toString()
-        }]
-      }
-    ]
+        {
+          filters: [{
+            operator: 'EQ',
+            property: 'companyId',
+            value: id.toString()
+          }]
+        }
+      ]
     : []
-  let data = {
+  const data = {
     offset: vidOffset,
     count,
     filterGroups,
@@ -86,13 +86,13 @@ async function getCompany (
     ],
     query: ''
   }
-  let headers = {
+  const headers = {
     ...jsonHeader,
     Accept: 'application/json, text/javascript, */*; q=0.01',
     'X-HS-Referer': window.location.href,
     'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
   }
-  let res = await fetchBg(url, {
+  const res = await fetchBg(url, {
     body: data,
     headers,
     method: 'post'
@@ -105,21 +105,21 @@ async function getCompany (
     return {
       companies: [],
       'has-more': false,
-      'offset': vidOffset
+      offset: vidOffset
     }
   }
 }
 
 export function formatCompanyContact (companyInfo) {
-  let phoneNumber = _.get(
+  const phoneNumber = _.get(
     companyInfo,
     'properties.phone.value'
   )
-  let phoneNumbers = phoneNumber
+  const phoneNumbers = phoneNumber
     ? [{
-      phoneNumber,
-      phoneType: 'directPhone'
-    }]
+        phoneNumber,
+        phoneType: 'directPhone'
+      }]
     : []
   let name = _.get(companyInfo, 'properties.name.value') || 'no name'
   name = `[Company] ${name}`
@@ -140,7 +140,7 @@ export function formatCompanyContact (companyInfo) {
 }
 
 export async function getCompanyById (id) {
-  let comps = await getCompany(1, id)
+  const comps = await getCompany(1, id)
   if (comps && comps.companies && comps.companies.length) {
     return formatCompanyContact(comps.companies[0])
   }

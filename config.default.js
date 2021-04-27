@@ -1,6 +1,6 @@
 const os = require('os')
 const extend = require('recursive-assign')
-let config = {
+const config = {
 
   // dev related
   devCPUCount: os.cpus().length,
@@ -25,10 +25,8 @@ let config = {
 
   // for third party related
   thirdPartyConfigs: {
-    appServerHS: 'https://app.hubspot.com',
-    apiServerHS: 'https://api.hubspot.com',
     showCallLogSyncForm: true,
-    serviceName: 'Hubspot',
+    serviceName: 'RingCentral for HubSpot Chrome extension(Community Edition)',
     pageSize: 200000,
     dbSchema: {
       portalId: {

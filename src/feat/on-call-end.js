@@ -22,14 +22,14 @@ export default async (call) => {
   const number = call.direction === 'Inbound'
     ? call.from
     : call.to
-  let res = await match([number], 1)
+  const res = await match([number], 1)
   if (_.isEmpty(res)) {
     showContactFormPanel(number)
   }
 }
 
 function validateEmail (email) {
-  var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test(String(email).toLowerCase())
 }
 
@@ -91,8 +91,8 @@ function onCancel () {
 }
 
 function showContactFormPanel (number, name = '') {
-  let [firstname = '', lastname = ''] = name.split(' ')
-  let dom = createElementFromHTML(`
+  const [firstname = '', lastname = ''] = name.split(' ')
+  const dom = createElementFromHTML(`
     <form class="rc-sync-form animate" id="rc-contact-form">
       <div class="rc-sync-inner rc-pd2">
         <h4 class="rc-sync-title rc-pd1b">
@@ -153,7 +153,7 @@ function showContactFormPanel (number, name = '') {
   //   e.preventDefault()
   //   onSubmit()
   // }
-  let old = document.querySelector('.rc-sync-form')
+  const old = document.querySelector('.rc-sync-form')
   old && old.remove()
   document.getElementById('Hubspot-rc').appendChild(dom)
   setTimeout(() => {

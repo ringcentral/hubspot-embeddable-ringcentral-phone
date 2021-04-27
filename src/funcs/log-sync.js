@@ -20,13 +20,12 @@ import { getDeals } from './deal'
 import {
   match
 } from 'ringcentral-embeddable-extension-common/src/common/db'
-import getOwnerId from './get-owner-id'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
-import updateLog from './update-call-log'
-import { createSMS } from './create-custom-sms-event'
 import { nanoid } from 'nanoid/non-secure'
+import { createCallLog, updateCallLogStatus, checkCallLog } from '../common/log-call'
+import logSMS from '../common/log-sms'
 
 const {
   showCallLogSyncForm,
@@ -396,11 +395,6 @@ function buildKey (id, cid, email) {
   return `rc-log-${email}-${cid}-${id}`
 }
 
-async function saveLog (id, cid, email, engageId) {
-  const key = buildKey(id, cid, email)
-  await ls.set(key, engageId)
-}
-
 function getCallInfo (contact, toNumber, fromNumber) {
   const cnums = contact.phoneNumbers.map(n => formatPhone(n.phoneNumber))
   const fn = formatPhone(fromNumber)
@@ -464,8 +458,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (!isManuallySync) {
     desc = await ls.get(sessid) || ''
   }
-  const type = isCompany ? 'COMPANY' : 'CONTACT'
-  const ownerId = await getOwnerId(contact.id, type)
+  const { ownerId } = window.rc
   if (!ownerId) {
     return
   }
@@ -526,14 +519,13 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   })
   for (const uit of bodyAll) {
     let res = null
-    const portalId = getPortalId()
-    if (uit.isSMS && rc.logSMSAsCustomEvent) {
-      res = await createSMS(uit, contact.id)
+    if (uit.isSMS) {
+      res = await logSMS(uit, contact.id)
     }
     if (!res) {
-      const companyId = isCompany
-        ? contactId
-        : await getCompanyId(contactId)
+      // const companyId = isCompany
+      //   ? contactId
+      //   : await getCompanyId(contactId)
       const data = {
         engagement: {
           active: true,
@@ -543,7 +535,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
         },
         associations: {
           contactIds,
-          companyIds: companyId ? [Number(companyId)] : [],
+          companyIds: [],
           dealIds,
           ownerIds: []
         },
@@ -559,26 +551,25 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
           ...getCallInfo(contact, toNumber, fromNumber)
         }
       }
-
-      const url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
-      res = await fetchBg(url, {
-        method: 'post',
-        body: data,
-        headers: {
-          ...commonFetchOptions().headers,
-          'X-Source': 'CRM_UI',
-          'X-SourceId': email
-        }
+      res = await createCallLog({
+        data,
+        isManuallySync,
+        id: uit.id
       })
     } else {
       res = {
-        engagement: copy(res)
+        result: {
+          engagement: copy(res)
+        }
       }
     }
     // let res = await fetch.post(url, data, commonFetchOptions())
-    if (res && res.engagement) {
-      await saveLog(uit.id, contactId, email, res.engagement.id)
-      await updateLog(res.engagement.id, formData.callResult)
+    const engagement = _.get(
+      res,
+      'result.engagement'
+    )
+    if (engagement) {
+      await updateCallLogStatus(formData.callResult, engagement.id)
       notifySyncSuccess({
         id: contactId,
         logType,
@@ -599,54 +590,20 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
 }
 
 export async function findMatchCallLog (data) {
-  const portalId = getPortalId()
-  const url = `${apiServerHS}/contacts/search/v1/search/engagements?portalId=${portalId}&clienttimeout=14000`
-  const body = {
-    query: '',
-    count: 100,
-    offset: 0,
-    filterGroups: [
-      {
-        filters: [
-          {
-            property: 'engagement.createdAt',
-            operator: 'HAS_PROPERTY'
-          }
-        ]
-      }
-    ],
-    sorts: [
-      {
-        property: 'engagement.createdAt',
-        order: 'DESC'
-      }
-    ],
-    properties: []
-  }
   const sessionIds = _.get(data, 'body.sessionIds') || _.get(data, 'body.conversationLogIds') || []
-  const res = await fetchBg(url, {
-    method: 'post',
-    body,
-    headers: {
-      ...commonFetchOptions().headers
-    }
-  })
-  if (!res || !res.engagements) {
-    return
+  if (!sessionIds.length) {
+    return {}
   }
-  const x = res.engagements.reduce((prev, en) => {
-    const sid = _.get(en, 'metadata.externalId')
-    const id = _.get(en, 'engagement.id')
-    const note = _.get(en, 'engagement.bodyPreview')
-    if (!sessionIds.includes(sid)) {
-      return prev
-    }
-    prev[sid] = prev[sid] || []
-    prev[sid].push({
-      id,
-      note
-    })
-    return prev
-  }, {})
-  return x
+  let r = await checkCallLog(sessionIds)
+  if (r && r.result) {
+    r = r.result.reduce((p, d) => {
+      const sid = d.sessionId
+      prev[sid] = prev[sid] || []
+      prev[sid].push({
+        id: d.id,
+        note: ''
+      })
+    }, {})
+  }
+  return r
 }

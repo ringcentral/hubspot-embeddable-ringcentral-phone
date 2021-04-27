@@ -15,9 +15,9 @@ import {
   notify, formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import CountDown from './countdown'
-import { getFullNumber } from '../feat/common'
+import { getFullNumber } from '../common/common'
 
-let {
+const {
   serviceName
 } = thirdPartyConfigs
 
@@ -72,8 +72,7 @@ export default function AddContactForm (props) {
     let fromNames = []
     let toNames = []
     let time
-    let fromNumber
-    let toNumber
+    // let fromNumber
     // let noContact = () => notify(`No related contact in ${serviceName}`)
     let fromText = 'From'
     let toText = 'To'
@@ -91,7 +90,7 @@ export default function AddContactForm (props) {
       toText = 'Correspondents'
       toNames = _.get(body, 'correspondentEntity')
       toNames = toNames ? [toNames] : []
-      let selfNumber = getFullNumber(_.get(body, 'conversation.self'))
+      const selfNumber = getFullNumber(_.get(body, 'conversation.self'))
       fromNames = await match([selfNumber])
       fromNames = fromNames[selfNumber] || []
       time = _.get(body, 'conversation.date')
@@ -106,7 +105,7 @@ export default function AddContactForm (props) {
     fromNames = fromNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    fromNumber = formatPhone(
+    const fromNumber = formatPhone(
       getFullNumber(
         _.get(body, 'call.from')) || getFullNumber(_.get(body, 'conversation.self')
       )
@@ -114,7 +113,7 @@ export default function AddContactForm (props) {
     toNames = toNames
       .filter(d => d.type === serviceName)
       .map(d => d.name)
-    toNumber = formatPhone(getFullNumber(_.get(body, 'call.to')))
+    const toNumber = formatPhone(getFullNumber(_.get(body, 'call.to')))
     setLoding(false)
     setState({
       fromNames,
@@ -188,7 +187,7 @@ export default function AddContactForm (props) {
                   >
                     <Input.TextArea rows={2} />
                   </FormItem>
-                )
+                  )
                 : null
             }
             {
@@ -213,7 +212,7 @@ export default function AddContactForm (props) {
                       }
                     </Select>
                   </FormItem>
-                )
+                  )
                 : null
             }
             <Button type='primary' htmlType='submit'>

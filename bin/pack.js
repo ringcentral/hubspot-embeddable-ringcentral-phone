@@ -29,12 +29,12 @@ const config = [
 
 async function run () {
   rm('-rf', '*.zip')
-  for (let v of config) {
-    let cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
+  for (const v of config) {
+    const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
     exec(cmd)
     cp('dist/content.js', 'content.js.bak.js')
     await replace(options)
-    let cmd1 = `zip -vr ${pack.name}-${v.name}-no-auto-log-sync-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
+    const cmd1 = `zip -vr ${pack.name}-${v.name}-no-auto-log-sync-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
     exec(cmd1)
     cp('content.js.bak.js', 'dist/content.js')
     rm('content.js.bak.js')

@@ -5,7 +5,7 @@
 import { ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import { rc, getPortalId } from './common'
 
-let {
+const {
   clientID,
   appServer,
   authServer
@@ -19,7 +19,7 @@ export function onTriggerLogin (data) {
   window.open(`${appServer}/restapi/oauth/authorize?redirect_uri=${authUrl}&client_id=${clientID}&response_type=code&state=pid:${pid}&brand_id=&display=&prompt=`, '_blank', params)
 }
 
-export function onLoginCallback (callbackUri) {
+export function onLoginCallback ({ callbackUri }) {
   rc.postMessage({
     type: 'rc-adapter-authorization-code',
     callbackUri

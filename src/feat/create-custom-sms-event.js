@@ -41,7 +41,7 @@ export async function createSMS (opts, objectId) {
     objectId
   }
   const url = `${authServer}/hs/create-sms-event`
-  let res = await fetch.post(url, data, {
+  const res = await fetch.post(url, data, {
     credentials: 'include'
   })
   return res
@@ -66,8 +66,8 @@ export function onSMSlogEnabled () {
     <div>
       <p>To enable logging SMS as RingCentral SMS timeline event, you need:</p>
       <ul>
-        <li>Install RingCentral integration from HubSpot App market, <a target='_blank' href={hsAppUrl}>Install page</a></li>
-        <li>Install RingCentral Chrome extension version ≥ <b>4.5.0</b> (your current RingCentral Chrome extension version is <b>{appVersion}</b>) and relogin RingCentral account, <a target='_blank' href={rcUrl}>Download page</a></li>
+        <li>Install RingCentral integration from HubSpot App market, <a target='_blank' href={hsAppUrl} rel='noreferrer'>Install page</a></li>
+        <li>Install RingCentral Chrome extension version ≥ <b>4.5.0</b> (your current RingCentral Chrome extension version is <b>{appVersion}</b>) and relogin RingCentral account, <a rel='noreferrer' target='_blank' href={rcUrl}>Download page</a></li>
         <li>Make sure your email of RingCentral account is exactly the same as your HubSpot account.</li>
         <li>Then check the RingCentral from activities filter.</li>
       </ul>

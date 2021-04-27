@@ -7,7 +7,7 @@ import _ from 'lodash'
 import CallLogForm from './call-log-form'
 import copy from 'json-deep-copy'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
-import { callResultListKey } from '../feat/common'
+import { callResultListKey } from '../common/common'
 
 export default () => {
   const [forms, setStateOri] = useState([])

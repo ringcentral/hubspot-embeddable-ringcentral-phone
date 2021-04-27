@@ -7,7 +7,7 @@ import { Tooltip, Input, notification } from 'antd'
 import { EditOutlined, LeftCircleOutlined, SyncOutlined } from '@ant-design/icons'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 // prefix telephonySessionId
-import { autoLogPrefix, rc, getFullNumber } from '../feat/common'
+import { autoLogPrefix, rc, getFullNumber } from '../common/common'
 import ContactForm from './add-contact-form'
 import { getOwnerId as getVid, formatContacts, notifyReSyncContacts } from '../feat/contacts'
 import getOwnerId from '../feat/get-owner-id'
@@ -153,7 +153,7 @@ export default () => {
         ? _.get(call, 'from.name')
         : _.get(call, 'to.name')
       const [firstname, lastname] = (name || '').replace(/\s+/, '\x01').split('\x01')
-      let res = await match([phone])
+      const res = await match([phone])
       if (_.isEmpty(res)) {
         setData({
           phone,

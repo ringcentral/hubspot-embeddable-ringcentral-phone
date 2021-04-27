@@ -4,7 +4,7 @@ import { getCSRFToken, getPortalId } from './common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 // import _ from 'lodash'
 
-let {
+const {
   apiServerHS
 } = thirdPartyConfigs
 
@@ -106,13 +106,13 @@ request payload
 export async function addCompany ({
   name, desc
 }) {
-  let portalId = getPortalId()
+  const portalId = getPortalId()
   // const oid = ownerIdGlob || await getUserId()
   // https://api.hubapi.com/contacts/v1/lists/all/contacts/all
   //  let url =`${apiServerHS}/contacts/v1/lists/all/contacts/all?count=${count}&vidOffset=${vidOffset}&property=firstname&property=phone&property=lastname&property=mobilephone&property=company`
 
-  let url = `${apiServerHS}/companies/v2/companies?portalId=${portalId}&clienttimeout=1400`
-  let data = {
+  const url = `${apiServerHS}/companies/v2/companies?portalId=${portalId}&clienttimeout=1400`
+  const data = {
     properties: [
       {
         value: name,
@@ -124,13 +124,13 @@ export async function addCompany ({
       }
     ]
   }
-  let headers = {
+  const headers = {
     ...jsonHeader,
     Accept: 'application/json, text/javascript, */*; q=0.01',
     'X-HS-Referer': window.location.href,
     'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
   }
-  let res = await fetchBg(url, {
+  const res = await fetchBg(url, {
     body: data,
     headers,
     method: 'post'

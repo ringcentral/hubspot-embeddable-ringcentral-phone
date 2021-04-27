@@ -15,7 +15,7 @@ function checkTab (tab) {
     !tab.url.startsWith('https://app.hubspot.com/developer')
 }
 
-let list = [
+const list = [
   /^https:\/\/api\.hubspot\.com.+/
 ]
 if (thirdPartyConfigs.upgradeServer) {

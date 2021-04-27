@@ -9,11 +9,11 @@ https://api.hubspot.com/engagements/v2/engagements/7716693999?portalId=6879799&c
 
  */
 import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { getPortalId, commonFetchOptions, getEmail } from './common'
+import { getPortalId, commonFetchOptions, getEmail } from '../common/common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 // import _ from 'lodash'
 
-let {
+const {
   apiServerHS
 } = thirdPartyConfigs
 
@@ -21,9 +21,9 @@ export default async function (eid, statusId) {
   if (!statusId) {
     return
   }
-  let portalId = getPortalId()
-  let email = getEmail()
-  let url = `${apiServerHS}/engagements/v2/engagements/${eid}?portalId=${portalId}&clienttimeout=14000`
+  const portalId = getPortalId()
+  const email = getEmail()
+  const url = `${apiServerHS}/engagements/v2/engagements/${eid}?portalId=${portalId}&clienttimeout=14000`
   const body = {
     properties: [
       {

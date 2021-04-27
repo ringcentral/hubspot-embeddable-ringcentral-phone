@@ -17,28 +17,28 @@ import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-wi
 
 import getOwnerId from './get-owner-id'
 import { getCompanyId, notifySyncSuccess } from './log-sync'
-import { commonFetchOptions, getPortalId, getEmail, rc } from './common'
+import { commonFetchOptions, getPortalId, getEmail, rc } from '../common/common'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import {
   showAuthBtn
 } from './auth'
 
-let {
+const {
   apiServerHS
 } = thirdPartyConfigs
 
 export async function doSyncMeeting (contact, meetingInfo) {
   const { title, body, endTime, startTime } = meetingInfo
-  let { id: contactId, isCompany } = contact
+  const { id: contactId, isCompany } = contact
   const type = isCompany ? 'COMPANY' : 'CONTACT'
-  let email = getEmail()
-  let ownerId = await getOwnerId(contact.id, type)
-  let now = +new Date()
-  let contactIds = isCompany ? [] : [Number(contactId)]
-  let companyId = isCompany
+  const email = getEmail()
+  const ownerId = await getOwnerId(contact.id, type)
+  const now = +new Date()
+  const contactIds = isCompany ? [] : [Number(contactId)]
+  const companyId = isCompany
     ? contactId
     : await getCompanyId(contactId)
-  let data = {
+  const data = {
     engagement: {
       source: 'CRM_UI',
       ownerId,
@@ -67,9 +67,9 @@ export async function doSyncMeeting (contact, meetingInfo) {
       source: 'CRM_UI'
     }
   }
-  let portalId = getPortalId()
-  let url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
-  let res = await fetchBg(url, {
+  const portalId = getPortalId()
+  const url = `${apiServerHS}/engagements/v1/engagements/?portalId=${portalId}&clienttimeout=14000`
+  const res = await fetchBg(url, {
     method: 'post',
     body: data,
     headers: {
