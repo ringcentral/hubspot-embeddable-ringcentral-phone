@@ -3,7 +3,7 @@
  */
 
 import { useEffect } from 'react'
-import { Input, Form, Button, Select } from 'antd'
+import { Input, Form, Button, Select, Tooltip } from 'antd'
 import { doSync } from '../funcs/log-sync'
 import CountDown from './countdown'
 
@@ -19,18 +19,18 @@ export default function CallLogForm (props) {
   const timer = isCall ? 20000 : 100
   const cls = isCall || isManuallySync ? 'rc-add-call-log-form' : 'rc-hide'
   function renderList () {
+    const txt = relatedContacts.map(c => {
+      return `${c.name}(${c.emails[0]})`
+    }).join(', ')
     return (
-      <li>
-        {
-          relatedContacts.map(c => {
-            return (
-              <span key={c.id} className='rc-pd1x'>
-                <b>{c.name} ({c.emails.join(', ')})</b>
-              </span>
-            )
-          })
-        }
-      </li>
+      <div className='rc-pd1b'>
+        <Tooltip
+          title={txt}
+          getPopupContainer={getBox}
+        >
+          <div className='rc-elli'>{txt}</div>
+        </Tooltip>
+      </div>
     )
   }
   function renderDetail () {
@@ -91,10 +91,10 @@ export default function CallLogForm (props) {
           <h3 class='rc-sync-title rc-pd1b'>
             Sync {name} log to HubSpot matched contacts:
           </h3>
-          <ul class='rc-pd1b'>
-            {
-              renderList()
-            }
+          {
+            renderList()
+          }
+          <ul class='rc-pd1b rc-wordbreak'>
             {
               renderDetail()
             }

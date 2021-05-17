@@ -52,7 +52,7 @@ export const insertClickToCallButton = [
         getElem: () => {
           const p = document.querySelector('[data-unit-test="highlightSubtitle"]') || document.querySelector('[data-selenium-test="contact-highlight-details"]')
           return p
-            ? p.parentNode.parentNode
+            ? p.parentNode.parentNode.parentNode
             : null
         },
         insertMethod: 'append'

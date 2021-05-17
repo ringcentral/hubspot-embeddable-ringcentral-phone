@@ -161,11 +161,13 @@ export default function Main () {
     )
   }
   async function loadSettings () {
-    const ext = {}
     for (const a of sets) {
-      ext[a.key] = await ls.get(`rc-${a.key}`) || false
+      const v = await ls.get(`rc-${a.key}`) || false
+      window.rc[a.key] = v
+      setState({
+        [a.key]: v
+      })
     }
-    setGlob(ext)
   }
   function onEvent (e) {
     if (!e || !e.data) {

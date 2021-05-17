@@ -194,9 +194,9 @@ export async function doSync (
   contacts,
   info
 ) {
-  if (!contacts.length) {
-    return notify('No related contacts')
-  } else if (contacts.length > 1 && !contacts && !window.rc.autoSyncToAll) {
+  if (!contacts || !contacts.length) {
+    return false
+  } else if (contacts.length > 1 && !window.rc.autoSyncToAll) {
     return window.postMessage({
       inst: {
         id: nanoid(),
