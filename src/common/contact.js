@@ -4,12 +4,23 @@
 
 import request from './request'
 
-export function createContact (data) {
+export async function createContact (data) {
   const url = '/hs/create-contact'
-  return request(url, data)
+  const r = await request(url, { data })
+  if (r && r.result && r.result.id) {
+    return r.result
+  }
 }
 
-export function getContact (vid) {
+export async function getContact (vid) {
   const url = '/hs/get-contact'
-  return request(url)
+  const r = await request(url, {
+    id: vid
+  })
+  if (r && r.result && r.result.id) {
+    return r.result
+  } else {
+    console.log(r)
+    return null
+  }
 }

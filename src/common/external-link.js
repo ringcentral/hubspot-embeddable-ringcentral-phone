@@ -1,5 +1,5 @@
 export default (url) => {
   return (
-    <a href={url} target='_blank' rel='external nofollow'>{url}</a>
+    <a href={url} target='_blank' rel='noreferrer'>{url}</a>
   )
 }

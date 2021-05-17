@@ -9,25 +9,32 @@
 
 /// *
 import _ from 'lodash'
-import searchPhone from '../common/search'
+import { searchPhone } from '../common/search'
 import { upgrade } from 'ringcentral-embeddable-extension-common/src/feat/upgrade-notification'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { rc } from '../common/common'
-import '../feat/on-unload'
+import '../funcs/on-unload'
 import {
-  syncCallLogToThirdParty,
+  syncCallLogToThirdParty
+} from '../funcs/log-sync'
+import {
   findMatchCallLog
-} from '../feat/log-sync.js'
+} from '../funcs/match-log'
 import {
   showContactInfoPanel
 } from '../funcs/contacts.js'
 import copy from 'json-deep-copy'
-import { onRCMeetingCreate, onMeetingPanelOpen } from '../feat/meeting'
-import { initMeetingSelect } from '../feat/meeting-sync'
+import { onRCMeetingCreate, onMeetingPanelOpen } from '../funcs/meeting'
+// import { initMeetingSelect } from '../funcs/meeting-sync'
 import initReact from '../lib/main-entry'
 import initInner from '../lib/inner-entry'
 import initInnerCallLog from '../lib/call-log-entry.js'
 import initSyncContactsSelect from '../lib/sync-contacts-select-entry.js'
+import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+
+const {
+  extensionName
+} = thirdPartyConfigs
 
 export function getUserId () {
   const emailDom = document.querySelector('.user-info-email')
@@ -42,14 +49,11 @@ export function getUserId () {
  * thirdPartyService config
  * @param {*} serviceName
  */
-export async function thirdPartyServiceConfig (serviceName) {
-  const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
-  const filterSMSThread = await ls.get('rc-filterSMSThread') || false
-  const autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
-  console.log(serviceName)
-  const logTitle = `Log to HubSpot`
+export async function thirdPartyServiceConfig () {
+  console.log(extensionName)
+  const logTitle = 'Log to HubSpot'
   const services = {
-    name: serviceName,
+    name: extensionName,
     // show contacts in ringcentral widgets
     // contactsPath: '/contacts',
     // contactIcon: 'https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/blob/master/src/hubspot.png?raw=true',
@@ -78,21 +82,7 @@ export async function thirdPartyServiceConfig (serviceName) {
     // meeting
     meetingInvitePath: '/meeting/invite',
     meetingInviteTitle: 'Schedule meeting',
-    settingsPath: '/settings',
-    settings: [
-      {
-        name: 'Log SMS thread as one log',
-        value: logSMSAsThread
-      },
-      {
-        name: 'For SMS thread Only show SMS in 5 minutes',
-        value: filterSMSThread
-      },
-      {
-        name: 'Auto sync call/message log to all matched contact(do not show selection)',
-        value: autoSyncToAll
-      }
-    ]
+    settingsPath: '/settings'
   }
 
   // handle ringcentral event
@@ -113,12 +103,6 @@ export async function thirdPartyServiceConfig (serviceName) {
         responseId: requestId,
         response: { data: 'ok' }
       })
-      setTimeout(() => {
-        rc.postMessage({
-          type: 'rc-adapter-trigger-call-logger-match',
-          sessionIds
-        })
-      }, 8000)
     }
     if (
       type === 'rc-route-changed-notify' &&
@@ -160,20 +144,9 @@ export async function thirdPartyServiceConfig (serviceName) {
     if (type !== 'rc-post-message-request') {
       return
     }
-    if (data.path === '/settings') {
-      const arr = data.body.settings
-      const logSMSAsThread = arr[1].value
-      rc.logSMSAsThread = logSMSAsThread
-      ls.set('rc-logSMSAsThread', rc.logSMSAsThread)
-      const filterSMSThread = arr[3].value
-      rc.filterSMSThread = filterSMSThread
-      ls.set('rc-filterSMSThread', rc.filterSMSThread)
-      const autoSyncToAll = arr[4].value
-      rc.autoSyncToAll = autoSyncToAll
-      ls.set('rc-autoSyncToAll', rc.autoSyncToAll)
-    } else if (path === '/contacts/match') {
+    if (path === '/contacts/match') {
       const phoneNumbers = _.get(data, 'body.phoneNumbers') || []
-      const res = await searchPhone(phoneNumbers)
+      const res = await searchPhone(phoneNumbers, false)
       rc.postMessage({
         type: 'rc-post-message-response',
         responseId: data.requestId,
@@ -225,14 +198,11 @@ export async function initThirdParty () {
   const userId = getUserId()
   rc.currentUserId = userId
   rc.cacheKey = 'contacts' + '_' + userId
-  rc.logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
-  rc.filterSMSThread = await ls.get('rc-filterSMSThread') || false
-  rc.autoSyncToAll = await ls.get('rc-autoSyncToAll') || false
   rc.countryCode = await ls.get('rc-country-code') || undefined
   console.log('rc.countryCode:', rc.countryCode)
   upgrade()
   onMeetingPanelOpen()
-  initMeetingSelect()
+  // initMeetingSelect()
   initReact()
   initInner()
   initInnerCallLog()

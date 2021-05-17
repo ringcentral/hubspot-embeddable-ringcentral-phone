@@ -5,37 +5,11 @@
 import _ from 'lodash'
 import {
   popup,
-  createElementFromHTML,
   host
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { getFullNumber, format164 } from '../common/common'
-import searchPhone from '../common/search'
-
-/**
- * click contact info panel event handler
- * @param {Event} e
- */
-function onClickContactPanel (e) {
-  const { target } = e
-  const { classList } = target
-  if (classList.contains('rc-close-contact')) {
-    document
-      .querySelector('.rc-contact-panel')
-      .classList.add('rc-hide-contact-panel')
-  }
-}
-
-function onloadIframe () {
-  const dom = document
-    .querySelector('.rc-contact-panel')
-  dom && dom.classList.add('rc-contact-panel-loaded')
-}
-
-export function hideContactInfoPanel () {
-  const dom = document
-    .querySelector('.rc-contact-panel')
-  dom && dom.classList.add('rc-hide-contact-panel')
-}
+import { searchPhone } from '../common/search'
+import { Modal } from 'antd'
 
 /**
  * show caller/callee info
@@ -55,44 +29,40 @@ export async function showContactInfoPanel (call) {
     return
   }
   phone = format164(phone)
-  const contacts = await searchPhone([phone])
-  const contact = _.get(contacts, `${phone}[0]`)
+  const contacts = await searchPhone([phone], true, true)
+  const contact = _.get(contacts, '[0]')
   if (!contact) {
     return
   }
-  const type = contact.isCompany
-    ? 'company'
-    : 'contact'
-  // let contactTrLinkElem = canShowNativeContact(contact)
-  // if (contactTrLinkElem) {
-  //   return showNativeContact(contact, contactTrLinkElem)
-  // }
-  const url = `${host}/contacts/${contact.portalId}/${type}/${contact.id}/?interaction=logged-call`
-  const elem = createElementFromHTML(
-    `
-    <div class="animate rc-contact-panel" draggable="false">
-      <div class="rc-close-box">
-        <div class="rc-fix rc-pd2x">
-          <span class="rc-fleft">Contact</span>
-          <span class="rc-fright">
-            <span class="rc-close-contact">&times;</span>
-          </span>
-        </div>
-      </div>
-      <div class="rc-contact-frame-box">
-        <iframe scrolling="no" class="rc-contact-frame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups" allow="microphone" src="${url}" id="rc-contact-frame">
-        </iframe>
-      </div>
-      <div class="rc-loading">loading...</div>
-    </div>
-    `
+  const type = 'contact'
+  const [pid, id] = contact.split('-')
+  const url = `${host}/contacts/${pid}/${type}/${id}/?interaction=logged-call`
+  const elem = (
+    <iframe
+      scrolling='no'
+      class='rc-contact-frame'
+      sandbox='allow-same-origin allow-scripts allow-forms allow-popups'
+      allow='microphone'
+      src={url}
+      id='rc-contact-frame'
+    />
   )
-  elem.onclick = onClickContactPanel
-  elem.querySelector('iframe').onload = onloadIframe
-  const old = document
-    .querySelector('.rc-contact-panel')
-  old && old.remove()
-
-  document.body.appendChild(elem)
-  // moveWidgets()
+  const opts = {
+    title: 'Incoming call',
+    width: '100%',
+    style: {
+      height: '100%'
+    },
+    content: elem
+  }
+  Modal.info(opts)
 }
+setTimeout(() => {
+  showContactInfoPanel({
+    call: {
+      telephonyStatus: 'Ringing',
+      direction: 'fff',
+      from: '+12054097374'
+    }
+  })
+}, 5000)

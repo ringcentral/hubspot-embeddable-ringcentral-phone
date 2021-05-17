@@ -16,7 +16,7 @@ const config = {
 
   // ringcentral config
   ringCentralConfigs: {
-    // extensionId
+    // extensionId must pare with extensionKey
     extensionId: 'extensionidstringxxxxxxxxxxxxxx',
     clientID: '',
     clientSecret: '',
@@ -26,26 +26,8 @@ const config = {
   // for third party related
   thirdPartyConfigs: {
     showCallLogSyncForm: true,
-    serviceName: 'RingCentral for HubSpot Chrome extension(Community Edition)',
-    pageSize: 200000,
-    dbSchema: {
-      portalId: {
-        dataType: 'string'
-      },
-      companyId: {
-        dataType: 'string'
-      },
-      isCompany: {
-        dataType: 'string',
-        enableSearch: true
-      },
-      firstname: {
-        dataType: 'string'
-      },
-      lastname: {
-        dataType: 'string'
-      }
-    }
+    serviceName: 'HubSpot',
+    extensionName: 'RingCentral for HubSpot Chrome extension(Community Edition)'
   }
 
 }

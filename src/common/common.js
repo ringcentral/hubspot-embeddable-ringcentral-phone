@@ -42,7 +42,7 @@ export function getIds (href = window.location.href) {
     vid
   }
 }
-
+export const autoLogPrefix = 'rc-auto-log-id:'
 export function formatPhoneLocal (number) {
   return formatPhone(number, undefined)
 }
@@ -77,10 +77,9 @@ export function getFullNumber (numberObj) {
 
 export function format164 (
   phone = '',
-  country = 'US'
+  country = window.rc.countryCode || 'US'
 ) {
   const res = parsePhoneNumberFromString(phone, country)
-  console.log(res)
   if (!res) {
     return false
   }

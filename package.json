@@ -1,6 +1,6 @@
 {
   "name": "hubspot-embeddable-ringcentral-phone",
-  "version": "7.0.0",
+  "version": "7.0.2",
   "description": "RingCentral Chrome extension for HubSpot based on RingCentral Embeddable",
   "main": "index.js",
   "scripts": {
@@ -95,5 +95,8 @@
     "ignore": [
       "docs"
     ]
+  },
+  "dependencies": {
+    "blueimp-md5": "^2.18.0"
   }
 }

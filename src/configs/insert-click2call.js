@@ -14,7 +14,7 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { getIds } from '../common/common'
 
-import { openRCMeeting } from '../feat/meeting'
+import { openRCMeeting } from '../funcs/meeting'
 
 function formatNumbers (res) {
   return res.phoneNumbers.map(p => {

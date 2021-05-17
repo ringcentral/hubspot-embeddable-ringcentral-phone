@@ -4,11 +4,12 @@
 
 import request from './request'
 
-export function createCallLog (data, id) {
+export function createCallLog (data) {
   const url = '/hs/create-log'
-  return request(url, {
-    data, id
-  })
+  return request(
+    url,
+    data
+  )
 }
 
 export function updateCallLog (data, id) {
@@ -26,7 +27,7 @@ export function updateCallLogStatus (statusId, id) {
 }
 
 export function checkCallLog (sessionIds) {
-  const url = '/hs/check-sync'
+  const url = '/hs/check-log'
   return request(url, {
     sessionIds
   })

@@ -44,7 +44,7 @@ export default function AddContactForm (props) {
               <Input />
             </FormItem>
             <FormItem
-              name='contactEmail'
+              name='email'
               label='Email'
               rules={[{ required: true, type: 'email' }]}
             >

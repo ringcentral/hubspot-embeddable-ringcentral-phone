@@ -15,7 +15,7 @@ export default () => {
     return
   }
   rootElement = createElementFromHTML(`<div id="${id}"></div>`)
-  const home = document.getElementById('Hubspot-rc')
+  const home = document.getElementById('HubSpot-rc')
   home.appendChild(rootElement)
   render(
     <App />,

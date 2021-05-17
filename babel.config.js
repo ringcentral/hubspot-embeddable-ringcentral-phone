@@ -15,7 +15,7 @@ module.exports = {
       'import',
       {
         libraryName: 'antd',
-        style: 'less'
+        style: true
       }
     ],
     '@babel/plugin-transform-runtime'

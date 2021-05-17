@@ -2,36 +2,28 @@
  * call/message log sync feature
  */
 
-import { thirdPartyConfigs, ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
-import { getContactInfo } from './log-sync-form'
+import { ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import extLinkSvg from 'ringcentral-embeddable-extension-common/src/common/link-external.svg'
-import {
-  showAuthBtn
-} from './auth'
+import searchPhone from '../common/search'
 import _ from 'lodash'
 import {
-  notify,
   host,
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import fetchBg from 'ringcentral-embeddable-extension-common/src/common/fetch-with-background'
-import { getFullNumber, commonFetchOptions, rc, getPortalId, formatPhoneLocal, getEmail, autoLogPrefix } from '../common/common'
-import { getDeals } from './deal'
 import {
-  match
-} from 'ringcentral-embeddable-extension-common/src/common/db'
+  notify
+} from '../common/notify'
+import { getFullNumber, rc, getPortalId, formatPhoneLocal, autoLogPrefix } from '../common/common'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid/non-secure'
-import { createCallLog, updateCallLogStatus, checkCallLog } from '../common/log-call'
+import { createCallLog, updateCallLogStatus } from '../common/log-call'
 import logSMS from '../common/log-sms'
-
-const {
-  showCallLogSyncForm,
-  serviceName,
-  apiServerHS
-} = thirdPartyConfigs
+import { getContactInfo } from '../common/get-contact-info'
+import { message } from 'antd'
+import getCid from '../common/get-contact-id'
+import md5 from 'blueimp-md5'
 
 const filterTime = 5 * 60 * 1000
 
@@ -49,12 +41,21 @@ function filterSMS (arr) {
   return res
 }
 
-// function getPortalId() {
-//   let dom = document.querySelector('.navAccount-portalId')
-//   return dom
-//     ? dom.textContent.trim()
-//     : ''
-// }
+let msgShow = false
+
+function showMatchingMessage () {
+  if (msgShow) {
+    return
+  }
+  msgShow = true
+  message.loading({
+    content: 'Matching contacts, please wait',
+    duration: 3,
+    onClose: () => {
+      msgShow = false
+    }
+  })
+}
 
 export function notifySyncSuccess ({
   id,
@@ -68,21 +69,21 @@ export function notifySyncSuccess ({
   const portalId = getPortalId()
   const cat = isCompany ? 'company' : 'contact'
   const url = `${host}/contacts/${portalId}/${cat}/${id}`
-  const msg = `
+  const msg = (
     <div>
-      <div class="rc-pd1b">
-        ${logType} log synced to hubspot!
+      <div class='rc-pd1b'>
+        {logType} log synced to hubspot!
       </div>
-      <div class="rc-pd1b">
-        <a href="${url}" target="_blank">
-          <img src="${extLinkSvg}" width=16 height=16 class="rc-iblock rc-mg1r" />
-          <span class="rc-iblock">
+      <div class='rc-pd1b'>
+        <a href={url} target='_blank' rel='noreferrer'>
+          <img src={extLinkSvg} width={16} height={16} class='rc-iblock rc-mg1r' />
+          <span class='rc-iblock'>
             Check contact activities
           </span>
         </a>
       </div>
     </div>
-  `
+  )
   notify(msg, type, 9000)
   window.postMessage({
     type: 'rc-sync-log-success',
@@ -91,38 +92,38 @@ export function notifySyncSuccess ({
   }, '*')
 }
 
-const prev = {
-  time: Date.now(),
-  sessionId: '',
-  body: {}
-}
+// const prev = {
+//   time: Date.now(),
+//   sessionId: '',
+//   body: {}
+// }
 
-function checkMerge (body) {
-  const maxDiff = 100
-  const now = Date.now()
-  const sid = _.get(body, 'conversation.conversationId')
-  const type = _.get(body, 'conversation.type')
-  if (type !== 'SMS') {
-    return body
-  }
-  if (prev.sessionId === sid && prev.time - now < maxDiff) {
-    console.log('trigger merger')
-    let msgs = [
-      ...body.conversation.messages,
-      ...prev.body.conversation.messages
-    ]
-    msgs = _.uniqBy(msgs, (e) => e.id)
-    body.conversation.messages = msgs
-    prev.body = copy(body)
-    return body
-  } else {
-    console.log('not trigger merger')
-    prev.time = now
-    prev.sessionId = sid
-    prev.body = copy(body)
-    return body
-  }
-}
+// function checkMerge (body) {
+//   const maxDiff = 100
+//   const now = Date.now()
+//   const sid = _.get(body, 'conversation.conversationId')
+//   const type = _.get(body, 'conversation.type')
+//   if (type !== 'SMS') {
+//     return body
+//   }
+//   if (prev.sessionId === sid && prev.time - now < maxDiff) {
+//     console.log('trigger merger')
+//     let msgs = [
+//       ...body.conversation.messages,
+//       ...prev.body.conversation.messages
+//     ]
+//     msgs = _.uniqBy(msgs, (e) => e.id)
+//     body.conversation.messages = msgs
+//     prev.body = copy(body)
+//     return body
+//   } else {
+//     console.log('not trigger merger')
+//     prev.time = now
+//     prev.sessionId = sid
+//     prev.body = copy(body)
+//     return body
+//   }
+// }
 
 function buildId (body) {
   return body.id ||
@@ -144,124 +145,39 @@ export async function syncCallLogToThirdParty (body) {
     // todo: support voicemail
     return
   }
-  if (!rc.local.accessToken) {
-    return isManuallySync ? showAuthBtn() : null
+  if (!window.rc.ownerId) {
+    return null
   }
   const id = buildId(body)
-  if (showCallLogSyncForm && isManuallySync) {
-    body = checkMerge(body)
-    console.log('bbbb', body)
-    const contactRelated = await getContactInfo(body, serviceName)
+  // body = checkMerge(body)
+  const info = getContactInfo(body)
+  showMatchingMessage()
+  const relatedContacts = await searchPhone(info.numbers)
+  const obj = {
+    type: 'rc-init-call-log-form',
+    isManuallySync,
+    callLogProps: {
+      relatedContacts,
+      info,
+      id,
+      isManuallySync,
+      body
+    }
+  }
+  if (isManuallySync) {
     if (
-      !contactRelated ||
-      (!contactRelated.froms && !contactRelated.tos)
+      !relatedContacts ||
+      !relatedContacts.length
     ) {
       const b = copy(body)
+      Object.assign(b, info)
       b.type = 'rc-show-add-contact-panel'
       return window.postMessage(b, '*')
     }
-    window.postMessage({
-      type: 'rc-init-call-log-form',
-      isManuallySync,
-      callLogProps: {
-        id,
-        isManuallySync,
-        body
-      }
-    }, '*')
+    window.postMessage(obj, '*')
   } else {
-    window.postMessage({
-      type: 'rc-init-call-log-form',
-      isManuallySync,
-      callLogProps: {
-        id,
-        isManuallySync,
-        body
-      }
-    }, '*')
+    window.postMessage(obj, '*')
   }
-}
-
-async function getSyncContacts (body) {
-  // let objs = _.filter(
-  //   [
-  //     ..._.get(body, 'call.toMatches') || [],
-  //     ..._.get(body, 'call.fromMatches') || [],
-  //     ...(_.get(body, 'correspondentEntity') ? [_.get(body, 'correspondentEntity')] : [])
-  //   ],
-  //   m => m.type === serviceName
-  // )
-  // if (objs.length) {
-  //   return objs
-  // }
-  let all = []
-  if (body.call) {
-    const nf = getFullNumber(_.get(body, 'to')) ||
-      getFullNumber(_.get(body, 'call.to'))
-    const nt = getFullNumber(_.get(body, 'from')) ||
-      getFullNumber(_.get(body.call, 'from'))
-    all = [nt, nf]
-  } else {
-    all = [
-      getFullNumber(_.get(body, 'conversation.self')),
-      ...body.conversation.correspondents.map(d => getFullNumber(d))
-    ]
-  }
-  all = all.map(s => formatPhone(s))
-  const contacts = await match(all)
-  const arr = Object.keys(contacts).reduce((p, k) => {
-    return [
-      ...p,
-      ...contacts[k]
-    ]
-  }, [])
-  return _.uniqBy(arr, d => d.id)
-}
-
-export async function getUserId () {
-  const pid = getPortalId()
-  const url = `${apiServerHS}/login-verify/hub-user-info?early=true&portalId=${pid}`
-  const res = await fetchBg(url, {
-    headers: commonFetchOptions().headers
-  })
-  // let res = await fetch.get(url, commonFetchOptions())
-  let ownerId = ''
-  if (res && res.user) {
-    ownerId = _.get(res, 'user.user_id')
-  } else {
-    console.log('fetch ownerId error')
-    console.log(res)
-  }
-  return ownerId
-}
-
-export async function getCompanyId (contactId) {
-  const pid = getPortalId()
-  const url = `${apiServerHS}/crm-meta/v1/meta?portalId=${pid}&clienttimeout=15000`
-  const res = await fetchBg(url, {
-    headers: commonFetchOptions().headers,
-    method: 'post',
-    body: {
-      vid: Number(contactId),
-      objectIds: {
-        CONTACT: Number(contactId)
-      },
-      timeoutMillis: 5000,
-      types: [
-        'CONTACT',
-        'CONTACT_ASSOCIATIONS_FIRST_PAGE'
-      ]
-    }
-  })
-  // let res = await fetch.get(url, commonFetchOptions())
-  let companyId = ''
-  if (res && res.data) {
-    companyId = _.get(res, 'data.CONTACT.properties.associatedcompanyid.value')
-  } else {
-    console.log('fetch company error')
-    console.log(res)
-  }
-  return companyId
 }
 
 /**
@@ -271,11 +187,16 @@ export async function getCompanyId (contactId) {
  * @param {*} body
  * @param {*} formData
  */
-export async function doSync (body, formData, isManuallySync, contactList) {
-  const contacts = contactList || await getSyncContacts(body)
+export async function doSync (
+  body,
+  formData,
+  isManuallySync,
+  contacts,
+  info
+) {
   if (!contacts.length) {
     return notify('No related contacts')
-  } else if (contacts.length > 1 && !contactList && !window.rc.autoSyncToAll) {
+  } else if (contacts.length > 1 && !contacts && !window.rc.autoSyncToAll) {
     return window.postMessage({
       inst: {
         id: nanoid(),
@@ -356,7 +277,7 @@ function buildMsgs (body, contactId, logSMSAsThread) {
       mds: filterSMS(arrMd),
       isSMS: true,
       stamp: arr[0].stamp,
-      id: ms.map(s => s.id).join(','),
+      id: md5(ms.map(s => s.id).join(',')),
       contactId
     }]
   }
@@ -391,38 +312,22 @@ function buildVoiceMailMsgs (body, contactId) {
   return arr
 }
 
-function buildKey (id, cid, email) {
-  return `rc-log-${email}-${cid}-${id}`
-}
-
-function getCallInfo (contact, toNumber, fromNumber) {
+function getCallInfo (contact, toNumber, fromNumber, contactId) {
   const cnums = contact.phoneNumbers.map(n => formatPhone(n.phoneNumber))
   const fn = formatPhone(fromNumber)
   const tn = formatPhone(toNumber)
   if (cnums.includes(tn)) {
     return {
       calleeObjectType: 'CONTACT',
-      calleeObjectId: contact.id
+      calleeObjectId: contactId
     }
   } else if (cnums.includes(fn)) {
     return {
       callerObjectType: 'CONTACT',
-      callerObjectId: contact.id
+      callerObjectId: contactId
     }
   }
   return {}
-}
-
-async function filterLoggered (arr, email) {
-  const res = []
-  for (const m of arr) {
-    const key = buildKey(m.id, m.contactId, email)
-    const ig = await ls.get(key)
-    if (!ig) {
-      res.push(m)
-    }
-  }
-  return res
 }
 
 function getStamp (body) {
@@ -445,7 +350,8 @@ function parseLogName (list, contact) {
 }
 
 async function doSyncOne (contact, body, formData, isManuallySync) {
-  const { id: contactId, isCompany } = contact
+  const { id: contactIdPid, isCompany } = contact
+  const contactId = getCid(contactIdPid)
   if (isCompany) {
     return
   }
@@ -462,7 +368,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   if (!ownerId) {
     return
   }
-  const email = getEmail()
+  // const email = getEmail()
   // let now = +new Date()
   const contactIds = isCompany ? [] : [Number(contactId)]
   const toNumber = getFullNumber(_.get(body, 'call.to'))
@@ -481,7 +387,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   const recordingUrl = _.get(body, 'call.recording')
     ? ringCentralConfigs.mediaPlayUrl + encodeURIComponent(body.call.recording.contentUri)
     : undefined
-  const dealIds = await getDeals(contactId)
+  const dealIds = []
   let mainBody = ''
   const ctype = _.get(body, 'conversation.type')
   const isVoiceMail = ctype === 'VoiceMail'
@@ -503,9 +409,6 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       contactId
     }]
   }
-  if (!isManuallySync) {
-    mainBody = await filterLoggered(mainBody, email)
-  }
   const descFormatted = (desc || '')
     .split('\n')
     .map(d => `<p>${d}</p>`)
@@ -520,7 +423,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   for (const uit of bodyAll) {
     let res = null
     if (uit.isSMS) {
-      res = await logSMS(uit, contact.id)
+      res = await logSMS(uit, contactId, isManuallySync)
     }
     if (!res) {
       // const companyId = isCompany
@@ -548,7 +451,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
           status,
           durationMilliseconds,
           recordingUrl,
-          ...getCallInfo(contact, toNumber, fromNumber)
+          ...getCallInfo(contact, toNumber, fromNumber, contactId)
         }
       }
       res = await createCallLog({
@@ -569,41 +472,26 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       'result.engagement'
     )
     if (engagement) {
-      await updateCallLogStatus(formData.callResult, engagement.id)
-      notifySyncSuccess({
-        id: contactId,
-        logType,
-        interactionType,
-        isCompany,
-        requestId: body.requestId,
-        sessionIds: bodyAll.map(t => t.id)
-      })
+      if (!uit.isSMS) {
+        await updateCallLogStatus(formData.callResult, engagement.id)
+      }
+      console.log('engagement 000 ', engagement)
+      if (!engagement.skipped) {
+        notifySyncSuccess({
+          id: contactId,
+          logType,
+          interactionType,
+          isCompany,
+          requestId: body.requestId,
+          sessionIds: bodyAll.map(t => t.id)
+        })
+      }
     } else {
       notify('call log sync to hubspot failed', 'warn')
-      console.log('post engagements/v1/engagements error')
       console.log(res)
     }
     window.postMessage({
       type: 'rc-call-log-form-hide'
     }, '*')
   }
-}
-
-export async function findMatchCallLog (data) {
-  const sessionIds = _.get(data, 'body.sessionIds') || _.get(data, 'body.conversationLogIds') || []
-  if (!sessionIds.length) {
-    return {}
-  }
-  let r = await checkCallLog(sessionIds)
-  if (r && r.result) {
-    r = r.result.reduce((p, d) => {
-      const sid = d.sessionId
-      prev[sid] = prev[sid] || []
-      prev[sid].push({
-        id: d.id,
-        note: ''
-      })
-    }, {})
-  }
-  return r
 }

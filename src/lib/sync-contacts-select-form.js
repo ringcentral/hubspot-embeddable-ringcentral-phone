@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import { Button, Select } from 'antd'
-import { doSync } from '../feat/log-sync'
+import { doSync } from '../funcs/log-sync'
 
 const { Option } = Select
 
@@ -44,7 +44,7 @@ export default function SelectContactForm (props) {
     props.remove(props.form.id)
   }
   function getBox () {
-    return document.getElementById('Hubspot-rc')
+    return document.getElementById('HubSpot-rc')
   }
   function handleChange (value) {
     setState({
