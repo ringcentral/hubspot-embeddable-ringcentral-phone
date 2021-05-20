@@ -29,6 +29,7 @@ export const rcIconSvg = (size = 30) => {
       width={size}
       height={size}
       viewBox='0 0 16 16'
+      className='rc-logo'
     >
       <g fill='none' fill-rule='evenodd'>
         <rect width='16' height='16' fill='#F80' rx='3.75' />
@@ -162,7 +163,7 @@ export default function Main () {
   }
   async function loadSettings () {
     for (const a of sets) {
-      const v = await ls.get(`rc-${a.key}`) || false
+      const v = await ls.get(`rc-${a.key}`) || true
       window.rc[a.key] = v
       setState({
         [a.key]: v
@@ -250,7 +251,7 @@ export default function Main () {
       return null
     }
     return (
-      <Tooltip title='Syncing contacts in server, before syncing all contacts, you will not be able to sync call and SMS to contact, when sync finished, this icon will be hidden'>
+      <Tooltip title='Building phone-contacts index in server, before finish all phone-contacts index building, you will not be able to sync call and SMS to contacts, when sync finished, this icon will be hidden, we will not store contact information in our database.'>
         <SyncOutlined spin className='rc-iblock rc-mg1l' />
       </Tooltip>
     )
