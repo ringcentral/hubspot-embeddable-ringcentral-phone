@@ -30,11 +30,11 @@ window.rc = {
 export const rc = window.rc
 
 export function getIds (href = window.location.href) {
-  const reg = /[^/]+\/(\d+)\/[^/]+\/(\d+)/
+  const reg = /[^/]+\/(\d+)(\/[^/]+\/(\d+))?/
   const arr = href.match(reg) || []
   const portalId = arr[1]
-  const vid = arr[2]
-  if (!portalId || !vid) {
+  const vid = arr[3]
+  if (!portalId && !vid) {
     return null
   }
   return {
