@@ -132,11 +132,14 @@ export default function Main () {
           <div className='rc-pd1b'>
             <b>Download</b>: {link(ringCentralConfigs.download)}
           </div>
+          <div className='rc-pd1b'>
+            <b>Submit issues</b>: {link(ringCentralConfigs.issue)}
+          </div>
           <div className='rc-pd1y'>
             <Button
               type='primary'
               loading={isSyncing}
-              disabled={isSyncing}
+              disabled={isSyncing && !state.loggedIn}
               onClick={startSyncNow}
             >
               Rebuild phone contact index
