@@ -4,22 +4,20 @@ site_description: A Google Chrome extension that enables click-to-dial functiona
 
 repo_url: https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone
 
-plugins:
-  - search
-  - bootstrap-tables
+# plugins:
+#   - search
+#   - bootstrap-tables
 
 theme:
-  name: moonstone
-  custom_dir: 'theme/'
-  fluid_layout: False
+  name: mkdocs
 
-markdown_extensions:
-  - markdown.extensions.admonition
-  - pymdownx.details
-  - pymdownx.keys
-  - pymdownx.superfences
-  - codehilite:
-      linenums: "None"
+# markdown_extensions:
+#   - markdown.extensions.admonition
+#   - pymdownx.details
+#   - pymdownx.keys
+#   - pymdownx.superfences
+#   - codehilite:
+#       linenums: "None"
 
 nav:
   - Home: index.md

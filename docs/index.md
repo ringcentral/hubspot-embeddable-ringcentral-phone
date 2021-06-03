@@ -2,6 +2,8 @@ no_breadcrumb:true
 
 # RingCentral Embeddable for HubSpot
 
+<a class="btn btn-primary" href="install/">Install Now &raquo;</a>
+
 The RingCentral Hubspot integration enhances HubSpot with a full-featured phone and dialer, allowing Hubspot users to send and receive phone calls from directly within Hubspot, as well as providing them with the following features:
 
 * Click-to-call contacts
@@ -17,6 +19,3 @@ The RingCentral Hubspot integration is built on top of [RingCentral Embeddable](
 ## Demonstration
 
 <iframe src="https://www.youtube.com/embed/N3fUhOkky7M?modestbranding=1&rel=0&theme=light" width="630" height="360" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-<a class="btn btn-primary" href="install/">Install Now &raquo;</a>
-
