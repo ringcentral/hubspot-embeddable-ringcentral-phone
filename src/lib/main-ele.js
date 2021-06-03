@@ -210,6 +210,16 @@ export default function Main () {
       syncStatus: 'syncing'
     })
     startSync()
+    Modal.info({
+      title: 'Syncing contacts',
+      content: (
+        <div className='rc-pd1b'>
+          <div className='rc-pd1b'>Server start to sync contacts data, to build the contact lookup mapping(we do not store your contact data in our server), so the extension could match phone number with contact and create proper call/SMS log.</div>
+          <div>Before finishing the sync, call/SMS log would not work, but you can still click to call/SMS.</div>
+          <div>When syncing finished, the loading icon on left bottom corner will disappear.</div>
+        </div>
+      )
+    })
     setTimeout(loopCheckSync, loopTimer)
   }
   async function loopCheckSync () {
