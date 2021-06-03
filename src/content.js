@@ -9,7 +9,7 @@ import { ringCentralConfigs, thirdPartyConfigs, appVersion } from 'ringcentral-e
 import 'ringcentral-embeddable-extension-common/src/spa/style.styl'
 import './custom.styl'
 
-let {
+const {
   clientID,
   appServer,
   clientSecret,
@@ -17,18 +17,18 @@ let {
 } = ringCentralConfigs
 const authUrl = authServer + '/rc-ext-oauth'
 let appConfigQuery = ''
-let { serviceName } = thirdPartyConfigs
+const { serviceName } = thirdPartyConfigs
 if (clientID || appServer) {
   appConfigQuery = `?appVersion=${appVersion}&zIndex=2222&prefix=${serviceName}-rc&newAdapterUI=1&disconnectInactiveWebphone=1&userAgent=${serviceName}_extension%2F${appVersion}&disableActiveCallControl=false&appKey=${clientID}&appSecret=${clientSecret}&appServer=${encodeURIComponent(appServer)}&disableConferenceCall=false&redirectUri=${authUrl}&disableLoginPopup=1`
 }
 
 /* eslint-disable-next-line */
 ;(function() {
-  console.log('import RingCentral Embeddable Voice to web page')
-  var rcs = document.createElement('script')
-  var u = chrome.runtime.getURL('embeddable/adapter.js') + appConfigQuery
+  console.log('import RingCentral Embeddable to web page')
+  const rcs = document.createElement('script')
+  const u = chrome.runtime.getURL('embeddable/adapter.js') + appConfigQuery
   rcs.src = u
-  var rcs0 = document.getElementsByTagName('script')[0]
+  const rcs0 = document.getElementsByTagName('script')[0]
   rcs0.parentNode.insertBefore(rcs, rcs0)
 })()
 

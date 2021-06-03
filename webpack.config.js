@@ -1,7 +1,6 @@
 
 const webpack = require('webpack')
 const sysConfigDefault = require('./config.default')
-const ExtraneousFileCleanupPlugin = require('webpack-extraneous-file-cleanup-plugin')
 const path = require('path')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -38,10 +37,6 @@ const to4 = path.resolve(
   __dirname,
   'dist'
 )
-const opts = {
-  extensions: ['.map', '.js'],
-  minBytes: 3900
-}
 const patterns = [{
   from,
   to: to1,
@@ -78,7 +73,7 @@ const pug = {
   }
 }
 
-var config = {
+const config = {
   mode: 'production',
   entry: {
     content: './src/content.js',
@@ -90,7 +85,8 @@ var config = {
     filename: '[name].js',
     publicPath: '/',
     chunkFilename: '[name].[hash].js',
-    libraryTarget: 'var'
+    libraryTarget: 'var',
+    library: 'RcForHubSpotChromeExt'
   },
   resolve: {
     extensions: ['.js', '.json'],
@@ -122,68 +118,29 @@ var config = {
       {
         test: /\.less$/,
         use: [
-          {
-            loader: 'style-loader'
-          },
-          {
-            loader: 'css-loader'
-          },
-          {
-            loader: 'postcss-loader'
-          },
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
           {
             loader: 'less-loader',
             options: {
-              javascriptEnabled: true
+              lessOptions: {
+                javascriptEnabled: true
+              }
             }
           }
         ]
       },
       {
         test: /\.jsx?$/,
-        exclude: /node_modules\/(?!(ringcentral-embeddable-extension-common)\/).*/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              cacheDirectory: true,
-              presets: [
-                '@babel/react',
-                ['@babel/env', {
-                  targets: {
-                    chrome: 58,
-                    node: 'current'
-                  }
-                }]
-              ],
-              plugins: [
-                '@babel/plugin-proposal-class-properties',
-                'babel-plugin-lodash',
-                '@babel/plugin-syntax-dynamic-import',
-                [
-                  '@babel/plugin-proposal-decorators',
-                  {
-                    legacy: true
-                  }
-                ],
-                [
-                  '@babel/plugin-transform-runtime',
-                  {
-                    regenerator: true
-                  }
-                ],
-                [
-                  'import',
-                  {
-                    libraryName: 'antd',
-                    libraryDirectory: 'es',
-                    style: true
-                  }
-                ]
-              ]
-            }
-          }
-        ]
+        exclude: {
+          and: [/node_modules/], // Exclude libraries in node_modules ...
+          not: [
+            // Except for a few of them that needs to be transpiled because they use modern syntax
+            /ringcentral-embeddable-extension-common/
+          ]
+        },
+        use: ['babel-loader']
       },
       {
         test: /\.styl$/,
@@ -217,7 +174,6 @@ var config = {
       paths: true
     }),
     new CopyWebpackPlugin({ patterns }),
-    new ExtraneousFileCleanupPlugin(opts),
     new webpack.DefinePlugin({
       'process.env.ringCentralConfigs': JSON.stringify(sysConfigDefault.ringCentralConfigs),
       'process.env.thirdPartyConfigs': JSON.stringify(sysConfigDefault.thirdPartyConfigs),

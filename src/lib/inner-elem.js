@@ -4,18 +4,14 @@
 
 import { useEffect, useState } from 'react'
 import { Tooltip, Input, notification } from 'antd'
-import { EditOutlined, LeftCircleOutlined, SyncOutlined } from '@ant-design/icons'
+import { EditOutlined, LeftCircleOutlined } from '@ant-design/icons'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 // prefix telephonySessionId
-import { autoLogPrefix, rc, getFullNumber } from '../feat/common'
+import { autoLogPrefix, rc } from '../common/common'
 import ContactForm from './add-contact-form'
-import { getOwnerId as getVid, formatContacts, notifyReSyncContacts } from '../feat/contacts'
-import getOwnerId from '../feat/get-owner-id'
-import { addContact } from '../feat/add-contact'
-import { showAuthBtn } from '../feat/auth'
-import {
-  insert, match
-} from 'ringcentral-embeddable-extension-common/src/common/db'
+import { createContact } from '../common/contact'
+import { getContactInfo } from '../common/get-contact-info'
+import { searchPhone } from '../common/search'
 import _ from 'lodash'
 import './inner.styl'
 
@@ -43,7 +39,7 @@ export default () => {
   })
   let refer
   const [data, setData] = useState({})
-  const { noteId, shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path, transferringData } = state
+  const { noteId, shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path } = state
   function setState (obj) {
     setStateOri(s => ({
       ...s,
@@ -67,28 +63,18 @@ export default () => {
     setState({
       submitting: true
     })
-    const vid = await getVid(true)
-    const oid = await getOwnerId(vid)
+    const oid = window.rc.ownerId
     if (!oid) {
       return notification.error({
         message: 'Add contact failed, can not get owner ID'
       })
     }
-    const r = await addContact({
-      ...data,
-      ownerId: oid
-    })
-    if (!r || !r.vid) {
+    const r = await createContact(data)
+    if (!r || !r.id) {
       notification.error({
         message: 'Create contact failed'
       })
     } else {
-      if (r && r.vid) {
-        await insert(
-          formatContacts([r])
-        )
-        notifyReSyncContacts()
-      }
       notification.info({
         message: 'Contact created'
       })
@@ -135,35 +121,26 @@ export default () => {
       saveNote(id)
       autoHide(10)
     } else if (type === 'rc-show-add-contact-panel') {
-      if (!rc.local.accessToken) {
-        showAuthBtn()
+      if (!rc.ownerId) {
         return
       }
-      const { call = {} } = e.data
-      let phone = getFullNumber(_.get(
-        e.data,
-        'conversation.correspondents[0]'
-      ))
-      if (!phone) {
-        phone = call.direction === 'Inbound'
-          ? getFullNumber(_.get(call, 'from'))
-          : getFullNumber(_.get(call, 'to'))
+      const { numbers, name } = getContactInfo(e.data)
+      const countOnly = true
+      const returnArray = true
+      const relatedContacts = await searchPhone(numbers, returnArray, countOnly)
+      if (relatedContacts.length) {
+        return
       }
-      const name = call.direction === 'Inbound'
-        ? _.get(call, 'from.name')
-        : _.get(call, 'to.name')
+      const phone = numbers[0]
       const [firstname, lastname] = (name || '').replace(/\s+/, '\x01').split('\x01')
-      let res = await match([phone])
-      if (_.isEmpty(res)) {
-        setData({
-          phone,
-          firstname,
-          lastname
-        })
-        setState({
-          showAddContactForm: true
-        })
-      }
+      setData({
+        phone,
+        firstname,
+        lastname
+      })
+      setState({
+        showAddContactForm: true
+      })
     } else if (type === 'rc-call-log-form') {
       setState({
         showCallLogForm: true,
@@ -189,19 +166,6 @@ export default () => {
     }
   }, [note])
   const isCallPath = path.startsWith('/calls/') || path.startsWith('/dialer')
-  if (path === '/contacts' && transferringData) {
-    return (
-      <Tooltip title='Rebuilding data...' overlayClassName='rc-toolt-tip-card'>
-        <span className='rc-show-note-form rc-rebuild-data rc-iblock rc-pd1'>
-          <SyncOutlined
-            spin
-            className='rc-iblock rc-mg1r'
-          />
-          <span className='rc-iblock'>Rebuilding data, please wait</span>
-        </span>
-      </Tooltip>
-    )
-  }
   if (showAddContactForm) {
     return (
       <ContactForm

@@ -5,7 +5,57 @@ Add [RingCentral Embeddable Voice widgets](https://github.com/ringcentral/ringce
 
 Created with [ringcentral-embeddable-extension-factory](https://github.com/ringcentral/ringcentral-embeddable-extension-factory), you could create similar extension for other CRM sites.
 
-## About the Chrome extension take down
+## Table of contents <!-- omit in toc -->
 
-This Chrome Extension for HubSpot has been pulled as we work together with HubSpot to resolve issues with the Chrome Extension. We hope to resolve these issues before 15 May, where the Chrome Extension will once again be available on GitHub. You can still install and use the [RingCentral integration from the HubSpot Marketplace](https://ecosystem.hubspot.com/marketplace/apps/sales/calling/ringcentral-202602).
+- [Youtube video](#youtube-video)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Try it](#try-it)
+- [Credits](#credits)
+- [License](#license)
 
+## Youtube video
+
+[https://youtu.be/N3fUhOkky7M](https://youtu.be/N3fUhOkky7M)
+
+## Screenshots
+
+| screenshots            |  screenshots |
+:-------------------------:|:-------------------------:
+![hubspot-btn2](docs/img/screenshots/ss1.jpg) | ![hubspot-btn2](docs/img/screenshots/ss2.jpg)
+![hubspot-list2](docs/img/screenshots/ss3.jpg) | ![hubspot-list2](docs/img/screenshots/ss4.jpg)
+![hubspot-list2](docs/img/screenshots/ss5.jpg) | ![hubspot-list2](docs/img/screenshots/ss6.jpg)
+![hubspot-list2](docs/img/screenshots/ss7.jpg) | ![hubspot-list2](docs/img/screenshots/ss8.jpg)
+![hubspot-list2](docs/img/screenshots/ss9.jpg) | ![hubspot-list2](docs/img/screenshots/ss1.jpg)
+
+## Features
+
+- Click to call button
+- Popup callee info panel when call inbound
+- Build with custom app config
+- Auto/manually sync call log/voicemail/sms to hubspot, [About auto call log sync feature](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/issues/137).
+- Check hubspot activities from ringcentral contact panel
+- Custom X-USER-AGENT header for api request
+- Active call control
+- Sync call log to deal
+- Call log with call recording link
+- Call from deal page
+- Insert meeting content to HubSpot or sync meeting info to HubSpot
+- Click to open schedule meeting page.
+- Support RingCentral Video
+
+## Try it
+
+- Download the zip from release page: [https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases](https://github.com/ringcentral/hubspot-embeddable-ringcentral-phone/releases)
+- Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), make sure you **enable the developer mode**, click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
+- Go to `https://app.hubspot.com` to check
+- Make sure you ***turn off*** `Block third-party cookies` in `chrome://settings/content/cookies`
+
+## Credits
+
+Created with [Embbnux Ji](https://github.com/embbnux)'s tuturial:
+ [Building Chrome Extension Integrations with RingCentral Embeddable](https://medium.com/ringcentral-developers/build-a-chrome-extension-with-ringcentral-embeddable-bb6faee808a3)
+
+## License
+
+MIT

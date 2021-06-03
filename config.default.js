@@ -1,6 +1,6 @@
 const os = require('os')
 const extend = require('recursive-assign')
-let config = {
+const config = {
 
   // dev related
   devCPUCount: os.cpus().length,
@@ -16,7 +16,7 @@ let config = {
 
   // ringcentral config
   ringCentralConfigs: {
-    // extensionId
+    // extensionId must pare with extensionKey
     extensionId: 'extensionidstringxxxxxxxxxxxxxx',
     clientID: '',
     clientSecret: '',
@@ -25,29 +25,9 @@ let config = {
 
   // for third party related
   thirdPartyConfigs: {
-    appServerHS: 'https://app.hubspot.com',
-    apiServerHS: 'https://api.hubspot.com',
     showCallLogSyncForm: true,
-    serviceName: 'Hubspot',
-    pageSize: 200000,
-    dbSchema: {
-      portalId: {
-        dataType: 'string'
-      },
-      companyId: {
-        dataType: 'string'
-      },
-      isCompany: {
-        dataType: 'string',
-        enableSearch: true
-      },
-      firstname: {
-        dataType: 'string'
-      },
-      lastname: {
-        dataType: 'string'
-      }
-    }
+    serviceName: 'HubSpot',
+    extensionName: 'RingCentral for HubSpot Chrome extension(Community Edition)'
   }
 
 }

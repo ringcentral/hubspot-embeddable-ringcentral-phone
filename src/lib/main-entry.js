@@ -6,7 +6,7 @@ import { render } from 'react-dom'
 import {
   createElementFromHTML
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
-import App from './react-ele'
+import App from './main-ele'
 
 export default () => {
   const id = 'rc-react-entry'

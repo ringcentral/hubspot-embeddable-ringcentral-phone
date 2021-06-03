@@ -1,15 +1,11 @@
 import _ from 'lodash'
-import { jsonHeader, handleErr } from 'ringcentral-embeddable-extension-common/src/common/fetch'
-import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { sendMsgToRCIframe, formatPhone } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 
+import {
+  parsePhoneNumberFromString
+} from 'libphonenumber-js'
+
 export const callResultListKey = 'rc-call-result-list'
-export function getCSRFToken () {
-  return _.get(
-    document.cookie.match(/hubspotapi-csrf=([^=;]+);/),
-    '[1]'
-  )
-}
 
 export function getPortalId () {
   let pid = _.get(
@@ -24,49 +20,21 @@ export function getPortalId () {
   return pid
 }
 window.rc = {
-  logSMSType: 'CALL',
   local: {
-    accessToken: null
+    accessToken: 1
   },
   postMessage: sendMsgToRCIframe,
   currentUserId: '',
-  rcLogined: false,
-  cacheKey: 'contacts' + '_' + '',
-  updateToken: async (newToken, type = 'accessToken') => {
-    if (!newToken) {
-      await ls.remove(type)
-      rc.local = {
-        accessToken: null
-      }
-    } else {
-      rc.local[type] = newToken
-      await ls.set(type, newToken)
-    }
-  }
+  rcLogined: false
 }
 export const rc = window.rc
-export const commonFetchOptions = (headers) => ({
-  headers: headers || {
-    ...jsonHeader,
-    'X-HubSpot-CSRF-hubspotapi': getCSRFToken()
-  },
-  handleErr: (res) => {
-    let { status } = res
-    if (status === 401) {
-      rc.updateToken(null)
-    }
-    if (status > 304) {
-      handleErr(res)
-    }
-  }
-})
 
 export function getIds (href = window.location.href) {
-  let reg = /[^/]+\/(\d+)\/[^/]+\/(\d+)/
-  let arr = href.match(reg) || []
-  let portalId = arr[1]
-  let vid = arr[2]
-  if (!portalId || !vid) {
+  const reg = /[^/]+\/(\d+)(\/[^/]+\/(\d+))?/
+  const arr = href.match(reg) || []
+  const portalId = arr[1]
+  const vid = arr[3]
+  if (!portalId && !vid) {
     return null
   }
   return {
@@ -74,7 +42,7 @@ export function getIds (href = window.location.href) {
     vid
   }
 }
-
+export const autoLogPrefix = 'rc-auto-log-id:'
 export function formatPhoneLocal (number) {
   return formatPhone(number, undefined)
 }
@@ -86,14 +54,12 @@ export function delay (ms) {
 }
 
 export function getEmail () {
-  let emailDom = document.querySelector('.user-info-email')
+  const emailDom = document.querySelector('.user-info-email')
   if (!emailDom) {
     return ''
   }
   return emailDom.textContent.trim()
 }
-
-export const autoLogPrefix = 'rc-auto-log-id:'
 
 export function getFullNumber (numberObj) {
   if (!numberObj) {
@@ -107,4 +73,15 @@ export function getFullNumber (numberObj) {
   } = numberObj
   return phoneNumber +
     (extensionNumber ? '#' + extensionNumber : '')
+}
+
+export function format164 (
+  phone = '',
+  country = window.rc.countryCode || 'US'
+) {
+  const res = parsePhoneNumberFromString(phone, country)
+  if (!res) {
+    return false
+  }
+  return res.number + (res.ext ? '#' + res.ext : '')
 }
