@@ -14,7 +14,7 @@ import { appVersion, ringCentralConfigs } from 'ringcentral-embeddable-extension
 import link from '../common/external-link'
 import { checkSync, startSync } from '../common/sync'
 import getDispositions from '../common/get-dispositions'
-import { onTriggerLogin, onLoginCallback } from '../common/handle-login'
+import { onTriggerLogin, onLoginCallback, install } from '../common/handle-login'
 import { rc } from '../common/common'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 
@@ -147,6 +147,15 @@ export default function Main () {
             >
               Rebuild phone contact index
             </Button>
+          </div>
+          <div className='rc-pd1y'>
+            <Button
+              type='primary'
+              onClick={install}
+            >
+              ReConnect your HubSpot account
+            </Button>
+            <p>* You may only need this if you uninstalled the app from HubSpot settings and want it back</p>
           </div>
         </TabPane>
         {renderSettings()}
