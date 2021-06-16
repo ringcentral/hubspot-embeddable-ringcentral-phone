@@ -12,6 +12,14 @@ export function createCallLog (data) {
   )
 }
 
+export function autoCallLog (data) {
+  const url = '/hs/auto-call-log'
+  return request(
+    url,
+    data
+  )
+}
+
 export function updateCallLog (data, id) {
   const url = '/hs/update-log'
   return request(url, {

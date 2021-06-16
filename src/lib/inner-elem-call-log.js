@@ -24,6 +24,9 @@ export default () => {
   }
   function add (obj) {
     setStateOri(s => {
+      if (s.map(d => d.id).includes(obj.id)) {
+        return s
+      }
       return [
         ...copy(s),
         obj

@@ -119,7 +119,7 @@ export default () => {
         noteId: id
       })
       saveNote(id)
-      autoHide(10)
+      autoHide(0)
     } else if (type === 'rc-show-add-contact-panel') {
       if (!rc.ownerId) {
         return

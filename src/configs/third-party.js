@@ -21,7 +21,7 @@ import {
   findMatchCallLog
 } from '../funcs/match-log'
 import {
-  showContactInfoPanel
+  showContactInfoPanel, afterCallEnd
 } from '../funcs/contacts.js'
 import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen } from '../funcs/meeting'
@@ -133,7 +133,9 @@ export async function thirdPartyServiceConfig () {
       if (telephonyStatus === 'Ringing') {
         window.rc.calling = true
       } else if (telephonyStatus === 'NoCall') {
-        window.rc.calling = false
+        if (window.rc.calling) {
+          afterCallEnd()
+        }
       }
     }
     // if (type === 'rc-inbound-message-notify') {

@@ -18,7 +18,7 @@ import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid/non-secure'
-import { createCallLog, updateCallLogStatus } from '../common/log-call'
+import { createCallLog, updateCallLogStatus, autoCallLog } from '../common/log-call'
 import logSMS from '../common/log-sms'
 import { getContactInfo } from '../common/get-contact-info'
 import { message } from 'antd'
@@ -494,4 +494,19 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       type: 'rc-call-log-form-hide'
     }, '*')
   }
+}
+
+async function afterCallLogOne (data) {
+  return autoCallLog(data)
+}
+
+export async function afterCallLog (contacts, sessId, callResult) {
+  const all = contacts.map(c => {
+    return afterCallLogOne({
+      oid: c.id.split('-')[1],
+      sessId,
+      callResult
+    })
+  })
+  return Promise.all(all)
 }
