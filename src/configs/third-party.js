@@ -132,9 +132,15 @@ export async function thirdPartyServiceConfig () {
     } else if (type === 'rc-adapter-syncPresence') {
       if (telephonyStatus === 'Ringing') {
         window.rc.calling = true
+        window.postMessage({
+          type: 'rc-is-ringing'
+        }, '*')
       } else if (telephonyStatus === 'NoCall') {
         if (window.rc.calling) {
           afterCallEnd()
+          window.postMessage({
+            type: 'rc-is-call-end'
+          }, '*')
         }
       }
     }

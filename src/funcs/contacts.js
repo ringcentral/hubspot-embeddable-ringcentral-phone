@@ -95,13 +95,16 @@ export async function afterCallEnd () {
   if (!window.rc.currentContacts) {
     return
   }
+  const id = window.rc.currentCall.sessionId
+  const note = window.rc.note
   const callLogProps = {
     relatedContacts: copy(window.rc.currentContacts) || [],
     afterCallForm: true,
-    id: window.rc.currentCall.sessionId,
+    id,
     body: {
       call: copy(window.rc.currentCall)
-    }
+    },
+    note
   }
   delete window.rc.currentCall
   delete window.rc.currentContacts
