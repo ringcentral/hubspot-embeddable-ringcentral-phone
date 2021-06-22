@@ -149,6 +149,13 @@ export async function syncCallLogToThirdParty (body) {
     return null
   }
   const id = buildId(body)
+  if (isAutoSync && body.call) {
+    const sid = autoLogPrefix + id
+    const autoLogged = await ls.get(sid)
+    if (autoLogged) {
+      return false
+    }
+  }
   // body = checkMerge(body)
   const info = getContactInfo(body)
   showMatchingMessage()
@@ -501,6 +508,7 @@ async function afterCallLogOne (data) {
 }
 
 export async function afterCallLog (contacts, sessId, data) {
+  const id = autoLogPrefix + sessId
   const all = contacts.map(c => {
     return afterCallLogOne({
       oid: c.split('-')[1],
@@ -509,5 +517,10 @@ export async function afterCallLog (contacts, sessId, data) {
       callResult: data.callResult
     })
   })
-  return Promise.all(all)
+  await Promise.all(all)
+  await ls.set(id, '1')
+  message.success({
+    content: 'Submitted, may take a few seconds',
+    duration: 3
+  })
 }
