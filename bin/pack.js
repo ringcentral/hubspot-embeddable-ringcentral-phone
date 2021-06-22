@@ -4,17 +4,16 @@
 
 const {
   exec,
-  rm,
-  cp
+  rm
 } = require('shelljs')
 const pack = require('../package.json')
-const replace = require('replace-in-file')
-const { resolve } = require('path')
-const options = {
-  files: resolve(__dirname, '../dist/content.js'),
-  from: /messageLoggerPath|callLoggerPath/g,
-  to: '// messageLoggerPath:'
-}
+// const replace = require('replace-in-file')
+// const { resolve } = require('path')
+// const options = {
+//   files: resolve(__dirname, '../dist/content.js'),
+//   from: /messageLoggerPath|callLoggerPath/g,
+//   to: '// messageLoggerPath:'
+// }
 
 // zip -vr folder.zip folder/ -x "*.DS_Store"
 // hubspot-embeddable-ringcentral-phone-google-chrome-1.6.0.zip

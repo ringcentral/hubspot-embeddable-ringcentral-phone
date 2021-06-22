@@ -5,9 +5,8 @@
 import { useEffect, useState } from 'react'
 import { Tooltip, Input, notification } from 'antd'
 import { EditOutlined, LeftCircleOutlined } from '@ant-design/icons'
-import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 // prefix telephonySessionId
-import { autoLogPrefix, rc } from '../common/common'
+import { rc } from '../common/common'
 import ContactForm from './add-contact-form'
 import { createContact } from '../common/contact'
 import { getContactInfo } from '../common/get-contact-info'
@@ -39,23 +38,21 @@ export default () => {
   })
   let refer
   const [data, setData] = useState({})
-  const { noteId, shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path } = state
+  const { shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path } = state
   function setState (obj) {
     setStateOri(s => ({
       ...s,
       ...obj
     }))
   }
-  function saveNote (id = noteId) {
-    if (!id) {
-      return
-    }
-    ls.set(id, note)
+  function saveNote () {
+    window.rc.note = note
   }
   function autoHide (sec) {
     refer = setTimeout(() => {
       setState({
-        shouldShowNote: false
+        shouldShowNote: false,
+        note: ''
       })
     }, sec * 1000)
   }
@@ -97,7 +94,7 @@ export default () => {
       setState({
         path
       })
-    } else if (type === 'rc-call-start-notify') {
+    } else if (type === 'rc-call-start-notify' || type === 'rc-is-ringing') {
       clearTimeout(refer)
       setState({
         calling: true,
@@ -106,20 +103,9 @@ export default () => {
         hideForm: false,
         shouldShowNote: true
       })
-    } else if (type === 'rc-call-end-notify') {
-      // setState({
-      //   hideForm: true
-      // })
-      const sid = _.get(e, 'data.call.partyData.sessionId')
-      if (!sid) {
-        return
-      }
-      const id = autoLogPrefix + sid
-      setState({
-        noteId: id
-      })
-      saveNote(id)
-      autoHide(10)
+    } else if (type === 'rc-call-end-notify' || type === 'rc-is-call-end') {
+      saveNote()
+      autoHide(0)
     } else if (type === 'rc-show-add-contact-panel') {
       if (!rc.ownerId) {
         return

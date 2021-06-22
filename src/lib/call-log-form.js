@@ -2,23 +2,34 @@
  * form for create contact
  */
 
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Input, Form, Button, Select, Tooltip } from 'antd'
-import { doSync } from '../funcs/log-sync'
+import { doSync, afterCallLog } from '../funcs/log-sync'
 import CountDown from './countdown'
 
 const FormItem = Form.Item
 const { Option } = Select
 
 export default function CallLogForm (props) {
+  const countdownRef = useRef()
   const [form] = Form.useForm()
+  const [showCountdown, setCountDownShow] = useState(true)
   const {
-    body, isManuallySync, relatedContacts, info
+    body,
+    afterCallForm,
+    isManuallySync,
+    relatedContacts,
+    id,
+    info,
+    note
   } = props.form
   const isCall = !!body.call
   const timer = isCall ? 20000 : 100
   const cls = isCall || isManuallySync ? 'rc-add-call-log-form' : 'rc-hide'
   function renderList () {
+    if (afterCallForm) {
+      return null
+    }
     const txt = relatedContacts.map(c => {
       return `${c.name}(${c.emails[0]})`
     }).join(', ')
@@ -34,21 +45,41 @@ export default function CallLogForm (props) {
     )
   }
   function renderDetail () {
+    if (afterCallForm) {
+      return null
+    }
     return (
       <li>
         {info.detail}
       </li>
     )
   }
+  function renderNote () {
+    return isCall && (props.form.isManuallySync || afterCallForm)
+      ? (
+        <FormItem
+          name='description'
+          label='Note'
+        >
+          <Input.TextArea rows={row} onClick={removeCountDown} />
+        </FormItem>
+        )
+      : null
+  }
   // const cls = 'rc-add-call-log-form'
   function onFinish (data) {
-    doSync(
-      body,
-      data || {},
-      isManuallySync,
-      relatedContacts,
-      info
-    )
+    clearTimeout(countdownRef.current)
+    if (afterCallForm) {
+      afterCallLog(relatedContacts, id, data)
+    } else {
+      doSync(
+        body,
+        data || {},
+        isManuallySync,
+        relatedContacts,
+        info
+      )
+    }
     handleCancel()
   }
   function handleCancel () {
@@ -57,27 +88,43 @@ export default function CallLogForm (props) {
   function getBox () {
     return document.getElementById('HubSpot-rc')
   }
-  let ref
   function onTimeout () {
     form.submit()
   }
   useEffect(() => {
-    if (!isManuallySync) {
-      ref = setTimeout(onTimeout, timer)
+    if (!isManuallySync && !afterCallForm) {
+      countdownRef.current = setTimeout(onTimeout, timer)
     }
     return () => {
-      clearTimeout(ref)
+      clearTimeout(countdownRef.current)
     }
   }, [])
   function renderCountDown () {
-    if (props.form.isManuallySync) {
+    if (!showCountdown || props.form.isManuallySync || afterCallForm) {
       return null
     }
     return (
       <span>(<CountDown time={20} />)</span>
     )
   }
+  function renderTime () {
+    if (afterCallForm) {
+      return null
+    }
+    return (
+      <li>
+        time: <b>{info.time}</b>
+      </li>
+    )
+  }
+  function removeCountDown () {
+    if (afterCallForm) {
+      return false
+    }
+    setCountDownShow(false)
+  }
   const name = isCall ? 'call' : 'message'
+  const row = afterCallForm ? 5 : 2
   return (
     <div className={cls}>
       <div className='rc-pd2'>
@@ -86,7 +133,9 @@ export default function CallLogForm (props) {
           form={form}
           name='rc-add-call-log-form'
           onFinish={onFinish}
-          initialValues={{}}
+          initialValues={{
+            description: note
+          }}
         >
           <h3 class='rc-sync-title rc-pd1b'>
             Sync {name} log to HubSpot matched contacts:
@@ -95,25 +144,10 @@ export default function CallLogForm (props) {
             renderList()
           }
           <ul class='rc-pd1b rc-wordbreak'>
-            {
-              renderDetail()
-            }
-            <li>
-              time: <b>{info.time}</b>
-            </li>
+            {renderDetail()}
+            {renderTime()}
           </ul>
-          {
-            isCall && props.form.isManuallySync
-              ? (
-                <FormItem
-                  name='description'
-                  label='Description'
-                >
-                  <Input.TextArea rows={2} />
-                </FormItem>
-                )
-              : null
-          }
+          {renderNote()}
           {
             isCall
               ? (
@@ -124,6 +158,7 @@ export default function CallLogForm (props) {
                   <Select
                     getPopupContainer={getBox}
                     placeholder='Select Result'
+                    onClick={removeCountDown}
                   >
                     {
                       props.callResultList.map(obj => {
@@ -139,7 +174,10 @@ export default function CallLogForm (props) {
                 )
               : null
           }
-          <Button type='primary' htmlType='submit'>
+          <Button
+            type='primary'
+            htmlType='submit'
+          >
             Submit {renderCountDown()}
           </Button>
           <Button onClick={handleCancel} className='rc-mg1l'>

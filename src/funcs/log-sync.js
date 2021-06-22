@@ -18,7 +18,7 @@ import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import copy from 'json-deep-copy'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid/non-secure'
-import { createCallLog, updateCallLogStatus } from '../common/log-call'
+import { createCallLog, updateCallLogStatus, autoCallLog } from '../common/log-call'
 import logSMS from '../common/log-sms'
 import { getContactInfo } from '../common/get-contact-info'
 import { message } from 'antd'
@@ -149,6 +149,13 @@ export async function syncCallLogToThirdParty (body) {
     return null
   }
   const id = buildId(body)
+  if (isAutoSync && body.call) {
+    const sid = autoLogPrefix + id
+    const autoLogged = await ls.get(sid)
+    if (autoLogged) {
+      return false
+    }
+  }
   // body = checkMerge(body)
   const info = getContactInfo(body)
   showMatchingMessage()
@@ -359,7 +366,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     return notify('No related contact', 'warn')
   }
   let desc = formData.description
-  const sid = _.get(body, 'call.telephonySessionId') || 'not-exist'
+  const sid = _.get(body, 'call.sessionId') || 'not-exist'
   const sessid = autoLogPrefix + sid
   if (!isManuallySync) {
     desc = await ls.get(sessid) || ''
@@ -475,7 +482,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       if (!uit.isSMS) {
         await updateCallLogStatus(formData.callResult, engagement.id)
       }
-      console.log('engagement 000 ', engagement)
+      // console.log('engagement 000 ', engagement)
       if (!engagement.skipped) {
         notifySyncSuccess({
           id: contactId,
@@ -494,4 +501,26 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
       type: 'rc-call-log-form-hide'
     }, '*')
   }
+}
+
+async function afterCallLogOne (data) {
+  return autoCallLog(data)
+}
+
+export async function afterCallLog (contacts, sessId, data) {
+  const id = autoLogPrefix + sessId
+  const all = contacts.map(c => {
+    return afterCallLogOne({
+      oid: c.split('-')[1],
+      sessId,
+      note: data.description,
+      callResult: data.callResult
+    })
+  })
+  await Promise.all(all)
+  await ls.set(id, '1')
+  message.success({
+    content: 'Submitted, may take a few seconds',
+    duration: 3
+  })
 }

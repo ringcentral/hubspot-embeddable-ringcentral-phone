@@ -12,18 +12,21 @@ export default () => {
   function update (id, data) {
     setStateOri(s => {
       const arr = copy(s)
-      const ref = _.find(arr, d => d.id === id)
+      const ref = _.find(arr, d => d.id + '' === id + '')
       Object.assign(ref, data)
       return arr
     })
   }
   function remove (id) {
     setStateOri(s => {
-      return copy(s).filter(d => d.id !== id)
+      return copy(s).filter(d => d.id + '' !== id + '')
     })
   }
   function add (obj) {
     setStateOri(s => {
+      if (s.map(d => d.id + '').includes(obj.id + '')) {
+        return s
+      }
       return [
         ...copy(s),
         obj

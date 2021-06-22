@@ -21,7 +21,7 @@ import {
   findMatchCallLog
 } from '../funcs/match-log'
 import {
-  showContactInfoPanel
+  showContactInfoPanel, afterCallEnd
 } from '../funcs/contacts.js'
 import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen } from '../funcs/meeting'
@@ -132,8 +132,16 @@ export async function thirdPartyServiceConfig () {
     } else if (type === 'rc-adapter-syncPresence') {
       if (telephonyStatus === 'Ringing') {
         window.rc.calling = true
+        window.postMessage({
+          type: 'rc-is-ringing'
+        }, '*')
       } else if (telephonyStatus === 'NoCall') {
-        window.rc.calling = false
+        if (window.rc.calling) {
+          afterCallEnd()
+          window.postMessage({
+            type: 'rc-is-call-end'
+          }, '*')
+        }
       }
     }
     // if (type === 'rc-inbound-message-notify') {
