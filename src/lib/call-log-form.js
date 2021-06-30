@@ -4,7 +4,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { Input, Form, Button, Select, Tooltip } from 'antd'
-import { doSync, afterCallLog } from '../funcs/log-sync'
+import { doSync, afterCallLog, setCallHandled } from '../funcs/log-sync'
 import CountDown from './countdown'
 
 const FormItem = Form.Item
@@ -70,7 +70,7 @@ export default function CallLogForm (props) {
   function onFinish (data) {
     clearTimeout(countdownRef.current)
     if (afterCallForm) {
-      afterCallLog(relatedContacts, id, data)
+      return afterCallLog(relatedContacts, id, data)
     } else {
       doSync(
         body,
@@ -94,6 +94,9 @@ export default function CallLogForm (props) {
   useEffect(() => {
     if (!isManuallySync && !afterCallForm) {
       countdownRef.current = setTimeout(onTimeout, timer)
+    }
+    if (afterCallForm) {
+      setCallHandled(id)
     }
     return () => {
       clearTimeout(countdownRef.current)

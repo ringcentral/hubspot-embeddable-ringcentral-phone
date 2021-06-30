@@ -507,8 +507,17 @@ async function afterCallLogOne (data) {
   return autoCallLog(data)
 }
 
-export async function afterCallLog (contacts, sessId, data) {
+export function setCallHandled (sessId) {
   const id = autoLogPrefix + sessId
+  return ls.set(id, '1')
+}
+
+export async function afterCallLog (contacts, sessId, data) {
+  message.success({
+    content: 'Submitting, please wait',
+    duration: 3
+  })
+  // await setCallHandled(sessId)
   const all = contacts.map(c => {
     return afterCallLogOne({
       oid: c.split('-')[1],
@@ -518,9 +527,8 @@ export async function afterCallLog (contacts, sessId, data) {
     })
   })
   await Promise.all(all)
-  await ls.set(id, '1')
   message.success({
-    content: 'Submitted, may take a few seconds',
+    content: 'Submitted, may take up to 30 seconds to show',
     duration: 3
   })
 }
