@@ -215,7 +215,7 @@ export default function Main () {
       content: (
         <div className='rc-pd1b'>
           <div className='rc-pd1b'>Server start to sync contacts data, to build the contact lookup mapping(we do not store your contact data in our server), so the extension could match phone number with contact and create proper call/SMS log.</div>
-          <div>Before finishing the sync, call/SMS log would not work, but you can still click to call/SMS.</div>
+          <div>Before finishing the sync, call/SMS log may not work, reload contact to check, if you see the click to call icon, then this contact is synced.</div>
           <div>When syncing finished, the loading icon on left bottom corner will disappear.</div>
         </div>
       )
