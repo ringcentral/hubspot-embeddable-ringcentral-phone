@@ -8,7 +8,7 @@ const {
 } = thirdPartyConfigs
 
 export default async (opts, objectId, isManuallySync) => {
-  const logged = await checkCallLog([opts.id])
+  const logged = await checkCallLog([opts.id], objectId)
   if (logged && logged.result && logged.result.length) {
     const r = logged.result[0]
     r.skipped = true

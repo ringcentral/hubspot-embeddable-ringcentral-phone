@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useDelta, useConditionalEffect } from 'react-delta'
 import eq from 'fast-deep-equal'
 import Drag from 'react-draggable'
-import { Modal, Tooltip, Tabs, Switch, Button } from 'antd'
+import { Modal, Tooltip, Tabs, Switch, Button, message } from 'antd'
 import { SyncOutlined } from '@ant-design/icons'
 import './antd.less'
 import 'antd/dist/antd.less'
@@ -205,11 +205,24 @@ export default function Main () {
       onTriggerLogin(data)
     }
   }
+  async function startSyncFunc () {
+    const r = await startSync()
+    if (!r) {
+      message.error('Sync failed')
+      setState({
+        syncStatus: 'unknown'
+      })
+    } else if (r !== 'ok' && r) {
+      setState({
+        syncStatus: 'unknown'
+      })
+      message.error(r)
+    }
+  }
   function startSyncNow () {
     setState({
       syncStatus: 'syncing'
     })
-    startSync()
     Modal.info({
       title: 'Syncing contacts',
       content: (
@@ -220,6 +233,7 @@ export default function Main () {
         </div>
       )
     })
+    startSyncFunc()
     setTimeout(loopCheckSync, loopTimer)
   }
   async function loopCheckSync () {

@@ -34,9 +34,10 @@ export function updateCallLogStatus (statusId, id) {
   })
 }
 
-export function checkCallLog (sessionIds) {
+export function checkCallLog (sessionIds, oid) {
   const url = '/hs/check-log'
   return request(url, {
-    sessionIds
+    sessionIds,
+    oid
   })
 }
