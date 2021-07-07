@@ -187,6 +187,16 @@ export async function syncCallLogToThirdParty (body) {
   }
 }
 
+function getVoiceMailResultId () {
+  const i = window.rc.callResultList.find(d => d.label.toLowerCase.includes('voicemail'))
+  return i ? i.id : ''
+}
+
+function getDefaultResultId () {
+  const i = window.rc.callResultList.find(d => d.label.toLowerCase.includes('connected'))
+  return i ? i.id : ''
+}
+
 /**
  * sync call log action
  * todo: need you find out how to do the sync
@@ -309,11 +319,18 @@ function buildVoiceMailMsgs (body, contactId) {
       : [m.from]
     n = n.map(m => formatPhoneLocal(getFullNumber(m))).join(', ')
     const links = m.attachments.map(t => t.link).join(', ')
+    const fromNumber = getFullNumber(_.get(m, 'from[0]') || _.get(m, 'from'))
+    const toNumber = getFullNumber(
+      _.get(m, 'to[0]') ||
+      _.get(m, 'to')
+    )
     arr.push({
-      body: `<p>Voice mail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
+      body: `<p>${m.direction} voicemail: ${links} - ${n ? desc : ''} <b>${n}</b> ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</p>`,
       id: m.id,
       stamp: dayjs(m.creationTime).valueOf(),
-      contactId
+      contactId,
+      toNumber,
+      fromNumber
     })
   }
   return arr
@@ -354,6 +371,19 @@ function getStamp (body) {
 function parseLogName (list, contact) {
   const inList = list.map(d => d.id).includes(contact.id)
   return inList ? contact.name : list.map(d => d.name).join(', ')
+}
+
+function buildVoicemailData (uit, status) {
+  return {
+    externalId: uit.id,
+    body: uit.body,
+    toNumber: formatPhone(uit.toNumber),
+    fromNumber: formatPhone(uit.fromNumber),
+    status,
+    durationMilliseconds: 0,
+    calleeObjectType: 'CONTACT',
+    calleeObjectId: uit.contactId
+  }
 }
 
 async function doSyncOne (contact, body, formData, isManuallySync) {
@@ -450,16 +480,18 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
           ownerIds: []
         },
         attachments: [],
-        metadata: {
-          externalId: uit.id,
-          body: uit.body,
-          toNumber,
-          fromNumber,
-          status,
-          durationMilliseconds,
-          recordingUrl,
-          ...getCallInfo(contact, toNumber, fromNumber, contactId)
-        }
+        metadata: isVoiceMail
+          ? buildVoicemailData(uit)
+          : {
+              externalId: uit.id,
+              body: uit.body,
+              toNumber,
+              fromNumber,
+              status,
+              durationMilliseconds,
+              recordingUrl,
+              ...getCallInfo(contact, toNumber, fromNumber, contactId)
+            }
       }
       res = await createCallLog({
         data,
@@ -480,9 +512,11 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
     )
     if (engagement) {
       if (!uit.isSMS) {
-        await updateCallLogStatus(formData.callResult, engagement.id)
+        const resultId = isVoiceMail
+          ? getVoiceMailResultId()
+          : formData.callResult || getDefaultResultId()
+        await updateCallLogStatus(resultId, engagement.id)
       }
-      // console.log('engagement 000 ', engagement)
       if (!engagement.skipped) {
         notifySyncSuccess({
           id: contactId,
