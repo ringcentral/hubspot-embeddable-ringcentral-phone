@@ -381,8 +381,8 @@ function buildVoicemailData (uit, status) {
     fromNumber: formatPhone(uit.fromNumber),
     status,
     durationMilliseconds: 0,
-    calleeObjectType: 'CONTACT',
-    calleeObjectId: uit.contactId
+    callerObjectType: 'CONTACT',
+    callerObjectId: uit.contactId
   }
 }
 
