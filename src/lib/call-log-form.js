@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Input, Form, Button, Select, Tooltip } from 'antd'
 import { doSync, afterCallLog, setCallHandled } from '../funcs/log-sync'
 import CountDown from './countdown'
+import copy from 'json-deep-copy'
 
 const FormItem = Form.Item
 const { Option } = Select
@@ -18,11 +19,11 @@ export default function CallLogForm (props) {
     body,
     afterCallForm,
     isManuallySync,
-    relatedContacts,
     id,
     info,
     note
   } = props.form
+  const relatedContacts = copy(props.form.relatedContacts)
   const isCall = !!body.call
   const timer = isCall ? 20000 : 100
   const cls = isCall || isManuallySync ? 'rc-add-call-log-form' : 'rc-hide'
@@ -70,7 +71,7 @@ export default function CallLogForm (props) {
   function onFinish (data) {
     clearTimeout(countdownRef.current)
     if (afterCallForm) {
-      return afterCallLog(relatedContacts, id, data)
+      afterCallLog(relatedContacts, id, data)
     } else {
       doSync(
         body,
