@@ -56,7 +56,7 @@ export async function showContactInfoPanel (call) {
   window.rc.currentContact = contact
   const type = 'contact'
   const [pid, id] = contact.split('-')
-  const url = `${host}/contacts/${pid}/${type}/${id}/?interaction=logged-call`
+  const url = `${host}/contacts/${pid}/${type}/${id}`
   const elem = (
     <iframe
       scrolling='no'
