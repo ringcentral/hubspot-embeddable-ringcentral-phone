@@ -9,9 +9,10 @@ import {
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { getFullNumber, format164 } from '../common/common'
 import { searchPhone } from '../common/search'
-import { Modal } from 'antd'
+import { Modal, Button } from 'antd'
 import delay from 'timeout-as-promise'
 import copy from 'json-deep-copy'
+import { CloseCircleOutlined } from '@ant-design/icons'
 
 async function getContactInfo (call) {
   let phone = call.direction === 'Outbound'
@@ -67,15 +68,30 @@ export async function showContactInfoPanel (call) {
       id='rc-contact-frame'
     />
   )
+  function close () {
+    window.incomingCall && window.incomingCall.destroy()
+  }
+  const title = (
+    <div>
+      <span>Incoming call</span>
+      <Button
+        onClick={close}
+        icon={<CloseCircleOutlined />}
+        className='rc-mg1l'
+      >
+        Close
+      </Button>
+    </div>
+  )
   const opts = {
-    title: 'Incoming call',
+    title,
     width: '100%',
     style: {
       height: '100%'
     },
     content: elem
   }
-  Modal.info(opts)
+  window.incomingCall = Modal.info(opts)
 }
 setTimeout(() => {
   showContactInfoPanel({
