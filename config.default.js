@@ -20,7 +20,8 @@ const config = {
     extensionId: 'extensionidstringxxxxxxxxxxxxxx',
     clientID: '',
     clientSecret: '',
-    appServer: 'https://platform.ringcentral.com'
+    appServer: 'https://platform.ringcentral.com',
+    segmentAppName: 'RingCentral for HubSpot Chrome extension'
   },
 
   // for third party related
