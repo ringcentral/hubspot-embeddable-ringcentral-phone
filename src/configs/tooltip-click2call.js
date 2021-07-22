@@ -14,7 +14,7 @@ import { getNumbers } from './insert-click2call'
 export const hoverShowClickToCallButton = [
   {
     shouldAct: href => {
-      return href.includes('contacts/list/') || href.includes('contacts/view/all/')
+      return href.includes('/contacts/') && href.includes('list')
     },
     selector: 'table.table tbody tr',
     getContactPhoneNumbers: async elem => {
