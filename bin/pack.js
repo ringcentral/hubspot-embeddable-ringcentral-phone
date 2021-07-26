@@ -4,7 +4,8 @@
 
 const {
   exec,
-  rm
+  rm,
+  cp
 } = require('shelljs')
 const pack = require('../package.json')
 // const replace = require('replace-in-file')
@@ -28,8 +29,23 @@ const config = [
 
 async function run () {
   rm('-rf', '*.zip')
+  rm('-rf', 'dist/*.map')
+  rm('-rf', 'dist/manifest.js')
   for (const v of config) {
     const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
+    exec(cmd)
+  }
+  cp('-r', 'dist', 'dist2')
+  // Load the library and specify options
+  const replace = require('replace-in-file')
+  const options = {
+    files: 'dist2/manifest.json',
+    from: /  \"key\"\: \"[^"]+\"\,/,
+    to: ''
+  }
+  replace.sync(options)
+  for (const v of config) {
+    const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.publish.zip ${v.folder}2/ -x "*.DS_Store"`
     exec(cmd)
   }
 }

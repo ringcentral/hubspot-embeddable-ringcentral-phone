@@ -7,18 +7,9 @@
     "http://*/",
     "https://*/",
     "storage",
-    "activeTab",
-    "tabs",
     "background",
-    "tabCapture",
-    "unlimitedStorage",
     "clipboardRead",
-    "clipboardWrite",
-    "debugger",
-    "https://*.hubspot.com/*",
-    "https://kocm6omq0b.execute-api.us-east-1.amazonaws.com/*",
-    "https://*.gtihub.io/*",
-    "https://*.ringcentral.com/*"
+    "clipboardWrite"
   ],
   "page_action": {
     "default_title": "RingCentral Embeddable Voice for HubSpot",
