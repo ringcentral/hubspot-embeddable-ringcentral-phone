@@ -11,7 +11,7 @@ import ContactForm from './add-contact-form'
 import { createContact } from '../common/contact'
 import { getContactInfo } from '../common/get-contact-info'
 import { searchPhone } from '../common/search'
-import _ from 'lodash'
+// import _ from 'lodash'
 import './inner.styl'
 
 notification.config({
