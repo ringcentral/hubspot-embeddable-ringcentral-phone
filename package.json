@@ -1,6 +1,6 @@
 {
   "name": "hubspot-embeddable-ringcentral-phone",
-  "version": "7.2.0",
+  "version": "7.3.0",
   "description": "RingCentral Chrome extension for HubSpot based on RingCentral Embeddable",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "deploy": "npm run docs-b && npm run docs-p",
     "clean": "rm -rf dist dist-firefox",
     "down": "node bin/download-adapter.js",
-    "pack": "rm -rf dist && cross-env NODE_ENV=production ./node_modules/.bin/webpack && npm run down && node bin/pack"
+    "pack": "rm -rf dist && rm -rf dist2 && cross-env NODE_ENV=production ./node_modules/.bin/webpack && npm run down && node bin/pack"
   },
   "repository": {
     "type": "git",
@@ -55,6 +55,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^5.2.4",
     "dayjs": "^1.10.4",
+    "eslint": "^7.31.0",
     "extract-loader": "^5.1.0",
     "fast-deep-equal": "^3.1.3",
     "file-loader": "^6.2.0",
