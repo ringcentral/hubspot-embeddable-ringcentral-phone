@@ -4,6 +4,7 @@
 
 import request from './request'
 import { getIds } from './common'
+import { notification } from 'antd'
 
 function checkPid (pid) {
   const { portalId } = getIds() || {}
@@ -20,6 +21,13 @@ export async function checkSync () {
   if (r && r.ownerId) {
     window.rc.ownerId = Number(r.ownerId)
     checkPid(r.pid)
+  }
+  if (r && r.note) {
+    notification.warn({
+      title: 'Warning',
+      description: r.note,
+      duration: 10
+    })
   }
   if (r && r.result) {
     return r.result
