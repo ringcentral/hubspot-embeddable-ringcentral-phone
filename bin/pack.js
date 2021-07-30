@@ -4,8 +4,8 @@
 
 const {
   exec,
-  rm,
-  cp
+  rm // ,
+  // cp
 } = require('shelljs')
 const pack = require('../package.json')
 // const replace = require('replace-in-file')
