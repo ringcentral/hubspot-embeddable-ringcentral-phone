@@ -10,7 +10,7 @@
 /// *
 import _ from 'lodash'
 import { searchPhone } from '../common/search'
-// import { upgrade } from 'ringcentral-embeddable-extension-common/src/feat/upgrade-notification'
+import { upgrade } from 'ringcentral-embeddable-extension-common/src/feat/upgrade-notification'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { rc } from '../common/common'
 import '../funcs/on-unload'
@@ -208,7 +208,7 @@ export async function initThirdParty () {
   rc.cacheKey = 'contacts' + '_' + userId
   rc.countryCode = await ls.get('rc-country-code') || undefined
   console.log('rc.countryCode:', rc.countryCode)
-  // upgrade()
+  upgrade()
   onMeetingPanelOpen()
   // initMeetingSelect()
   initReact()

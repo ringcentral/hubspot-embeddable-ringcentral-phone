@@ -35,19 +35,19 @@ async function run () {
     const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.zip ${v.folder}/ -x "*.DS_Store"`
     exec(cmd)
   }
-  cp('-r', 'dist', 'dist2')
+  // cp('-r', 'dist', 'dist2')
   // Load the library and specify options
-  const replace = require('replace-in-file')
-  const options = {
-    files: 'dist2/manifest.json',
-    from: / {2}"key": "[^"]+",/,
-    to: ''
-  }
-  replace.sync(options)
-  for (const v of config) {
-    const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.publish.zip ${v.folder}2/ -x "*.DS_Store"`
-    exec(cmd)
-  }
+  // const replace = require('replace-in-file')
+  // const options = {
+  //   files: 'dist2/manifest.json',
+  //   from: / {2}"key": "[^"]+",/,
+  //   to: ''
+  // }
+  // replace.sync(options)
+  // for (const v of config) {
+  //   const cmd = `zip -vr ${pack.name}-${v.name}-${pack.version}.publish.zip ${v.folder}2/ -x "*.DS_Store"`
+  //   exec(cmd)
+  // }
 }
 
 run()
