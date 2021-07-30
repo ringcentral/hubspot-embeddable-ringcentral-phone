@@ -40,7 +40,7 @@ async function run () {
   const replace = require('replace-in-file')
   const options = {
     files: 'dist2/manifest.json',
-    from: /  \"key\"\: \"[^"]+\"\,/,
+    from: / {2}"key": "[^"]+",/,
     to: ''
   }
   replace.sync(options)
