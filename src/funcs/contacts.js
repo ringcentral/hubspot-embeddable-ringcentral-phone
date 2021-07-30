@@ -12,7 +12,7 @@ import { searchPhone } from '../common/search'
 import { Modal, Button } from 'antd'
 import delay from 'timeout-as-promise'
 import copy from 'json-deep-copy'
-import { CloseCircleOutlined } from '@ant-design/icons'
+import { CloseCircleOutlined, LinkOutlined } from '@ant-design/icons'
 
 async function getContactInfo (call) {
   let phone = call.direction === 'Outbound'
@@ -66,6 +66,7 @@ export async function showContactInfoPanel (call) {
       allow='microphone'
       src={url}
       id='rc-contact-frame'
+      style={{ height: 'calc(100vh - 60px)', width: '100%' }}
     />
   )
   function close () {
@@ -74,9 +75,19 @@ export async function showContactInfoPanel (call) {
   const title = (
     <div>
       <span>Incoming call</span>
+      <a href={url} target='_blank' rel='noreferrer'>
+        <Button
+          size='small'
+          icon={<LinkOutlined />}
+          className='rc-mg1l'
+        >
+          Open contact page in another tab
+        </Button>
+      </a>
       <Button
         onClick={close}
         icon={<CloseCircleOutlined />}
+        size='small'
         className='rc-mg1l'
       >
         Close
@@ -86,8 +97,12 @@ export async function showContactInfoPanel (call) {
   const opts = {
     title,
     width: '100%',
+    className: 'rc-incoming-call',
     style: {
-      height: '100%'
+      position: 'fixed',
+      left: 0,
+      right: 0,
+      top: 0
     },
     content: elem
   }
