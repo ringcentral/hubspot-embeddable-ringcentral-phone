@@ -38,7 +38,7 @@ export default () => {
   })
   let refer
   const [data, setData] = useState({})
-  const { shouldShowNote, note, hideForm, calling, showAddContactForm, submitting, path } = state
+  const { shouldShowNote, note, hideForm, calling, showAddContactForm, submitting } = state
   function setState (obj) {
     setStateOri(s => ({
       ...s,
