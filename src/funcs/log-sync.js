@@ -410,7 +410,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   const contactIds = isCompany ? [] : [Number(contactId)]
   const toNumber = getFullNumber(_.get(body, 'call.to'))
   const fromNumber = getFullNumber(_.get(body, 'call.from'))
-  const fmtime = dayjs(_.get(body, 'call.startTime')).format('MMM DD, YYYY h:mm A')
+  // const fmtime = dayjs(_.get(body, 'call.startTime')).format('MMM DD, YYYY h:mm A')
   const stamp = getStamp(body)
   const status = 'COMPLETED'
   let durationMilliseconds = _.get(body, 'call.duration')
@@ -431,7 +431,7 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   const logSMSAsThread = await ls.get('rc-logSMSAsThread') || false
   if (body.call) {
     const direction = _.get(body, 'call.direction')
-    mainBody = `${fmtime}: [${direction} ${_.get(body, 'call.result')}] CALL from <b>${parseLogName(body.call.fromMatches, contact)}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${parseLogName(body.call.toMatches, contact)}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
+    mainBody = `[${direction} ${_.get(body, 'call.result')}] CALL from <b>${parseLogName(body.call.fromMatches, contact)}</b>(<b>${formatPhoneLocal(fromNumber)}</b>) to <b>${parseLogName(body.call.toMatches, contact)}</b>(<b>${formatPhoneLocal(toNumber)}</b>)`
   } else if (ctype === 'SMS') {
     mainBody = buildMsgs(body, contactId, logSMSAsThread)
   } else if (isVoiceMail) {
