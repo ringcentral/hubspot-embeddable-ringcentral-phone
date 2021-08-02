@@ -94,7 +94,6 @@ export async function thirdPartyServiceConfig () {
     if (!data) {
       return
     }
-    console.debug(data)
     const { type, path, call, requestId, sessionIds, telephonyStatus } = data
     if (type === 'rc-sync-log-success') {
       // response to widget

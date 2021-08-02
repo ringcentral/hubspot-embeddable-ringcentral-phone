@@ -82,6 +82,7 @@ export default () => {
     })
   }
   async function onEvent (e) {
+    // console.debug(e.data)
     if (!e || !e.data || !e.data.type) {
       return
     }
@@ -151,7 +152,7 @@ export default () => {
       window.removeEventListener('message', onEvent)
     }
   }, [note])
-  const isCallPath = path.startsWith('/calls/') || path.startsWith('/dialer')
+  // const isCallPath = path.startsWith('/calls/') || path.startsWith('/dialer')
   if (showAddContactForm) {
     return (
       <ContactForm
@@ -167,7 +168,7 @@ export default () => {
   if (!calling) {
     return null
   }
-  if (shouldShowNote && hideForm && isCallPath) {
+  if (shouldShowNote && hideForm) {
     return (
       <Tooltip title='Show note edit form' overlayClassName='rc-toolt-tip-card'>
         <EditOutlined
@@ -178,7 +179,7 @@ export default () => {
         />
       </Tooltip>
     )
-  } else if (shouldShowNote && isCallPath) {
+  } else if (shouldShowNote) {
     return (
       <div className='rc-call-note-form'>
         <div className='pd1'>
