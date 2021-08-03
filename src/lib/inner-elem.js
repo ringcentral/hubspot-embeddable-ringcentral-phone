@@ -45,8 +45,8 @@ export default () => {
       ...obj
     }))
   }
-  function saveNote () {
-    window.rc.note = note
+  function saveNote (v) {
+    window.rc.note = v
   }
   function autoHide (sec) {
     refer = setTimeout(() => {
@@ -144,7 +144,7 @@ export default () => {
     setState({
       note: v
     })
-    saveNote()
+    saveNote(v)
   }
   useEffect(() => {
     window.addEventListener('message', onEvent)
