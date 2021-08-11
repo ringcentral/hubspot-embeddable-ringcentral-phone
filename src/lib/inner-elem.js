@@ -46,7 +46,7 @@ export default () => {
     }))
   }
   function saveNote (v) {
-    window.rc.note = v
+    window.rc.note = v || note
   }
   function autoHide (sec) {
     refer = setTimeout(() => {
