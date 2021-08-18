@@ -54,6 +54,7 @@ export async function showContactInfoPanel (call) {
   if (!contact) {
     return
   }
+  let ref = null
   window.rc.currentContact = contact
   const type = 'contact'
   const [pid, id] = contact.split('-')
@@ -70,7 +71,7 @@ export async function showContactInfoPanel (call) {
     />
   )
   function close () {
-    window.incomingCall && window.incomingCall.destroy()
+    ref && ref.destroy()
   }
   const title = (
     <div>
@@ -106,7 +107,7 @@ export async function showContactInfoPanel (call) {
     },
     content: elem
   }
-  window.incomingCall = Modal.info(opts)
+  ref = Modal.info(opts)
 }
 setTimeout(() => {
   showContactInfoPanel({
