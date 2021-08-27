@@ -271,7 +271,8 @@ export default function Main () {
       })
       setTimeout(loopCheckSync, loopTimer)
     }
-    const callResultList = await getDispositions()
+    let callResultList = await getDispositions()
+    callResultList = callResultList.filter(d => !d.deleted)
     console.log('callResultList', callResultList)
     window.rc.callResultList = callResultList && callResultList.result ? callResultList.result : []
   }
