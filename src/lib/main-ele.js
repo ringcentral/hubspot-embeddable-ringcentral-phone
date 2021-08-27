@@ -272,9 +272,9 @@ export default function Main () {
       setTimeout(loopCheckSync, loopTimer)
     }
     let callResultList = await getDispositions()
-    callResultList = callResultList.filter(d => !d.deleted)
+    callResultList = (callResultList && callResultList.result ? callResultList.result : []).filter(d => !d.deleted)
     console.log('callResultList', callResultList)
-    window.rc.callResultList = callResultList && callResultList.result ? callResultList.result : []
+    window.rc.callResultList = callResultList
   }
   useEffect(() => {
     window.addEventListener('message', onEvent)
