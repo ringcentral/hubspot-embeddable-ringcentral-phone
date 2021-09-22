@@ -12,6 +12,27 @@ import {
 const time = 5000
 const prefix = 'rc-contact-cache-'
 
+function hasExtension (r) {
+  return r.phoneNumbers.find(p => {
+    return p.phoneNumber.includes('#')
+  })
+}
+
+function returnResult (r) {
+  if (hasExtension(r) && !window.extensionWarn) {
+    window.extensionWarn = true
+    notification.warn({
+      title: 'Warning',
+      description: 'RingCentral for HubSpot extension do not support log calls for phone number with extension, you can remove extension from phone, save, reload and call again',
+      duration: 10,
+      onClose: () => {
+        delete window.extensionWarn
+      }
+    })
+  }
+  return r
+}
+
 export async function createContact (data) {
   const url = '/hs/create-contact'
   const r = await request(url, { data })
@@ -25,7 +46,7 @@ export async function getContact (vid) {
   const cached = await getCache(cid)
   if (cached) {
     console.log('use contact fetch cache')
-    return cached
+    return returnResult(cached)
   }
   const url = '/hs/get-contact'
   let r = null
@@ -43,10 +64,10 @@ export async function getContact (vid) {
   delete window.contactRequest
   if (r && r.result && r.result.id) {
     await setCache(cid, r.result, time)
-    return r.result
+    return returnResult(r.result)
   } else if (r && r.error) {
     notification.warn({
-      title: 'Error',
+      title: r.errorTitle || 'Error',
       description: r.note,
       duration: 10
     })
