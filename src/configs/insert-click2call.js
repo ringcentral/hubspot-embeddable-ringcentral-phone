@@ -34,13 +34,6 @@ export async function getNumbers (ids = getIds()) {
     vid
   } = ids
   const res = await getContact(vid)
-  if (hasExtension(res)) {
-    notification.warn({
-      title: 'Warning',
-      description: 'Do not support log calls for phone number with extension',
-      duration: 10
-    })
-  }
   return res ? formatNumbers(res) : []
 }
 
