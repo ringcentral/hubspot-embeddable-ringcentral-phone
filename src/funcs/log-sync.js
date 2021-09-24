@@ -554,7 +554,7 @@ export async function afterCallLog (contacts, sessId, data) {
   // await setCallHandled(sessId)
   const all = contacts.map(c => {
     return afterCallLogOne({
-      oid: c.split('-')[1],
+      oid: c.id.split('-')[1],
       sessId,
       note: data.description,
       callResult: data.callResult

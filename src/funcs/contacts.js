@@ -23,7 +23,7 @@ async function getContactInfo (call) {
     return
   }
   phone = format164(phone)
-  window.rc.currentSearch = searchPhone([phone], true, true)
+  window.rc.currentSearch = searchPhone([phone], true, false)
   const contacts = await window.rc.currentSearch
   if (contacts && contacts.length) {
     window.rc.currentContacts = contacts

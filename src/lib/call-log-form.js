@@ -3,10 +3,10 @@
  */
 
 import { useEffect, useState, useRef } from 'react'
-import { Input, Form, Button, Select, Tooltip } from 'antd'
+import { Input, Form, Button, Select, message } from 'antd'
 import { doSync, afterCallLog, setCallHandled } from '../funcs/log-sync'
 import CountDown from './countdown'
-import copy from 'json-deep-copy'
+// import copy from 'json-deep-copy'
 
 const FormItem = Form.Item
 const { Option } = Select
@@ -14,6 +14,8 @@ const { Option } = Select
 export default function CallLogForm (props) {
   const countdownRef = useRef()
   const [form] = Form.useForm()
+  const [relatedContacts, setSelectedContacts] = useState(props.form.relatedContacts.filter(d => d))
+  const latestRelatedContacts = useRef(relatedContacts)
   const [showCountdown, setCountDownShow] = useState(true)
   const {
     body,
@@ -23,26 +25,52 @@ export default function CallLogForm (props) {
     info,
     note
   } = props.form
-  const relatedContacts = copy(props.form.relatedContacts)
+  function setter (arr) {
+    setSelectedContacts(arr)
+    latestRelatedContacts.current = arr
+  }
+  const relatedContactsTree = props.form.relatedContacts
+    .reduce((p, r) => {
+      return {
+        ...p,
+        [r.id]: r
+      }
+    }, {})
   const isCall = !!body.call
   const timer = isCall ? 20000 : 100
   const cls = isCall || isManuallySync ? 'rc-add-call-log-form' : 'rc-hide'
+  function onChangeContact (v) {
+    setter(
+      v.map(id => {
+        return relatedContactsTree[id]
+      })
+    )
+  }
   function renderList () {
-    if (afterCallForm) {
-      return null
-    }
-    const txt = relatedContacts.map(c => {
-      return `${c.name}(${c.emails[0]})`
-    }).join(', ')
+    const value = relatedContacts.map(d => d.id)
+    // console.log('relatedContacts', relatedContacts, props.form.relatedContacts)
     return (
-      <div className='rc-pd1b'>
-        <Tooltip
-          title={txt}
-          getPopupContainer={getBox}
-        >
-          <div className='rc-elli'>{txt}</div>
-        </Tooltip>
-      </div>
+      <Select
+        value={value}
+        mode='multiple'
+        style={{ width: '100%' }}
+        maxTagCount={1}
+        getPopupContainer={getBox}
+        onChange={onChangeContact}
+      >
+        {
+          props.form.relatedContacts.map(c => {
+            return (
+              <Option
+                key={c.id}
+                value={c.id}
+              >
+                {c.name}({c.emails ? c.emails[0] : 'no email'})
+              </Option>
+            )
+          })
+        }
+      </Select>
     )
   }
   function renderDetail () {
@@ -69,15 +97,18 @@ export default function CallLogForm (props) {
   }
   // const cls = 'rc-add-call-log-form'
   function onFinish (data) {
+    if (!latestRelatedContacts.current.length) {
+      return message.error('please select 1 contact at least')
+    }
     clearTimeout(countdownRef.current)
     if (afterCallForm) {
-      afterCallLog(relatedContacts, id, data)
+      afterCallLog(latestRelatedContacts.current, id, data)
     } else {
       doSync(
         body,
         data || {},
         isManuallySync,
-        relatedContacts,
+        latestRelatedContacts.current,
         info
       )
     }
@@ -128,7 +159,7 @@ export default function CallLogForm (props) {
     setCountDownShow(false)
   }
   const name = isCall ? 'call' : 'message'
-  const row = afterCallForm ? 5 : 2
+  const row = 2
   return (
     <div className={cls}>
       <div className='rc-pd2'>
