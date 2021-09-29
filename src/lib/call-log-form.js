@@ -14,7 +14,7 @@ const { Option } = Select
 export default function CallLogForm (props) {
   const countdownRef = useRef()
   const [form] = Form.useForm()
-  const [relatedContacts, setSelectedContacts] = useState(props.form.relatedContacts.filter(d => d))
+  const [relatedContacts, setSelectedContacts] = useState(props.form.relatedContacts.filter(d => d).slice(0, 1))
   const latestRelatedContacts = useRef(relatedContacts)
   const [showCountdown, setCountDownShow] = useState(true)
   const {
@@ -47,7 +47,7 @@ export default function CallLogForm (props) {
     )
   }
   function renderList () {
-    const value = relatedContacts.slice(0, 1).map(d => d.id)
+    const value = relatedContacts.map(d => d.id)
     // console.log('relatedContacts', relatedContacts, props.form.relatedContacts)
     return (
       <Select
