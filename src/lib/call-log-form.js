@@ -47,7 +47,7 @@ export default function CallLogForm (props) {
     )
   }
   function renderList () {
-    const value = relatedContacts.map(d => d.id)
+    const value = relatedContacts.slice(0, 1).map(d => d.id)
     // console.log('relatedContacts', relatedContacts, props.form.relatedContacts)
     return (
       <Select
