@@ -5,6 +5,7 @@
 import fetch from 'ringcentral-embeddable-extension-common/src/common/fetch'
 import { ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import _ from 'lodash'
+import logout from './logout'
 
 const {
   authServer
@@ -20,9 +21,8 @@ export default (path, data) => {
         ? await res.text()
         : _.isPlainObject(res) ? JSON.stringify(res) : res
       if (text.includes('invalid token')) {
-        window.rc.postMessage({
-          type: 'rc-adapter-logout'
-        })
+        console.log('token invalid, should relogin')
+        logout()
       }
     }
   })

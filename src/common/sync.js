@@ -5,13 +5,14 @@
 import request from './request'
 import { getIds } from './common'
 import { notification } from 'antd'
+import logout from './logout'
 
 function checkPid (pid) {
   const { portalId } = getIds() || {}
+  console.log('current pid:', portalId, ', server pid:', pid)
   if (portalId !== pid) {
-    window.rc.postMessage({
-      type: 'rc-adapter-logout'
-    })
+    console.log('current pid:', portalId, ', server pid:', pid, ' not match, so logout')
+    logout()
   }
 }
 
