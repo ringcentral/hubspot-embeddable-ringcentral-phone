@@ -7,7 +7,13 @@ const {
   smsTemplateId
 } = thirdPartyConfigs
 
-export default async (opts, objectId, isManuallySync) => {
+export default async (
+  opts,
+  objectId,
+  isManuallySync,
+  email,
+  tokens
+) => {
   const logged = await checkCallLog([opts.id], objectId)
   if (logged && logged.result && logged.result.length) {
     const r = logged.result[0]
@@ -17,8 +23,10 @@ export default async (opts, objectId, isManuallySync) => {
   const data = {
     eventTemplateId: smsTemplateId,
     timestamp: dayjs(opts.mds[0].stamp).toISOString(),
+    email,
     tokens: {
-      countSMS: opts.mds.length
+      countSMS: opts.mds.length,
+      ...tokens
     },
     extraData: {
       smsList: opts.mds

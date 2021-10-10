@@ -269,10 +269,12 @@ function buildMsgs (body, contactId, logSMSAsThread) {
       id: m.id,
       stamp,
       time: dayjs(m.creationTime).format('MMM DD, YYYY HH:mm'),
+      subject: m.subject,
       content: `**${m.subject}** ${attachmentsMd} - from **${from}** to **${to}**`
     })
     if (logSMSAsThread) {
       arr.push({
+        subject: m.subject,
         text: `<div><b>${m.subject}</b> ${attachments} - from <b>${from}</b> to <b>${to}</b>  - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}</div>`,
         stamp
       })
@@ -281,6 +283,7 @@ function buildMsgs (body, contactId, logSMSAsThread) {
         body: `<div>SMS: <b>${m.subject}</b> - from <b>${from}</b> to <b>${to}</b> - ${dayjs(m.creationTime).format('MMM DD, YYYY HH:mm')}${attachments}</div>`,
         id: m.id,
         stamp,
+        subject: m.subject,
         isSMS: true,
         contactId
       })
@@ -386,6 +389,28 @@ function buildVoicemailData (uit, status) {
   }
 }
 
+function buildSmsPhones (contact) {
+  const {
+    phoneNumbers
+  } = contact
+  const res = {}
+  const mobilePhoneNumber = _.find(
+    phoneNumbers,
+    p => p.phoneType === 'mobile'
+  )
+  const phoneNumber = _.find(
+    phoneNumbers,
+    p => p.phoneType === 'direct'
+  )
+  if (mobilePhoneNumber) {
+    res.mobilePhoneNumber = mobilePhoneNumber.phoneNumber
+  }
+  if (phoneNumber) {
+    res.phoneNumber = phoneNumber.phoneNumber
+  }
+  return res
+}
+
 async function doSyncOne (contact, body, formData, isManuallySync) {
   const { id: contactIdPid, isCompany } = contact
   const contactId = getCid(contactIdPid)
@@ -460,7 +485,16 @@ async function doSyncOne (contact, body, formData, isManuallySync) {
   for (const uit of bodyAll) {
     let res = null
     if (uit.isSMS) {
-      res = await logSMS(uit, contactId, isManuallySync)
+      res = await logSMS(
+        uit, contactId, isManuallySync,
+        contact.emails[0],
+        {
+          messageBody: uit.mds.map(f => f.subject).join(', '),
+          firstName: contact.firstname,
+          lastName: contact.lastname,
+          ...buildSmsPhones(contact)
+        }
+      )
     }
     if (!res) {
       // const companyId = isCompany
