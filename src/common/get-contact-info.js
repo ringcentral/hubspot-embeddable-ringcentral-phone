@@ -20,7 +20,7 @@ export function getContactInfo (body) {
   let name = ''
   if (body.call) {
     const to = _.get(body, 'call.to.phoneNumber') || _.get(body, 'call.toNumber') || _.get(body, 'call.to')
-    const from = _.get(body, 'call.from.phoneNumber') || _.get(body, 'call.fromNumber') || _.get(body, 'call.from.extensionNumber')
+    const from = _.get(body, 'call.from.phoneNumber') || _.get(body, 'call.fromNumber') || _.get(body, 'call.from.extensionNumber') || _.get(body, 'call.from')
     isOutbound = _.get(body, 'call.direction') === 'Outbound'
     numbers = isOutbound
       ? [to]
@@ -46,7 +46,7 @@ export function getContactInfo (body) {
   }
   return {
     detail,
-    numbers,
+    numbers: numbers.filter(d => d),
     time,
     isOutbound,
     name

@@ -114,6 +114,9 @@ export default () => {
       const { numbers, name } = getContactInfo(e.data)
       const countOnly = true
       const returnArray = true
+      if (!numbers.length) {
+        return
+      }
       const relatedContacts = await searchPhone(numbers, returnArray, countOnly)
       if (relatedContacts.length) {
         return
