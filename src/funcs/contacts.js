@@ -57,7 +57,7 @@ export async function showContactInfoPanel (call) {
   let ref = null
   window.rc.currentContact = contact
   const type = 'contact'
-  const [pid, id] = contact.split('-')
+  const [pid, id] = contact.id.split('-')
   const url = `${host}/contacts/${pid}/${type}/${id}`
   const elem = (
     <iframe
