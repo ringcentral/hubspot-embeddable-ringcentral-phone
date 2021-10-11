@@ -188,12 +188,12 @@ export async function syncCallLogToThirdParty (body) {
 }
 
 function getVoiceMailResultId () {
-  const i = window.rc.callResultList.find(d => d.label.toLowerCase.includes('voicemail'))
+  const i = window.rc.callResultList.find(d => d.label.toLowerCase().includes('voicemail'))
   return i ? i.id : ''
 }
 
 function getDefaultResultId () {
-  const i = window.rc.callResultList.find(d => d.label.toLowerCase.includes('connected'))
+  const i = window.rc.callResultList.find(d => d.label.toLowerCase().includes('connected'))
   return i ? i.id : ''
 }
 
