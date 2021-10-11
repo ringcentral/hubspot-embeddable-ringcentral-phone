@@ -97,7 +97,10 @@ export default function CallLogForm (props) {
   }
   // const cls = 'rc-add-call-log-form'
   function onFinish (data) {
-    if (!latestRelatedContacts.current.length) {
+    if (
+      !latestRelatedContacts.current.length &&
+      (isCall || isManuallySync)
+    ) {
       return message.error('please select 1 contact at least')
     }
     clearTimeout(countdownRef.current)

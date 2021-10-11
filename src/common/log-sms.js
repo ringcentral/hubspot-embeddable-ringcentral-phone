@@ -23,7 +23,6 @@ export default async (
   const data = {
     eventTemplateId: smsTemplateId,
     timestamp: dayjs(opts.mds[0].stamp).toISOString(),
-    email,
     tokens: {
       countSMS: opts.mds.length,
       ...tokens
