@@ -38,7 +38,8 @@ export default function CallLogForm (props) {
     }, {})
   const isCall = !!body.call
   const timer = isCall ? 20000 : 100
-  const cls = isCall || isManuallySync ? 'rc-add-call-log-form' : 'rc-hide'
+  const shouldNotHide = isCall || isManuallySync
+  const cls = shouldNotHide ? 'rc-add-call-log-form' : 'rc-hide'
   function onChangeContact (v) {
     setter(
       v.map(id => {
@@ -90,7 +91,11 @@ export default function CallLogForm (props) {
           name='description'
           label='Note'
         >
-          <Input.TextArea rows={row} onClick={removeCountDown} />
+          <Input.TextArea
+            rows={row}
+            onClick={removeCountDown}
+            disabled={!shouldNotHide}
+          />
         </FormItem>
         )
       : null
