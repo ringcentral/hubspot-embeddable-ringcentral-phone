@@ -14,7 +14,7 @@ export function getPortalId () {
   )
   if (!pid) {
     pid = _.get(
-      window.location.href.match(/https:\/\/app\.hubspot\.com\/[^/]+\/(\d+)/), '[1]'
+      window.location.href.match(/https:\/\/app([-\w\d]+)?\.hubspot\.com\/[^/]+\/(\d+)/), '[2]'
     )
   }
   return pid

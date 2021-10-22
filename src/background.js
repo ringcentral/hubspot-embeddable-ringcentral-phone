@@ -8,12 +8,14 @@ import _ from 'lodash'
  * @param {object} tab
  */
 function checkTab (tab) {
-  return tab &&
-    tab.url &&
-    tab.url.startsWith('https://app.hubspot.com') &&
-    !tab.url.startsWith('https://app.hubspot.com/login') &&
-    !tab.url.startsWith('https://app.hubspot.com/myaccounts-beta') &&
-    !tab.url.startsWith('https://app.hubspot.com/developer')
+  if (!tab || !tab.url) {
+    return false
+  }
+  const { url } = tab
+  return /https:\/\/app([-\w\d]+)?\.hubspot\.com\//.test(url) &&
+    !/https:\/\/app([-\w\d]+)?\.hubspot\.com\/login/.test(url) &&
+    !/https:\/\/app([-\w\d]+)?\.hubspot\.com\/myaccounts-beta/.test(url) &&
+    !/https:\/\/app([-\w\d]+)?\.hubspot\.com\/developer/.test(url)
 }
 
 const list = [
