@@ -132,7 +132,7 @@ export default function CallLogForm (props) {
     form.submit()
   }
   useEffect(() => {
-    if (!isManuallySync && !afterCallForm) {
+    if (!isManuallySync) {
       countdownRef.current = setTimeout(onTimeout, timer)
     }
     if (afterCallForm) {
@@ -143,7 +143,7 @@ export default function CallLogForm (props) {
     }
   }, [])
   function renderCountDown () {
-    if (!showCountdown || props.form.isManuallySync || afterCallForm) {
+    if (!showCountdown || props.form.isManuallySync) {
       return null
     }
     return (
@@ -161,10 +161,8 @@ export default function CallLogForm (props) {
     )
   }
   function removeCountDown () {
-    if (afterCallForm) {
-      return false
-    }
     setCountDownShow(false)
+    clearTimeout(countdownRef.current)
   }
   const name = isCall ? 'call' : 'message'
   const row = 2
