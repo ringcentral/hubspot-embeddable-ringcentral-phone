@@ -9,7 +9,7 @@ import {
   setCache
 } from 'ringcentral-embeddable-extension-common/src/common/cache'
 
-const time = 5000
+const time = 10000
 const prefix = 'rc-contact-cache-'
 
 function hasExtension (r) {
@@ -65,10 +65,10 @@ export async function getContact (vid) {
   if (r && r.result && r.result.id) {
     await setCache(cid, r.result, time)
     return returnResult(r.result)
-  } else if (r && r.error) {
+  } else if (r && r.warning) {
     notification.warn({
       title: r.errorTitle || 'Error',
-      description: r.note,
+      description: r.note || r.warning,
       duration: 10
     })
   } else {
