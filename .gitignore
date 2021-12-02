@@ -43,3 +43,4 @@ npm-debug.log*
 docs/esdoc
 yarn.lock
 /dist2/
+/.env
