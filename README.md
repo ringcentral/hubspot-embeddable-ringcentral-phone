@@ -11,6 +11,7 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Try it](#try-it)
+- [Dev](#dev)
 - [Credits](#credits)
 - [License](#license)
 
@@ -50,6 +51,23 @@ Created with [ringcentral-embeddable-extension-factory](https://github.com/ringc
 - Unpack it, get a dist folder, open your Chrome extension page(chrome://extensions/), make sure you **enable the developer mode**, click load unpacked, select the dist folder, for Firefox extnesion, choose Addon -> Enable add-on debugging -> Load Temporary Add-on -> Choose dist-firefox/menifest.json.
 - Go to `https://app.hubspot.com` to check
 - Make sure you ***turn off*** `Block third-party cookies` in `chrome://settings/content/cookies`
+
+## Dev
+
+```bash
+npm i
+
+# edit .env, fill in all required
+cp sample.env .env
+
+# download files needed
+npm run down
+
+# start
+npm start
+
+# then load dist folder as unpacked extension
+```
 
 ## Credits
 
