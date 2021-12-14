@@ -85,3 +85,5 @@ export function format164 (
   }
   return res.number + (res.ext ? '#' + res.ext : '')
 }
+
+export const START_CHECK_CALL_LOG = 'rc-start-call-log'
