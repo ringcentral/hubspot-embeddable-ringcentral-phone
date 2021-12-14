@@ -3,27 +3,27 @@ const { resolve } = require('path')
 
 const from = resolve(
   __dirname,
-  'node_modules/ringcentral-embeddable-extension-common/src/icons'
+  '../node_modules/ringcentral-embeddable-extension-common/src/icons'
 )
 const to1 = resolve(
   __dirname,
-  'dist/icons'
+  '../dist/icons'
 )
 // const f2 = resolve(
 //   __dirname,
-//   'node_modules/jsstore/dist/jsstore.min.js'
+//   '../node_modules/jsstore/dist/jsstore.min.js'
 // )
 const f31 = resolve(
   __dirname,
-  'node_modules/react/umd/react.production.min.js'
+  '../node_modules/react/umd/react.production.min.js'
 )
 const f32 = resolve(
   __dirname,
-  'node_modules/react-dom/umd/react-dom.production.min.js'
+  '../node_modules/react-dom/umd/react-dom.production.min.js'
 )
 const to4 = resolve(
   __dirname,
-  'dist'
+  '../dist'
 )
 const patterns = [{
   from,
