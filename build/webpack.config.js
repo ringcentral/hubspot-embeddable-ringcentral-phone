@@ -12,6 +12,7 @@ const env = require('./config')
 const {
   version
 } = require('./common')
+const copy = require('./copy')
 
 const config = {
   mode: 'production',
@@ -54,6 +55,7 @@ const config = {
   },
   plugins: [
     stylusSettingPlugin,
+    copy,
     new LodashModuleReplacementPlugin({
       collections: true,
       paths: true
