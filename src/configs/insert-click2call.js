@@ -9,10 +9,12 @@
 
 /// *
 import { getContact } from '../common/contact'
+import { START_CHECK_CALL_LOG } from '../common/common'
 import {
   formatPhone
 } from 'ringcentral-embeddable-extension-common/src/common/helpers'
 import { getIds } from '../common/common'
+import getCid from '../common/get-contact-id'
 
 import { openRCMeeting } from '../funcs/meeting'
 
@@ -34,6 +36,13 @@ export async function getNumbers (ids = getIds()) {
     vid
   } = ids
   const res = await getContact(vid)
+  if (res) {
+    window.postMessage({
+      type: START_CHECK_CALL_LOG,
+      contact: res,
+      oid: getCid(res.id)
+    }, '*')
+  }
   return res ? formatNumbers(res) : []
 }
 

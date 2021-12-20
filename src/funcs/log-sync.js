@@ -411,7 +411,7 @@ function buildSmsPhones (contact) {
   return res
 }
 
-async function doSyncOne (contact, body, formData, isManuallySync) {
+export async function doSyncOne (contact, body, formData, isManuallySync) {
   const { id: contactIdPid, isCompany } = contact
   const contactId = getCid(contactIdPid)
   if (isCompany) {

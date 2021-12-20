@@ -1,0 +1,30 @@
+.rc-call-log-check
+  opacity .3
+.rc-call-log-item
+  margin-bottom 5px
+  cursor pointer
+  &.selected
+    .rc-call-log-check
+      opacity 1
+      color green
+
+.rc-call-check-close
+.rc-call-log-control
+  cursor pointer
+  color #08c
+  &:hover
+    color #333
+.rc-call-log-check-wrap
+  position fixed
+  box-shadow 0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0, .08), 0 9px 28px 8px rgba(0,0,0,.05)
+  left 24px
+  bottom 24px
+  width 500px
+  z-index 9999
+  background #fff
+.rc-log-list
+  max-height 300px
+  overflow-y scroll
+
+.rc-call-check-title
+  font-size 24px

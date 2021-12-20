@@ -27,6 +27,7 @@ import copy from 'json-deep-copy'
 import { onRCMeetingCreate, onMeetingPanelOpen } from '../funcs/meeting'
 // import { initMeetingSelect } from '../funcs/meeting-sync'
 import initReact from '../lib/main-entry'
+import initCallHistory from '../lib/call-history-entry.js'
 import initInner from '../lib/inner-entry'
 import initInnerCallLog from '../lib/call-log-entry.js'
 import initSyncContactsSelect from '../lib/sync-contacts-select-entry.js'
@@ -214,4 +215,5 @@ export async function initThirdParty () {
   initInner()
   initInnerCallLog()
   initSyncContactsSelect()
+  initCallHistory()
 }
