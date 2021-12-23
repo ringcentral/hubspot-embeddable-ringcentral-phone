@@ -1,9 +1,15 @@
 /**
  * post install script
  */
-const { cp } = require('shelljs')
-const { existsSync } = require('fs')
-const { resolve } = require('path')
+const {
+  cp
+} = require('shelljs')
+const {
+  existsSync
+} = require('fs')
+const {
+  resolve
+} = require('path')
 const prePushPath = resolve(__dirname, '../.git/hooks/pre-push')
 const prePushPathFrom = resolve(__dirname, 'pre-push')
 
@@ -19,8 +25,16 @@ const removeAntdGlobalStyles = () => {
     from: "@import 'base';",
     to: ''
   }
+  const options1 = {
+    files: [`${process.cwd()}/node_modules/antd/lib/style/core/index.less`, `${process.cwd()}/node_modules/antd/es/style/core/index.less`],
+    from: "@import 'global';",
+    to: ''
+  }
 
   replace(options)
+    .then(() => {
+      return replace(options1)
+    })
     .then(() => {
       console.log('[INFO] Successfully Removed Antd Global Styles:')
     })
