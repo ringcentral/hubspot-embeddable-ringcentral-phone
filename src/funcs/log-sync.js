@@ -160,6 +160,9 @@ export async function syncCallLogToThirdParty (body) {
   const info = getContactInfo(body)
   showMatchingMessage()
   const relatedContacts = await searchPhone(info.numbers)
+  if (!relatedContacts || !relatedContacts.length) {
+    return false
+  }
   const obj = {
     type: 'rc-init-call-log-form',
     isManuallySync,
