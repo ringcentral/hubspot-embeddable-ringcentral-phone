@@ -4,7 +4,7 @@
 
 import _ from 'lodash'
 import { Component } from 'react'
-import { START_CHECK_CALL_LOG } from '../common/common'
+import { START_CHECK_CALL_LOG, format164 } from '../common/common'
 import { getRcCallLogs } from '../common/rc-call-log'
 import { findMatchCallLog } from '../funcs/match-log'
 import copy from 'json-deep-copy'
@@ -90,7 +90,10 @@ export default class HistoryCallLogCheck extends Component {
           call: item
         },
         true
-      )
+      ).catch(err => {
+        console.log('create call log failed')
+        console.log(err)
+      })
     }
     this.setState({
       phone: '',
@@ -136,6 +139,18 @@ export default class HistoryCallLogCheck extends Component {
     })
   }
 
+  filterCallLogs = (arr, phone) => {
+    return arr.filter(obj => {
+      const from = format164(
+        _.get(obj, 'from.phoneNumber')
+      )
+      const to = format164(
+        _.get(obj, 'to.phoneNumber')
+      )
+      return to === phone || from === phone
+    })
+  }
+
   getCallLogs = async () => {
     const { phoneNumbers } = this.state.contact
     let logs = []
@@ -152,7 +167,7 @@ export default class HistoryCallLogCheck extends Component {
         if (arr && arr.length) {
           logs = [
             ...logs,
-            ...arr
+            ...this.filterCallLogs(arr, phoneNumber)
           ]
         }
       }
