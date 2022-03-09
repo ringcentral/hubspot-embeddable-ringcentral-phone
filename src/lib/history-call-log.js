@@ -89,6 +89,7 @@ export default class HistoryCallLogCheck extends Component {
         {
           call: item
         },
+        {},
         true
       ).catch(err => {
         console.log('create call log failed')
