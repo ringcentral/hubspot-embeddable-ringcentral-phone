@@ -35,6 +35,7 @@ export async function getNumbers (ids = getIds()) {
     vid
   } = ids
   const res = await getContact(vid)
+  window.rc.currentContact = res
   if (res) {
     window.postMessage({
       type: START_CHECK_CALL_LOG,

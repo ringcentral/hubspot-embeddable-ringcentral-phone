@@ -6,15 +6,29 @@ import { useEffect, useState, useRef } from 'react'
 import { Input, Form, Button, Select, message } from 'antd'
 import { doSync, afterCallLog, setCallHandled } from '../funcs/log-sync'
 import CountDown from './countdown'
-// import copy from 'json-deep-copy'
+import copy from 'json-deep-copy'
 
 const FormItem = Form.Item
 const { Option } = Select
 
+function getCurrentContact (relatedContacts) {
+  const { currentContact } = window.rc
+  let target = null
+  if (currentContact && currentContact.id) {
+    target = relatedContacts.find(d => d.id === currentContact.id)
+  }
+  if (target) {
+    return copy([target])
+  }
+  return relatedContacts.slice(0, 1)
+}
+
 export default function CallLogForm (props) {
   const countdownRef = useRef()
   const [form] = Form.useForm()
-  const [relatedContacts, setSelectedContacts] = useState(props.form.relatedContacts.filter(d => d).slice(0, 1))
+  const [relatedContacts, setSelectedContacts] = useState(
+    getCurrentContact(props.form.relatedContacts.filter(d => d))
+  )
   const latestRelatedContacts = useRef(relatedContacts)
   const [showCountdown, setCountDownShow] = useState(true)
   const {
