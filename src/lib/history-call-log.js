@@ -269,6 +269,14 @@ export default class HistoryCallLogCheck extends Component {
   }
 
   renderContent = () => {
+    const {
+      submitting
+    } = this.state
+    if (submitting) {
+      return (
+        <div className='rc-call-log-check-wrap submit'>Submitting...</div>
+      )
+    }
     return (
       <div className='rc-call-log-check-wrap'>
         <div className='rc-pd3'>
