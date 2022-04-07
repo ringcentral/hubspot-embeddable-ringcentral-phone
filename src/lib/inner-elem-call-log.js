@@ -37,6 +37,9 @@ export default () => {
     if (!e || !e.data || !e.data.type) {
       return
     }
+    if (!window.rc.ready) {
+      return console.log('dialer not ready, ignore events')
+    }
     const { type, callLogProps } = e.data
     if (type === 'rc-init-call-log-form') {
       add(callLogProps)

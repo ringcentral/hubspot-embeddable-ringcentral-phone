@@ -95,7 +95,18 @@ export async function thirdPartyServiceConfig () {
     if (!data) {
       return
     }
-    const { type, path, call, requestId, sessionIds, telephonyStatus } = data
+    const {
+      type,
+      path,
+      call,
+      requestId,
+      sessionIds,
+      telephonyStatus,
+      ready
+    } = data
+    if (type === 'rc-dialer-status-notify') {
+      window.rc.ready = ready
+    }
     if (type === 'rc-sync-log-success') {
       // response to widget
       rc.postMessage({
