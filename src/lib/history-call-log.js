@@ -13,6 +13,7 @@ import LogItem from './history-call-log-item'
 import { doSyncOne } from '../funcs/log-sync'
 import './call-log-check.styl'
 import { CloseCircleOutlined } from '@ant-design/icons'
+import cachedSearch, { searchPhone } from '../common/search'
 
 export default class HistoryCallLogCheck extends Component {
   state = {
@@ -63,38 +64,56 @@ export default class HistoryCallLogCheck extends Component {
     })
   }
 
-  addMatches = (con) => {
+  addMatches = (con, contacts) => {
     const { direction } = con
-    const arr = [copy(this.state.contact)]
     con.fromMatches = direction === 'Inbound'
-      ? arr
+      ? contacts
       : []
     con.toMatches = direction === 'Inbound'
       ? []
-      : arr
+      : contacts
     return con
+  }
+
+  getContacts = async item => {
+    const from = format164(
+      _.get(item, 'from.phoneNumber') || ''
+    )
+    const to = format164(
+      _.get(item, 'to.phoneNumber') || ''
+    )
+    const r = await cachedSearch(
+      [from, to].filter(d => d),
+      true,
+      false
+    )
+    return r
   }
 
   handleSubmit = async () => {
     this.setState({
       submitting: true
     })
-    const { callLogsSelected, callLogs, contact } = this.state
+    const { callLogsSelected, callLogs } = this.state
     for (const id of callLogsSelected) {
+      const log = copy(_.find(callLogs, d => d.sessionId === id))
+      const contacts = await this.getContacts(log)
       const item = this.addMatches(
-        copy(_.find(callLogs, d => d.sessionId === id))
+        log, contacts
       )
-      await doSyncOne(
-        contact,
-        {
-          call: item
-        },
-        {},
-        true
-      ).catch(err => {
-        console.log('create call log failed')
-        console.log(err)
-      })
+      for (const contact of contacts) {
+        await doSyncOne(
+          contact,
+          {
+            call: item
+          },
+          {},
+          true
+        ).catch(err => {
+          console.log('create call log failed')
+          console.log(err)
+        })
+      }
     }
     this.setState({
       phone: '',
@@ -131,6 +150,12 @@ export default class HistoryCallLogCheck extends Component {
     })
   }
 
+  handleSelectCurrent = () => {
+    this.setState({
+      callLogsSelected: this.filterSelectCallLogs()
+    })
+  }
+
   handleSelectReverse = () => {
     this.setState({
       callLogsSelected: _.difference(
@@ -152,27 +177,31 @@ export default class HistoryCallLogCheck extends Component {
     })
   }
 
-  getCallLogs = async () => {
+  filterSelectCallLogs = () => {
     const { phoneNumbers } = this.state.contact
+    const arr = this.state.callLogs
     let logs = []
     for (const p of phoneNumbers) {
       const {
         phoneNumber
       } = p
       if (phoneNumber) {
-        const arr = await getRcCallLogs(phoneNumber)
-          .catch(e => {
-            console.log('get rc call logs failed')
-            console.log(e)
-          })
-        if (arr && arr.length) {
-          logs = [
-            ...logs,
-            ...this.filterCallLogs(arr, phoneNumber)
-          ]
-        }
+        logs = [
+          ...logs,
+          ...this.filterCallLogs(arr, phoneNumber)
+        ]
       }
     }
+    return _.uniqBy(logs, d => d.id).map(d => d.sessionId)
+  }
+
+  getCallLogs = async () => {
+    const logs = await getRcCallLogs('')
+      .catch(e => {
+        console.log('get rc call logs failed')
+        console.log(e)
+        return []
+      })
     if (!logs.length) {
       return console.log('no history call log not synced')
     }
@@ -181,8 +210,68 @@ export default class HistoryCallLogCheck extends Component {
     }, this.checkLogs)
   }
 
+  // getCallLogs = async () => {
+  //   const { phoneNumbers } = this.state.contact
+  //   let logs = []
+  //   for (const p of phoneNumbers) {
+  //     const {
+  //       phoneNumber
+  //     } = p
+  //     if (phoneNumber) {
+  //       const arr = await getRcCallLogs(phoneNumber)
+  //         .catch(e => {
+  //           console.log('get rc call logs failed')
+  //           console.log(e)
+  //         })
+  //       if (arr && arr.length) {
+  //         logs = [
+  //           ...logs,
+  //           ...this.filterCallLogs(arr, phoneNumber)
+  //         ]
+  //       }
+  //     }
+  //   }
+  //   if (!logs.length) {
+  //     return console.log('no history call log not synced')
+  //   }
+  //   this.setState({
+  //     logs
+  //   }, this.checkLogs)
+  // }
+
+  // only show those match contact id
+  filterLogItems = async (logs) => {
+    const arr = logs.map(item => {
+      const from = format164(
+        _.get(item, 'from.phoneNumber') || ''
+      )
+      const to = format164(
+        _.get(item, 'to.phoneNumber') || ''
+      )
+      return searchPhone(
+        [from, to].filter(d => d),
+        true,
+        true
+      ).then((r) => {
+        if (r && r.length) {
+          return item
+        } else {
+          return ''
+        }
+      })
+    })
+    const rr = await Promise.all(arr)
+    return rr.filter(d => d)
+  }
+
   checkLogs = async () => {
-    const sessionsIds = this.state.logs.map(t => t.sessionId)
+    const logsOk = await this.filterLogItems(
+      copy(this.state.logs)
+    )
+    if (!logsOk.length) {
+      return false
+    }
+    const sessionsIds = logsOk.map(t => t.sessionId)
     if (!sessionsIds.length) {
       return false
     }
@@ -196,7 +285,7 @@ export default class HistoryCallLogCheck extends Component {
       oid
     } = this.state
     for (;index < len;) {
-      const arr = this.state.logs.slice(index, pageSize)
+      const arr = logsOk.slice(index, pageSize)
       const r = await findMatchCallLog({
         body: { sessionIds: arr.map(d => d.sessionId) }
       }, oid)
@@ -241,6 +330,12 @@ export default class HistoryCallLogCheck extends Component {
           onClick={this.handleSelectReverse}
         >
           Reverse
+        </span>
+        <span
+          className='pointer rc-mg1r rc-call-log-control'
+          onClick={this.handleSelectCurrent}
+        >
+          Current contact only
         </span>
       </div>
     )
