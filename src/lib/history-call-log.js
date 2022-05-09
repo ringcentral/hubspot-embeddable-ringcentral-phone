@@ -14,6 +14,7 @@ import { doSyncOne } from '../funcs/log-sync'
 import './call-log-check.styl'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import cachedSearch, { searchPhone } from '../common/search'
+import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 
 export default class HistoryCallLogCheck extends Component {
   state = {
@@ -88,6 +89,22 @@ export default class HistoryCallLogCheck extends Component {
       false
     )
     return r
+  }
+
+  handleIgnore = async () => {
+    this.setState({
+      submitting: true
+    })
+    const { callLogsSelected } = this.state
+    for (const id of callLogsSelected) {
+      await ls.set('ignore-' + id, 'yes')
+    }
+    this.setState({
+      phone: '',
+      submitting: false,
+      visible: false
+    })
+    this.noti && this.noti.destroy()
   }
 
   handleSubmit = async () => {
@@ -241,13 +258,18 @@ export default class HistoryCallLogCheck extends Component {
 
   // only show those match contact id
   filterLogItems = async (logs) => {
-    const arr = logs.map(item => {
+    const arr = logs.map(async (item) => {
       const from = format164(
         _.get(item, 'from.phoneNumber') || ''
       )
       const to = format164(
         _.get(item, 'to.phoneNumber') || ''
       )
+      const ignored = await ls.get('ignore-' + item.sessionId)
+      if (ignored) {
+        console.log('ignore', item.sessionId)
+        return false
+      }
       return searchPhone(
         [from, to].filter(d => d),
         true,
@@ -393,6 +415,14 @@ export default class HistoryCallLogCheck extends Component {
                 disabled={this.checkDisabled()}
               >
                 Sync to HubSpot
+              </Button>
+              <Button
+                type='danger'
+                className='mg1l'
+                onClick={this.handleIgnore}
+                disabled={this.checkDisabled()}
+              >
+                Ignore these calls
               </Button>
             </div>
             <p>* Only check recent 100 calls in 15 days.</p>
