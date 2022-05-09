@@ -173,7 +173,7 @@ export async function thirdPartyServiceConfig () {
           data: res
         }
       })
-    } else if (path === '/messageLogger') {
+    } else if (path === '/messageLogger' || path === '/callLogger') {
       syncCallLogToThirdParty({
         ...data.body,
         requestId: data.requestId

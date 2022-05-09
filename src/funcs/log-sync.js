@@ -150,11 +150,7 @@ export async function syncCallLogToThirdParty (body) {
   }
   const id = buildId(body)
   if (isAutoSync && body.call) {
-    const sid = autoLogPrefix + id
-    const autoLogged = await ls.get(sid)
-    if (autoLogged) {
-      return false
-    }
+    return false
   }
   // body = checkMerge(body)
   const info = getContactInfo(body)
