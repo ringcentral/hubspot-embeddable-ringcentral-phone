@@ -15,7 +15,7 @@ import link from '../common/external-link'
 import { checkSync, startSync } from '../common/sync'
 import getDispositions from '../common/get-dispositions'
 import { onTriggerLogin, onLoginCallback, install } from '../common/handle-login'
-import { rc } from '../common/common'
+import { rc, checkCallLogOnStartKey } from '../common/common'
 import * as ls from 'ringcentral-embeddable-extension-common/src/common/ls'
 import { rcIconSvg } from './rc-logo'
 
@@ -28,7 +28,7 @@ export default function Main () {
     loggedIn: false,
     logSMSAsThread: false,
     filterSMSThread: false,
-    autoSyncToAll: false,
+    checkCallLogOnStart: false,
     syncStatus: 'unknown',
     aboutVisible: false
   })
@@ -54,6 +54,7 @@ export default function Main () {
     })
   }
   function show () {
+    loadSettings()
     setState({
       aboutVisible: true
     })
@@ -63,13 +64,9 @@ export default function Main () {
     //   key: 'logSMSAsThread',
     //   desc: 'Log SMS thread as one log'
     // },
-    // {
-    //   desc: 'For SMS thread Only show SMS in 5 minutes',
-    //   key: 'filterSMSThread'
-    // },
     {
-      desc: 'Auto sync call/message log to all matched contact(do not show selection)',
-      key: 'autoSyncToAll'
+      desc: 'Check call logs not synced to HubSpot on start',
+      key: checkCallLogOnStartKey
     }
   ]
   function renderSetting (conf) {
@@ -161,7 +158,8 @@ export default function Main () {
   }
   async function loadSettings () {
     for (const a of sets) {
-      const v = await ls.get(`rc-${a.key}`) || true
+      let v = await ls.get(`rc-${a.key}`)
+      v = v !== 'no'
       window.rc[a.key] = v
       setState({
         [a.key]: v

@@ -4,11 +4,11 @@
 
 import _ from 'lodash'
 import { Component } from 'react'
-import { START_CHECK_CALL_LOG, format164 } from '../common/common'
+import { START_CHECK_CALL_LOG, format164, checkCallLogOnStartKey } from '../common/common'
 import { getRcCallLogs } from '../common/rc-call-log'
 import { findMatchCallLog } from '../funcs/match-log'
 import copy from 'json-deep-copy'
-import { Button, Spin } from 'antd'
+import { Button, Spin, notification } from 'antd'
 import LogItem from './history-call-log-item'
 import { doSyncOne } from '../funcs/log-sync'
 import './call-log-check.styl'
@@ -32,6 +32,8 @@ export default class HistoryCallLogCheck extends Component {
     this.initEvent()
   }
 
+  lsKey = 'rc-' + checkCallLogOnStartKey
+
   onMsg = e => {
     const {
       type,
@@ -47,7 +49,12 @@ export default class HistoryCallLogCheck extends Component {
     }
   }
 
-  initEvent () {
+  initEvent = async () => {
+    const ignore = await ls.get(`rc-${checkCallLogOnStartKey}`)
+    if (ignore === 'no') {
+      console.log('skip onstart call log check')
+      return false
+    }
     window.addEventListener('message', this.onMsg)
   }
 
@@ -76,35 +83,31 @@ export default class HistoryCallLogCheck extends Component {
     return con
   }
 
-  getContacts = async item => {
-    const from = format164(
-      _.get(item, 'from.phoneNumber') || ''
-    )
-    const to = format164(
-      _.get(item, 'to.phoneNumber') || ''
-    )
-    const r = await cachedSearch(
-      [from, to].filter(d => d),
+  getContacts = item => {
+    const n = this.getLogNumber(item)
+    const arr = [n].filter(d => d)
+    if (!arr.length) {
+      return []
+    }
+    return cachedSearch(
+      arr,
       true,
       false
     )
-    return r
   }
 
   handleIgnore = async () => {
-    this.setState({
-      submitting: true
-    })
-    const { callLogsSelected } = this.state
-    for (const id of callLogsSelected) {
-      await ls.set('ignore-' + id, 'yes')
-    }
+    await ls.set(this.lsKey, 'no')
     this.setState({
       phone: '',
       submitting: false,
       visible: false
     })
     this.noti && this.noti.destroy()
+    notification.info({
+      message: 'Call log check on start disabled',
+      description: 'You can turn on call log check on start from left bottom RingCentral icon'
+    })
   }
 
   handleSubmit = async () => {
@@ -184,13 +187,8 @@ export default class HistoryCallLogCheck extends Component {
 
   filterCallLogs = (arr, phone) => {
     return arr.filter(obj => {
-      const from = format164(
-        _.get(obj, 'from.phoneNumber')
-      )
-      const to = format164(
-        _.get(obj, 'to.phoneNumber')
-      )
-      return to === phone || from === phone
+      const n = this.getLogNumber(obj)
+      return n === phone
     })
   }
 
@@ -256,22 +254,29 @@ export default class HistoryCallLogCheck extends Component {
   //   }, this.checkLogs)
   // }
 
+  getLogNumber = log => {
+    const {
+      direction
+    } = log
+    return direction === 'Inbound'
+      ? format164(
+          _.get(log, 'from.phoneNumber') || ''
+        )
+      : format164(
+        _.get(log, 'to.phoneNumber') || ''
+      )
+  }
+
   // only show those match contact id
   filterLogItems = async (logs) => {
     const arr = logs.map(async (item) => {
-      const from = format164(
-        _.get(item, 'from.phoneNumber') || ''
-      )
-      const to = format164(
-        _.get(item, 'to.phoneNumber') || ''
-      )
-      const ignored = await ls.get('ignore-' + item.sessionId)
-      if (ignored) {
-        console.log('ignore', item.sessionId)
-        return false
+      const number = this.getLogNumber(item)
+      const arr = [number].filter(d => d)
+      if (!arr.length) {
+        return ''
       }
       return searchPhone(
-        [from, to].filter(d => d),
+        arr,
         true,
         true
       ).then((r) => {
@@ -416,16 +421,18 @@ export default class HistoryCallLogCheck extends Component {
               >
                 Sync to HubSpot
               </Button>
+            </div>
+            <p>
+              <span>* Only check recent 100 calls in 15 days.</span>
               <Button
                 type='danger'
-                className='mg1l'
+                className='rc-mg1l'
+                size='small'
                 onClick={this.handleIgnore}
-                disabled={this.checkDisabled()}
               >
-                Ignore these calls
+                Do not show this panel
               </Button>
-            </div>
-            <p>* Only check recent 100 calls in 15 days.</p>
+            </p>
           </Spin>
         </div>
       </div>
