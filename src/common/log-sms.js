@@ -2,10 +2,13 @@ import request from './request'
 import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import dayjs from 'dayjs'
 import { checkCallLog } from './log-call'
+import delay from 'timeout-as-promise'
 
 const {
   smsTemplateId
 } = thirdPartyConfigs
+
+window.lastSMSLogRequestTime = 0
 
 export default async (
   opts,
@@ -33,6 +36,15 @@ export default async (
     objectId
   }
   const url = '/hs/create-log-sms'
+  const now = Date.now()
+  const minDelay = 3000
+  let diff = now - window.lastSMSLogRequestTime
+  while (diff < minDelay) {
+    console.log('delay log sms to avoid trigger rate limit')
+    await delay(minDelay)
+    diff = Date.now() - window.lastSMSLogRequestTime
+  }
+  window.lastSMSLogRequestTime = Date.now()
   const res = await request(url, {
     data,
     id: opts.id,

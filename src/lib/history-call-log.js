@@ -96,7 +96,7 @@ export default class HistoryCallLogCheck extends Component {
     )
   }
 
-  handleIgnore = async () => {
+  handleHide = async () => {
     await ls.set(this.lsKey, 'no')
     this.setState({
       phone: '',
@@ -107,6 +107,21 @@ export default class HistoryCallLogCheck extends Component {
     notification.info({
       message: 'Call log check on start disabled',
       description: 'You can turn on call log check on start from left bottom RingCentral icon'
+    })
+  }
+
+  ignorePrefix = 'rc-ignore-call-'
+
+  handleIgnoreLogs = async () => {
+    const { callLogsSelected, callLogs } = this.state
+    for (const id of callLogsSelected) {
+      console.log('ignore call', id)
+      await ls.set(`${this.ignorePrefix}${id}`, 'yes')
+    }
+    this.setState({
+      callLogs: callLogs.filter(d => {
+        return !callLogsSelected.includes(d.sessionId)
+      })
     })
   }
 
@@ -270,6 +285,11 @@ export default class HistoryCallLogCheck extends Component {
   // only show those match contact id
   filterLogItems = async (logs) => {
     const arr = logs.map(async (item) => {
+      const ig = await ls.get(`${this.ignorePrefix}${item.sessionId}`)
+      if (ig) {
+        console.log('exist in ls', item.sessionId)
+        return ''
+      }
       const number = this.getLogNumber(item)
       const arr = [number].filter(d => d)
       if (!arr.length) {
@@ -421,6 +441,14 @@ export default class HistoryCallLogCheck extends Component {
               >
                 Sync to HubSpot
               </Button>
+              <Button
+                type='primary'
+                className='rc-mg1l'
+                onClick={this.handleIgnoreLogs}
+                disabled={this.checkDisabled()}
+              >
+                Ignore these calls
+              </Button>
             </div>
             <p>
               <span>* Only check recent 100 calls in 15 days.</span>
@@ -428,7 +456,7 @@ export default class HistoryCallLogCheck extends Component {
                 type='danger'
                 className='rc-mg1l'
                 size='small'
-                onClick={this.handleIgnore}
+                onClick={this.handleHide}
               >
                 Do not show this panel
               </Button>
