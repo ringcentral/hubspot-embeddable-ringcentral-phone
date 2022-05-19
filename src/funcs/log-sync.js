@@ -21,7 +21,7 @@ import { nanoid } from 'nanoid/non-secure'
 import { createCallLog, updateCallLogStatus, autoCallLog } from '../common/log-call'
 import logSMS from '../common/log-sms'
 import { getContactInfo } from '../common/get-contact-info'
-import { message } from 'antd'
+import { message, notification } from 'antd'
 import getCid from '../common/get-contact-id'
 import md5 from 'blueimp-md5'
 
@@ -54,6 +54,23 @@ function showMatchingMessage () {
     onClose: () => {
       msgShow = false
     }
+  })
+}
+
+function notifySMSLogFail (uit, contact) {
+  const msg = (
+    <div>
+      <div className='rc-pd1b'>
+        Contact: {contact.firstname || ''} {contact.lastname || ''}
+      </div>
+      <div className='rc-pd1b'>Message: {uit.mds.map(f => f.subject).join(', ')}</div>
+      <div>* You can try manually log SMS again later</div>
+    </div>
+  )
+  notification.warn({
+    duration: 10,
+    message: 'Log SMS failed',
+    description: msg
   })
 }
 
@@ -550,7 +567,10 @@ export async function doSyncOne (contact, body, formData, isManuallySync) {
           : formData.callResult || getDefaultResultId()
         await updateCallLogStatus(resultId, engagement.id)
       }
-      if (!engagement.skipped) {
+      if (uit.isSMS && !engagement.db) {
+        notifySMSLogFail(uit, contact)
+        return console.log('log sms failed, may triggered rate limit')
+      } else if (!engagement.skipped) {
         notifySyncSuccess({
           id: contactId,
           logType,
