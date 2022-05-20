@@ -2,7 +2,7 @@
  * handle login event
  */
 
-import { ringCentralConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { ringCentralConfigs, appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import { rc, getPortalId } from './common'
 
 const {
@@ -18,7 +18,7 @@ export function onTriggerLogin (data) {
   const pid = getPortalId()
   const authUrl = authServer + '/rc-ext-oauth'
   console.log('pid', pid)
-  window.open(`${appServer}/restapi/oauth/authorize?redirect_uri=${authUrl}&client_id=${clientID}&response_type=code&state=pid:${pid}&brand_id=&display=&prompt=`, '_blank', params)
+  window.open(`${appServer}/restapi/oauth/authorize?redirect_uri=${authUrl}&client_id=${clientID}&response_type=code&state=pid:${pid}:ver:${appVersion}&brand_id=&display=&prompt=`, '_blank', params)
 }
 
 export function onLoginCallback ({ callbackUri }) {
