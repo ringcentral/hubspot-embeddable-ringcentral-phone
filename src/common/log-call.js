@@ -3,12 +3,13 @@
  */
 
 import request from './request'
+import { appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 
 export function createCallLog (data) {
   const url = '/hs/create-log'
   return request(
     url,
-    data
+    { ...data, appVersion }
   )
 }
 
@@ -16,21 +17,21 @@ export function autoCallLog (data) {
   const url = '/hs/auto-call-log'
   return request(
     url,
-    data
+    { ...data, appVersion }
   )
 }
 
 export function updateCallLog (data, id) {
   const url = '/hs/update-log'
   return request(url, {
-    data, id
+    data, id, appVersion
   })
 }
 
 export function updateCallLogStatus (statusId, id) {
   const url = '/hs/update-log-status'
   return request(url, {
-    statusId, id
+    statusId, id, appVersion
   })
 }
 

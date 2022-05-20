@@ -1,5 +1,5 @@
 import request from './request'
-import { thirdPartyConfigs } from 'ringcentral-embeddable-extension-common/src/common/app-config'
+import { thirdPartyConfigs, appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 import dayjs from 'dayjs'
 import { checkCallLog } from './log-call'
 import delay from 'timeout-as-promise'
@@ -47,6 +47,7 @@ export default async (
   window.lastSMSLogRequestTime = Date.now()
   const res = await request(url, {
     data,
+    appVersion,
     id: opts.id,
     isManuallySync
   })

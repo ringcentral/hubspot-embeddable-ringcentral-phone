@@ -3,11 +3,12 @@
  */
 
 import request from './request'
-import { notification } from 'antd'
+import { Modal, notification } from 'antd'
 import {
   getCache,
   setCache
 } from 'ringcentral-embeddable-extension-common/src/common/cache'
+import { appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 
 const time = 10000
 const prefix = 'rc-contact-cache-'
@@ -42,6 +43,9 @@ export async function createContact (data) {
 }
 
 export async function getContact (vid) {
+  if (window.rc.hasWaning) {
+    return null
+  }
   const cid = prefix + vid
   const cached = await getCache(cid)
   if (cached) {
@@ -56,6 +60,7 @@ export async function getContact (vid) {
   } else {
     window.contactRequestId = vid
     window.contactRequest = request(url, {
+      appVersion,
       id: vid
     })
     r = await window.contactRequest
@@ -65,12 +70,41 @@ export async function getContact (vid) {
   if (r && r.result && r.result.id) {
     await setCache(cid, r.result, time)
     return returnResult(r.result)
-  } else if (r && r.warning) {
-    notification.warn({
+  } else if (r && r.warning && !window.rc.hasWaning) {
+    window.rc.hasWaning = true
+    const content = (
+      <div>
+        <p>{r.warning}</p>
+        {
+          r.link
+            ? (
+              <p>
+                <a
+                  href={r.link}
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  {r.link}
+                </a>
+              </p>
+              )
+            : null
+        }
+      </div>
+    )
+    // function onOk () {
+    //   delete window.rc.hasWaning
+    // }
+    Modal.confirm({
       title: r.errorTitle || 'Error',
-      description: r.note || r.warning,
-      duration: 10
+      content
     })
+    if (r.logout) {
+      window.rc.postMessage({
+        type: 'rc-adapter-logout'
+      })
+    }
+    return null
   } else {
     console.log(r)
     return null

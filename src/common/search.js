@@ -5,6 +5,7 @@
 import request from './request'
 import _ from 'lodash'
 import { format164 } from './common'
+import { appVersion } from 'ringcentral-embeddable-extension-common/src/common/app-config'
 
 const cache = {}
 
@@ -22,6 +23,7 @@ export async function searchPhone (_phones, returnArray = true, countOnly = fals
   const n = countOnly ? 1 : ''
   const url = `/hs/search?countOnly=${n}`
   const r = await request(url, {
+    appVersion,
     phones
   })
   if (!r) {
