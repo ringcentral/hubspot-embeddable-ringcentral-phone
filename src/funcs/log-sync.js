@@ -68,6 +68,7 @@ function notifySMSLogFail (uit, contact) {
     </div>
   )
   notification.warn({
+    key: 'rc-common-notify',
     duration: 10,
     message: 'Log SMS failed',
     description: msg
