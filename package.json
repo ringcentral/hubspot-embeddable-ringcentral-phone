@@ -67,7 +67,7 @@
     "less-loader": "10.2.0",
     "lodash": "4.17.21",
     "lodash-webpack-plugin": "0.11.6",
-    "nanoid": "3.1.30",
+    "nanoid": "3.1.31",
     "postcss-loader": "6.2.1",
     "postcss-rename-selector": "0.1.1",
     "@electerm/antd-dayjs-webpack-plugin": "1.0.7",
