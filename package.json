@@ -78,7 +78,7 @@
     "recursive-assign": "0.2.0",
     "replace-in-file": "6.3.2",
     "ringcentral-embeddable-extension-common": "0.12.2",
-    "shelljs": "0.8.4",
+    "shelljs": "0.8.5",
     "standard": "16.0.4",
     "style-loader": "3.3.1",
     "stylus": "0.55.0",
