@@ -568,7 +568,7 @@ export async function doSyncOne (contact, body, formData, isManuallySync) {
           : formData.callResult || getDefaultResultId()
         await updateCallLogStatus(resultId, engagement.id)
       }
-      if (uit.isSMS && !engagement.db) {
+      if (uit.isSMS && !engagement.db && !engagement.skipped) {
         notifySMSLogFail(uit, contact)
         return console.log('log sms failed, may triggered rate limit')
       } else if (!engagement.skipped) {

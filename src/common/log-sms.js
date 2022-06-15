@@ -21,6 +21,7 @@ export default async (
   if (logged && logged.result && logged.result.length) {
     const r = logged.result[0]
     r.skipped = true
+    r.db = 1
     return r
   }
   const data = {
